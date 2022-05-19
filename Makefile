@@ -22,10 +22,8 @@ BIN = demo
 
 # CAST_LIBS = -lneptune -lplatinum  -ldlna-porting
 # 
-#DEMO_LIBS = -lffplayer -lpthread -Wl,--start-group -lstdc++ $(CAST_LIBS) -lgo -Wl,--end-group
-#DEMO_LIBS += -lwpa_client
-DEMO_LIBS = -lpthread -Wl,--start-group -lstdc++ $(CAST_LIBS) -lgo -Wl,--end-group
-#DEMO_LIBS += -lwpa_client
+DEMO_LIBS = -lffplayer -lpthread -Wl,--start-group -lstdc++ $(CAST_LIBS) -lgo -Wl,--end-group
+DEMO_LIBS += -lwpa_client
 
 #LIBS = -lffplayer -lpthread
 

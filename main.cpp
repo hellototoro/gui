@@ -1,55 +1,22 @@
+/*
+ * @Author: totoro huangjian921@outlook.com
+ * @Date: 2022-05-19 00:48:40
+ * @LastEditors: totoro huangjian921@outlook.com
+ * @LastEditTime: 2022-05-19 16:24:42
+ * @FilePath: /gui/main.cpp
+ * @Description: None
+ * @other: None
+ */
 #include <unistd.h>
-#include <pthread.h>
-#include <time.h>
 #include <sys/time.h>
 #include <stdio.h>
 #include "lvgl/lvgl.h"
-#include "lv_drivers/display/fbdev.h"
-#include "application/ui/ui.h"
+#include "application/init.h"
 
-#  define HOR_RES     1280
-#  define VER_RES     720
-
-#define DISP_BUF_SIZE (HOR_RES * 1024)//(128 * 1024)
 
 int main(void)
 {
-    lv_disp_t *dsp = NULL;
-
-    /*LVGL init*/
-    lv_init();
-
-    /*Linux frame buffer device init*/
-    fbdev_init();
-    
-   /*A small buffer for LittlevGL to draw the screen's content*/
-    static lv_color_t buf[DISP_BUF_SIZE];
-
-    /*Initialize a descriptor for the buffer*/
-    static lv_disp_draw_buf_t disp_buf;
-    lv_disp_draw_buf_init(&disp_buf, buf, NULL, DISP_BUF_SIZE);
-
-    /*Initialize and register a display driver*/
-    static lv_disp_drv_t disp_drv;
-    lv_disp_drv_init(&disp_drv);
-    disp_drv.draw_buf   = &disp_buf;
-    disp_drv.flush_cb   = fbdev_flush;
-    disp_drv.hor_res    = HOR_RES;
-    disp_drv.ver_res    = VER_RES;
-    dsp = lv_disp_drv_register(&disp_drv);
-    if (!dsp) {
-        printf("lv_disp_drv_register error!\n");
-        return -1;
-    }
-    printf("init lv_disp_register: w-%d,h-%d\n",disp_drv.hor_res,disp_drv.ver_res);
-
-    /*Create a "Hello world!" label*/
-    lv_obj_t * label = lv_label_create(lv_scr_act());
-    lv_label_set_text(label, "Hello world!");
-    lv_obj_align(label, LV_ALIGN_CENTER, 0, 0);
-
-    ui_init();
-
+    app_init();
     /*Handle LitlevGL tasks (tickless mode)*/
     while(1) {
         lv_timer_handler();
