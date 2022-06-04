@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-extern void app_init(void);
+extern void lvgl_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -1,3 +1,5 @@
 build/
-application/ui/
+application/ui/resource/
 .vscode/
+/.metadata/
+lv_host_sim/

@@ -2,27 +2,30 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 15:18:33
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-05-19 16:28:24
- * @FilePath: /gui/application/init.c
+ * @LastEditTime: 2022-06-01 17:11:33
+ * @FilePath: /gui/lvgl_host_simulate/application/init.c
  * @Description: None
  * @other: None
  */
 #include <stdio.h>
 #include "init.h"
-#include "key/key.h"
 #include "lvgl/lvgl.h"
 #include "lv_drivers/display/fbdev.h"
-#include "application/ui/ui.h"
+#ifndef HOST_GCC
+#include "key/key.h"
+#endif
 
 #define HOR_RES         1280
 #define VER_RES         720
 #define DISP_BUF_SIZE   (HOR_RES * 1024)//(128 * 1024)
 
+void test(void);
+
 /**
  * @brief: 
  * @retval: 
  */
-void app_init(void)
+void lvgl_init(void)
 {
     lv_disp_t *dsp = NULL;
 
@@ -53,6 +56,8 @@ void app_init(void)
     }
     printf("init lv_disp_register: w-%d,h-%d\n",disp_drv.hor_res,disp_drv.ver_res);
 
-    ui_init();
+    #ifndef HOST_GCC
     key_init();
+    key_regist(NULL);
+    #endif
 }

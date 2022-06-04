@@ -3,10 +3,10 @@
 #include <sys/poll.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "../com_api.h"
 #include "lvgl/lvgl.h"
 #include "lvgl/src/misc/lv_types.h"
 #include "key.h"
+#include "application/hcapi/com_api.h"
 
 static int fd_key;
 static lv_indev_t * indev_keypad;
@@ -74,7 +74,6 @@ static void keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
             act_key = USER_KEY_FLAG | act_key;
             break;
         }
-
         last_key = act_key;
     } else {
         data->state = LV_INDEV_STATE_REL;
@@ -254,8 +253,15 @@ uint32_t key_convert_vkey(uint32_t lv_key)
 int key_regist(lv_group_t * group)
 {
 #if 1
+    if (!group) {
+        group = lv_group_get_default();
+        if (!group) {
+            group = lv_group_create();
+            lv_group_set_default(group);
+        }
+    }
     lv_indev_set_group(indev_keypad, group);
-    lv_group_set_default(group);
+    //lv_group_set_default(group);
 #else
     lv_group_set_default(group);
     lv_indev_t* cur_drv = NULL;
@@ -268,6 +274,11 @@ int key_regist(lv_group_t * group)
     }
 #endif
     return 0;
+}
+
+lv_indev_t * get_default_indev(void)
+{
+    return indev_keypad;
 }
 
 int key_init(void)

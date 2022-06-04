@@ -18,16 +18,14 @@ CFLAGS ?= -O3 -g0 $(SYS_DIR)/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-d
 CPPFLAGS ?= -O3 -g0 $(SYS_DIR)/ -Wall -Wshadow -Wundef -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare
 
 LDFLAGS ?= -lm
-BIN = demo
+BIN = gui_app
 
 # CAST_LIBS = -lneptune -lplatinum  -ldlna-porting
 # 
-DEMO_LIBS = -lffplayer -lpthread -Wl,--start-group -lstdc++ $(CAST_LIBS) -lgo -Wl,--end-group
-DEMO_LIBS += -lwpa_client
+GUI_LIBS = -lffplayer -lpthread -Wl,--start-group -lstdc++ $(CAST_LIBS) -lgo -Wl,--end-group
+GUI_LIBS += -lwpa_client
 
 #LIBS = -lffplayer -lpthread
-
-GUI_APP = gui_demo
 
 #Collect the files to compile
 MAINSRC = ./main.cpp
@@ -50,7 +48,7 @@ MAINOBJ = $(MAINSRC:.cpp=$(OBJEXT))
 ## MAINOBJ -> OBJFILES
 
 #all: default gui_app
-all: gui_app
+all: make_gui_app
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -63,11 +61,11 @@ all: gui_app
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	@$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS) -lffplayer
 	
-gui_app:	$(COBJS) $(GUI_OBJS) $(MAINOBJ)
-	@$(CC) -o $(GUI_APP) $(MAINOBJ) $(GUI_OBJS) $(COBJS) $(LDFLAGS) $(DEMO_LIBS)
+make_gui_app:	$(COBJS) $(GUI_OBJS) $(MAINOBJ)
+	@$(CC) -o $(BIN) $(MAINOBJ) $(GUI_OBJS) $(COBJS) $(LDFLAGS) $(GUI_LIBS)
 	
 clean: 
-	rm -f $(BIN) $(GUI_APP) $(AOBJS) $(COBJS) $(MAINOBJ) $(GUI_OBJS)
+	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ) $(GUI_OBJS)
 
 install:
 	@echo "install ......"
