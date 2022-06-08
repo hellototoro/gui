@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 16:05:49
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-05-19 16:32:33
- * @FilePath: /gui/application/cast_conf.h
+ * @LastEditTime: 2022-06-08 15:57:23
+ * @FilePath: /SOURCE/gui/hcapi/cast_conf.h
  * @Description: None
  * @other: None
  */
@@ -37,10 +37,10 @@
 
 //#define NETWORK_SUPPORT
 
-#define CAST_DLNA_ENABLE    0
+//#define CAST_DLNA_ENABLE    0
 //#define CAST_AIRPLAY_ENABLE
 //#define CAST_MIRACAST_ENABLE
-
+#define DRAW_UI_SYNC
 
 
 

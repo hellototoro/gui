@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-04 13:49:03
- * @FilePath: /gui/main.c
+ * @LastEditTime: 2022-06-08 15:34:09
+ * @FilePath: /SOURCE/gui/main.c
  * @Description: None
  * @other: None
  */
@@ -18,13 +18,9 @@
 #include "lvgl/lvgl.h"
 #include "application/init.h"
 #include "application/windows.h"
-#ifndef HOST_GCC
-#include "application/hcapi/com_api.h"
+#ifdef HCCHIP_GCC
+#include "hcapi/com_api.h"
 #endif
-#include "application/windows.h"
-//#include "application/ui/LanguageScreen.h"
-//#include "application/ui/MediaScreen.h"
-#include "application/ui/HomeScreen.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
@@ -48,7 +44,7 @@ int main(void)
     signal(SIGSEGV, exit_console);
     signal(SIGBUS, exit_console);
 
-    #ifndef HOST_GCC
+    #ifdef HCCHIP_GCC
     api_system_init();
     api_video_init();
     api_audio_init();
@@ -83,17 +79,17 @@ int main(void)
         exit(EXIT_FAILURE);
     }
 
-    DefaultScreen = MediaScreen;
+    DefaultScreen = HomeScreen;
     CurrentScreen = DefaultScreen;
     while(1) {
         CurrentWindow = Windows[CurrentScreen];
         if(CurrentWindow) {
             pthread_mutex_lock(&draw_mutex);
             CurrentWindow->ScreenInit(NULL, NULL);
-            pthread_mutex_unlock(&draw_mutex);
             CurrentWindow->ScreenLoad();
             if(LastWindow)
                 LastWindow->ScreenClose();
+            pthread_mutex_unlock(&draw_mutex);
             CurrentWindow->ScreenWait();
             LastWindow = CurrentWindow;
         }
@@ -120,7 +116,7 @@ void* lgvl_task(void* arg)
         pthread_mutex_lock(&draw_mutex);
         lv_timer_handler();
         pthread_mutex_unlock(&draw_mutex);
-        usleep(1000);
+        usleep(5000);
     }
     return NULL;
 }

@@ -49,14 +49,20 @@
 #define LV_MEM_CUSTOM 0
 #if LV_MEM_CUSTOM == 0
     /*Size of the memory available for `lv_mem_alloc()` in bytes (>= 2kB)*/
-    #define LV_MEM_SIZE (2 * 1024U * 1024U)          /*[bytes]*/
+    #define LV_MEM_SIZE (1024U * 1024U)          /*[bytes]*/
 
     /*Set an address for the memory pool instead of allocating it as a normal array. Can be in external SRAM too.*/
+    #ifdef HCCHIP_GCC
+    #define LV_MEM_ADR 1     /*0: unused*/
+    #else
     #define LV_MEM_ADR 0     /*0: unused*/
+    #endif
     /*Instead of an address give a memory allocator that will be called to get a memory pool for LVGL. E.g. my_malloc*/
     #if LV_MEM_ADR == 0
         #undef LV_MEM_POOL_INCLUDE
         #undef LV_MEM_POOL_ALLOC
+    #else
+    extern void *lv_mem_adr;
     #endif
 
 #else       /*LV_MEM_CUSTOM*/
@@ -85,13 +91,14 @@
 
 /*Use a custom tick source that tells the elapsed time in milliseconds.
  *It removes the need to manually update the tick with `lv_tick_inc()`)*/
-#ifndef HOST_GCC
+#ifdef HCCHIP_GCC
 #define LV_TICK_CUSTOM 1
 #else
 #define LV_TICK_CUSTOM 0
 #endif
 #if LV_TICK_CUSTOM
     #define LV_TICK_CUSTOM_INCLUDE <stdint.h>         /*Header for the system time function*/
+    uint32_t custom_tick_get(void);
     #define LV_TICK_CUSTOM_SYS_TIME_EXPR (custom_tick_get())    /*Expression evaluating to current system time in ms*/
 #endif   /*LV_TICK_CUSTOM*/
 
@@ -181,6 +188,11 @@
 
 /*Use Arm's 2D acceleration library Arm-2D */
 #define LV_USE_GPU_ARM2D 0
+
+/* hichip ge */
+#ifdef HCCHIP_GCC
+#define LV_USE_GPU_HICHIP 1
+#endif
 
 /*Use STM32's DMA2D (aka Chrom Art) GPU*/
 #define LV_USE_GPU_STM32_DMA2D 0
@@ -669,7 +681,11 @@
 
 /*FFmpeg library for image decoding and playing videos
  *Supports all major image formats so do not enable other image decoder with it*/
+#ifdef HOST_GCC
+#define LV_USE_FFMPEG 1
+#else
 #define LV_USE_FFMPEG 0
+#endif
 #if LV_USE_FFMPEG
     /*Dump input information to stderr*/
     #define LV_FFMPEG_DUMP_FORMAT 0
@@ -680,7 +696,7 @@
  *----------*/
 
 /*1: Enable API to take snapshot for object*/
-#define LV_USE_SNAPSHOT 0
+#define LV_USE_SNAPSHOT 1
 
 /*1: Enable Monkey test*/
 #define LV_USE_MONKEY 0
@@ -718,7 +734,7 @@
 #define LV_USE_DEMO_KEYPAD_AND_ENCODER 0
 
 /*Benchmark your system*/
-#define LV_USE_DEMO_BENCHMARK 0
+#define LV_USE_DEMO_BENCHMARK 1
 
 /*Stress test for LVGL*/
 #define LV_USE_DEMO_STRESS 0

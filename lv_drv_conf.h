@@ -86,10 +86,10 @@
 
 /* SDL based drivers for display, mouse, mousewheel and keyboard*/
 #ifndef USE_SDL
- #ifndef HOST_GCC
- # define USE_SDL 0
- #else
+ #ifdef HOST_GCC
  # define USE_SDL 01
+ #else
+ # define USE_SDL 0
  #endif
 #endif
 

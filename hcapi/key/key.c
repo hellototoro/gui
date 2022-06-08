@@ -6,7 +6,7 @@
 #include "lvgl/lvgl.h"
 #include "lvgl/src/misc/lv_types.h"
 #include "key.h"
-#include "application/hcapi/com_api.h"
+#include "hcapi/com_api.h"
 
 static int fd_key;
 static lv_indev_t * indev_keypad;

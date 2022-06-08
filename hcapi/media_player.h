@@ -58,12 +58,12 @@ typedef struct{
 	int                 msg_id;
 	uint8_t             exit;
 	pthread_mutex_t 	api_lock;
+
+	pthread_mutex_t 	msg_task_mutex;
+	pthread_cond_t 		msg_task_cond;
 }media_handle_t;
 
 
-int media_mute(bool mute);
-int media_set_vol(uint8_t volume);
-int media_vol_up(void);
 media_handle_t *media_open(media_type_t type);
 void media_close(media_handle_t *media_hld);
 int media_play(media_handle_t *media_hld, const char *media_src);

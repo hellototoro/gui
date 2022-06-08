@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 15:18:33
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-01 17:11:33
- * @FilePath: /gui/lvgl_host_simulate/application/init.c
+ * @LastEditTime: 2022-06-08 14:06:10
+ * @FilePath: /SOURCE/gui/application/init.c
  * @Description: None
  * @other: None
  */
@@ -11,8 +11,8 @@
 #include "init.h"
 #include "lvgl/lvgl.h"
 #include "lv_drivers/display/fbdev.h"
-#ifndef HOST_GCC
-#include "key/key.h"
+#ifdef HCCHIP_GCC
+#include "hcapi/key/key.h"
 #endif
 
 #define HOR_RES         1280
@@ -56,7 +56,7 @@ void lvgl_init(void)
     }
     printf("init lv_disp_register: w-%d,h-%d\n",disp_drv.hor_res,disp_drv.ver_res);
 
-    #ifndef HOST_GCC
+    #ifdef HCCHIP_GCC
     key_init();
     key_regist(NULL);
     #endif

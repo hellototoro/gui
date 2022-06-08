@@ -16,7 +16,7 @@
 #include <sys/ioctl.h>
 #include "com_api.h"
 #include "media_player.h"
-
+#include "os_api.h"
 
 static int m_ff_speed[] = {1, 2, 4, 8, 16, 24, 32};
 static int m_fb_speed[] = {1, -2, -4, -8, -16, -24, -32};
@@ -31,6 +31,7 @@ media_handle_t *media_open(media_type_t type)
 	memset(media_hld, 0, sizeof(media_handle_t));
 	media_hld->type = type;
 	media_hld->state = MEDIA_STOP;
+	media_hld->msg_id = INVALID_ID;
 
 	if (MEDIA_TYPE_PHOTO == type){
 		media_hld->time_gap = 2000; //2 seconds interval for next slide show
@@ -139,7 +140,7 @@ int media_set_vol(uint8_t volume)
 	return API_SUCCESS;
 }
 
-int media_vol_up(void)
+int media_vol_up()
 {
 	/*
 	uint8_t volume;
@@ -289,7 +290,7 @@ int media_slowforward(media_handle_t *media_hld)
 		speed += 1;
 		speed = speed % speed_cnt;
 	}
-	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, (double)m_sf_speed[speed]);
+	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, m_sf_speed[speed]);
 	hcplayer_set_speed_rate(media_hld->player, m_sf_speed[speed]);
 	media_hld->speed = speed;
 	if (0 == speed) //normal play
@@ -320,7 +321,7 @@ int media_slowbackward(media_handle_t *media_hld)
 		speed += 1;
 		speed = speed % speed_cnt;
 	}
-	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, (double)m_sb_speed[speed]);
+	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, m_sb_speed[speed]);
 	hcplayer_set_speed_rate(media_hld->player, m_sb_speed[speed]);
 	media_hld->speed = speed;
 	if (0 == speed) //normal play
