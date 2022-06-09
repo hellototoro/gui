@@ -180,6 +180,8 @@ int webs_stop();
 void api_sleep_ms(uint32_t ms);
 int api_shell_exe_result(char *cmd);
 
+int api_lvgl_init(int width, int height);
+
 #define SYS_HALT()      \
 {                       \
     while(1);           \

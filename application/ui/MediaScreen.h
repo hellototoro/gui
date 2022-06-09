@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:29
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-04 13:04:55
+ * @LastEditTime: 2022-06-09 15:44:53
  * @FilePath: /gui/application/ui/MediaScreen.h
  * @Description: None
  * @other: None
@@ -11,10 +11,16 @@
 #define __UI_MEDIA_SCREEN_H__
 
 #include "lvgl/lvgl.h"
+#include "hcapi/com_api.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define PLAYER_BAR_H    160
+#define PLAYER_BAR_W    (OSD_MAX_WIDTH-80)
+#define PLAYER_BAR_X    (OSD_MAX_WIDTH-PLAYER_BAR_W)/2
+#define PLAYER_BAR_Y    (OSD_MAX_HEIGHT-PLAYER_BAR_H-20)
 
 LV_IMG_DECLARE(ui_img_arrow_right_png);    // assets\arrow_right.png
 LV_IMG_DECLARE(ui_img_delivery_png);    // assets\delivery.png

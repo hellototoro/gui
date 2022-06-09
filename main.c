@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-08 15:34:09
- * @FilePath: /SOURCE/gui/main.c
+ * @LastEditTime: 2022-06-09 12:47:38
+ * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
  */
@@ -20,6 +20,7 @@
 #include "application/windows.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
+#include "hcapi/key/key.h"
 #endif
 
 #ifdef HOST_GCC
@@ -51,7 +52,10 @@ int main(void)
     //api_logo_show(BACK_LOGO);
     app_ffplay_init();
 
-    lvgl_init();
+    //lvgl_init();
+    api_lvgl_init(HOR_RES, VER_RES);
+    key_init();
+    key_regist(NULL);
     #endif
 
     #ifdef HOST_GCC

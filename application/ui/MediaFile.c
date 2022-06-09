@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-08 15:39:00
- * @FilePath: /SOURCE/gui/application/ui/MediaFile.c
+ * @LastEditTime: 2022-06-09 13:03:33
+ * @FilePath: /gui/application/ui/MediaFile.c
  * @Description: None
  * @other: None
  */
@@ -122,8 +122,8 @@ static FileType GetFileType(char *file_name)
     FileType file_type = FILE_OTHER;
 
     file_extension = strrchr(file_name, '.');
-    file_extension++;
     if (file_extension != NULL) {
+        file_extension++;
         if ( strcasecmp(file_extension, "mp4")  == 0 || 
              strcasecmp(file_extension, "mpg")  == 0 || 
              strcasecmp(file_extension, "mpeg") == 0 || 

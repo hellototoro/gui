@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-08 14:17:24
- * @FilePath: /SOURCE/gui/application/ui/MediaScreen.c
+ * @LastEditTime: 2022-06-09 15:53:16
+ * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
  */
@@ -47,6 +47,21 @@ bool ShowDisk_Falg = false;
 
 static void ShowDisk(void);
 static void ShowFile(char *path);
+static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, lv_coord_t x, lv_coord_t y, const void* pic, const char* str);
+
+static lv_obj_t* creat_video_window(void)
+{
+    lv_obj_t* vedio_screen = lv_obj_create(NULL);
+    lv_obj_set_style_bg_opa(vedio_screen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_disp_load_scr(vedio_screen);
+    return vedio_screen;
+}
+
+static void close_video_window(lv_obj_t* video_window)
+{
+    lv_disp_load_scr(ui_MediaScreen);
+    lv_obj_del(video_window);
+}
 
 static void base_event_handler(lv_obj_t* target, lv_obj_t* parents, lv_event_code_t code)
 {
@@ -184,15 +199,25 @@ static void enter_disk_handler(lv_event_t* event)
                 strcat(file_path, current_path);
                 strcat(file_path, "/");
                 strcat(file_path, ((FileStr *)(target->user_data))->name);
-                #ifdef HOST_GCC
+                #if 0//HOST_GCC
                 lv_obj_t * player = lv_ffmpeg_player_create(lv_scr_act());
                 lv_ffmpeg_player_set_src(player, file_path);
                 lv_ffmpeg_player_set_auto_restart(player, true);
                 lv_ffmpeg_player_set_cmd(player, LV_FFMPEG_PLAYER_CMD_START);
                 lv_obj_center(player);
+                lv_obj_t* btn = lv_btn_create(player);
+                 DrawCell(btn, 150, 180, FileListPanelStartPos_x, FileListPanelStartPos_y, &ui_img_delivery_png, "返回上一级");
+                //lv_obj_set_pos(btn, -30, -160);
                 #elif defined(HCCHIP_GCC)
+                lv_obj_t* vedio_screen = creat_video_window();
                 m_cur_media_hld = media_open(MEDIA_TYPE_VIDEO);
                 media_play(m_cur_media_hld, file_path);
+                /*lv_obj_t* bar = lv_btn_create(vedio_screen);
+                lv_obj_set_pos(bar, PLAYER_BAR_X, PLAYER_BAR_Y);
+                lv_obj_set_size(bar, PLAYER_BAR_W, PLAYER_BAR_H);
+                lv_obj_set_style_bg_color(bar, lv_color_hex(0x303030), 0);*/ //grey
+                lv_obj_set_style_bg_opa(vedio_screen, LV_OPA_TRANSP, 50);
+                //DrawCell(bar, 150, 180, FileListPanelStartPos_x, FileListPanelStartPos_y, &ui_img_delivery_png, "返回上一级");
                 #endif
             }
         }
