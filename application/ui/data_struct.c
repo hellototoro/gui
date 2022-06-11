@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:07
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-07 13:40:28
+ * @LastEditTime: 2022-06-10 15:15:44
  * @FilePath: /gui/application/ui/data_struct.c
  * @Description: None
  * @other: None
@@ -41,11 +41,11 @@ LNode* ListHead(LinkList *L)
 
 Status DestroyList(LinkList *L)
 {
-    LinkList *p = L;
-    while(p->head) {
-        LNode* head = p->head;
-        p->head = p->head->next;
-        free(head);
+    LNode *p = L->head;
+    while(p) {
+        LNode* q = p;
+        p = p->next;
+        free(q);
     }
     free(L);
     L = NULL;

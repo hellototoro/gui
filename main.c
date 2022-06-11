@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-09 12:47:38
+ * @LastEditTime: 2022-06-11 15:49:47
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -30,7 +30,7 @@ extern int sdl_init_2(void);
 static void exit_console(int signo);
 static void* lgvl_task(void* arg);
 
-pthread_mutex_t draw_mutex;
+pthread_mutex_t* draw_mutex;
 
 int main(void)
 {
@@ -62,7 +62,8 @@ int main(void)
     sdl_init_2();
     #endif
 
-    res = pthread_mutex_init(&draw_mutex, NULL);
+    draw_mutex = (pthread_mutex_t* ) malloc(sizeof(pthread_mutex_t));
+    res = pthread_mutex_init(draw_mutex, NULL);
     if (res != 0) {
         perror("Mutex init failed");
         exit(EXIT_FAILURE);
@@ -88,12 +89,12 @@ int main(void)
     while(1) {
         CurrentWindow = Windows[CurrentScreen];
         if(CurrentWindow) {
-            pthread_mutex_lock(&draw_mutex);
+            pthread_mutex_lock(draw_mutex);
             CurrentWindow->ScreenInit(NULL, NULL);
             CurrentWindow->ScreenLoad();
             if(LastWindow)
                 LastWindow->ScreenClose();
-            pthread_mutex_unlock(&draw_mutex);
+            pthread_mutex_unlock(draw_mutex);
             CurrentWindow->ScreenWait();
             LastWindow = CurrentWindow;
         }
@@ -117,9 +118,9 @@ void* lgvl_task(void* arg)
     (void)arg;
     /*Handle LitlevGL tasks (tickless mode)*/
     while(1) {
-        pthread_mutex_lock(&draw_mutex);
+        pthread_mutex_lock(draw_mutex);
         lv_timer_handler();
-        pthread_mutex_unlock(&draw_mutex);
+        pthread_mutex_unlock(draw_mutex);
         usleep(5000);
     }
     return NULL;

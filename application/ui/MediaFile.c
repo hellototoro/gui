@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-09 13:03:33
+ * @LastEditTime: 2022-06-10 21:46:45
  * @FilePath: /gui/application/ui/MediaFile.c
  * @Description: None
  * @other: None
@@ -25,6 +25,7 @@ void MediaFileInit(void)
 {
     file_list_stack = (LinkStack *) malloc(sizeof (LinkStack));
     InitStack(file_list_stack);
+    current_list = NULL;
 }
 
 FileList * GetFileList(char *path)
@@ -59,25 +60,47 @@ FileList * GetFileList(char *path)
     }
     file_list->DirList = dir_list;
     file_list->OtherList = other_list;
-    Push(file_list_stack, file_list);
+    Push(file_list_stack, current_list);
+    current_list = file_list;
+    return file_list;
+}
+
+FileList * GetPreviousFileList(void)
+{
+    FileList *file_list = (FileList*) malloc(sizeof(FileList));
+    DestroyList(current_list->DirList);
+    DestroyList(current_list->OtherList);
+    free(current_list);
+    Pop(file_list_stack, (ElemType *)&file_list);
+    current_list = file_list;
     return file_list;
 }
 
 int GetDirNumber(FileList* file_list)
 {
-    return file_list->DirList->len;
+    if (file_list)
+        return file_list->DirList->len;
+    else
+        return 0;
 }
 
 int GetFileNumber(FileList* file_list)
 {
-    //return file_list->len;
-    return file_list->DirList->len + file_list->OtherList->len;
+    if (file_list)
+        return file_list->DirList->len + file_list->OtherList->len;
+    else
+        return 0;
 }
 
 FileStr* GetNextFileFromFileList(FileList* file_list)
 {
     static LNode *next = NULL;
     static FileList* last_list = NULL;
+
+    if (file_list == NULL) {
+        last_list = NULL;
+        return NULL;
+    }
 
     if (last_list != file_list) {
         last_list = file_list;
@@ -114,6 +137,11 @@ FileStr* GetNextFile(LinkList *list)
         return (FileStr*) next->data;
     else
         return NULL;
+}
+
+bool IsRootPath(const char * path)
+{
+    return strcmp(media_dir, path) == 0 ? true : false;
 }
 
 static FileType GetFileType(char *file_name)

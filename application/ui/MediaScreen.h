@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:29
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-09 15:44:53
+ * @LastEditTime: 2022-06-11 11:21:07
  * @FilePath: /gui/application/ui/MediaScreen.h
  * @Description: None
  * @other: None
@@ -31,6 +31,10 @@ LV_IMG_DECLARE(ui_img_filetype_mp3_png);    // assets\filetype_mp3.png
 LV_IMG_DECLARE(ui_img_filetype_jpg_png);    // assets\filetype_jpg.png
 LV_IMG_DECLARE(ui_img_filetype_text_png);    // assets\filetype_text.png
 LV_IMG_DECLARE(ui_img_filetype_other_png);    // assets\filetype_other.png
+LV_IMG_DECLARE(ui_img_move_pause_png);    // assets\move_pause.png
+LV_IMG_DECLARE(ui_img_move_next_png);    // assets\move_next.png
+LV_IMG_DECLARE(ui_img_move_previous_png);    // assets\move_previous.png
+LV_IMG_DECLARE(ui_img_move_play_png);    // assets\move_play.png
 
 LV_FONT_DECLARE(ui_font_MyFont30);
 LV_FONT_DECLARE(ui_font_MyFont34);
