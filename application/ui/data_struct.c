@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:07
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-10 15:15:44
+ * @LastEditTime: 2022-06-12 20:00:31
  * @FilePath: /gui/application/ui/data_struct.c
  * @Description: None
  * @other: None
@@ -47,6 +47,48 @@ Status DestroyList(LinkList *L)
         p = p->next;
         free(q);
     }
+    free(L);
+    L = NULL;
+    return OK;
+}
+
+/* double list */
+Status InitDList(LinkDList *L)
+{
+    L->head = (DLNode *) malloc(sizeof (DLNode));
+    L->head->data = NULL;
+    L->head->next = L->head->pre = L->head;
+    L->len = 0;
+    return OK;
+}
+
+Status DListAppend(LinkDList *L, ElemType e)
+{
+    DLNode *p = L->head;
+    DLNode* s = (DLNode *) malloc(sizeof (DLNode));
+    s->data = e;
+    s->pre = p->pre;
+    s->next = p;
+    p->pre->next = s;
+    p->pre = s;
+    L->len++;
+    return OK;
+}
+
+DLNode* DListHead(LinkDList *L)
+{
+    return L->head;
+}
+
+Status DestroyDList(LinkDList *L)
+{
+    DLNode *head = L->head;
+    DLNode *p = head;
+    do {
+        DLNode* q = p;
+        p = p->next;
+        free(q);
+    } while(p != head);
     free(L);
     L = NULL;
     return OK;

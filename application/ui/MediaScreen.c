@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-11 19:25:04
+ * @LastEditTime: 2022-06-12 20:08:04
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -15,6 +15,7 @@
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
+#include "Video.h"
 
 static const lv_coord_t FileListPanelStartPos_x = -402;
 static const lv_coord_t FileListPanelStartPos_y = -182;
@@ -29,6 +30,7 @@ uint32_t played_time_host;
 #elif defined(HCCHIP_GCC)
 static media_handle_t *m_cur_media_hld = NULL;
 #endif
+VideoList* video_list;
 
 typedef enum {
     All,
@@ -76,20 +78,29 @@ static void return_handler(lv_event_t* event);
 static void PlayBar_Timer_cb(lv_timer_t * timer);
 static void play_bar_event_handler(lv_event_t* event);
 static void ShowPlayedState(lv_timer_t * timer);
+static void CreateMoveBarPanel(lv_obj_t* parent);
 
 static lv_obj_t* creat_video_window(void)
 {
-    lv_obj_t* vedio_screen = lv_obj_create(NULL);
-    lv_obj_set_style_bg_opa(vedio_screen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_clear_flag(vedio_screen, LV_OBJ_FLAG_SCROLLABLE);
-
+    #ifdef HOST_GCC
+    player_hld = lv_ffmpeg_player_create(lv_scr_act());
+    lv_ffmpeg_player_set_auto_restart(player_hld, true);
+    lv_obj_center(player_hld);
+    lv_obj_t * player = player_hld;
+    #elif defined(HCCHIP_GCC)
+    lv_obj_t* player = lv_obj_create(NULL);
+    lv_obj_set_style_bg_opa(player, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(player, LV_OBJ_FLAG_SCROLLABLE);
+    #endif
     Player_Group = lv_group_create();
     lv_group_set_default(Player_Group);
     lv_indev_set_group(keypad_indev, Player_Group);
-    //lv_group_add_obj(Player_Group, vedio_screen);
+    #ifdef HCCHIP_GCC
+    lv_disp_load_scr(player);
+    #endif
+    CreateMoveBarPanel(player);
+    return player;
 
-    lv_disp_load_scr(vedio_screen);
-    return vedio_screen;
 }
 
 static void close_video_window(lv_obj_t* video_window)
@@ -152,6 +163,7 @@ static void CreateMoveBarPanel(lv_obj_t* parent)
         lv_obj_set_align(ui_Move_Pause, LV_ALIGN_CENTER);
         lv_obj_add_flag(ui_Move_Pause, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(ui_Move_Pause, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_radius(ui_Move_Pause, 30, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_color(ui_Move_Pause, lv_color_hex(0x08AED2), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(ui_Move_Pause, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(Player_Group, ui_Move_Pause);
@@ -176,20 +188,15 @@ static void CreateMoveBarPanel(lv_obj_t* parent)
     lv_obj_set_x(ui_Lab_Total_Time, 540);
     lv_obj_set_y(ui_Lab_Total_Time, -35);
     lv_obj_set_align(ui_Lab_Total_Time, LV_ALIGN_CENTER);
-    //uint32_t* total_time = (uint32_t *) malloc(sizeof(uint32_t));
-    #if 1//def HOST_GCC
-    uint32_t total_time = 0*3600 + 1*60 + 12;
-    #elif defined(HCCHIP_GCC)
-    uint32_t total_time = media_get_playtime(m_cur_media_hld);
-    #endif
-    //ui_Lab_Total_Time->user_data = total_time;
     lv_obj_set_style_text_color(ui_Lab_Total_Time, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_label_set_text_fmt(ui_Lab_Total_Time, "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, (total_time) / 3600, ((total_time) % 3600) / 60, (total_time) % 60);
+    lv_label_set_text(ui_Lab_Total_Time, "00:00:00");
     lv_obj_set_style_text_font(ui_Lab_Total_Time, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_slider_set_range(ui_Progress_Bar, 0, total_time);
 
     lv_group_focus_obj(lv_obj_get_child(ui_Play_Bar_Panel, Play));
     PlayBar_Timer = lv_timer_create(PlayBar_Timer_cb, 5*1000, NULL);
+
+    PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
+    lv_timer_set_repeat_count(PlayState_Timer, -1);
 }
 
 static void PlayVideo(char * file_name)
@@ -199,29 +206,22 @@ static void PlayVideo(char * file_name)
     strcat(file_path, "/");
     strcat(file_path, file_name);
     #ifdef HOST_GCC
-    player_hld = lv_ffmpeg_player_create(lv_scr_act());
     lv_ffmpeg_player_set_src(player_hld, file_path);
-    lv_ffmpeg_player_set_auto_restart(player_hld, true);
     lv_ffmpeg_player_set_cmd(player_hld, LV_FFMPEG_PLAYER_CMD_START);
-    lv_obj_center(player_hld);
     play_state = LV_FFMPEG_PLAYER_CMD_START;
-
-    Player_Group = lv_group_create();
-    lv_group_set_default(Player_Group);
-    lv_indev_set_group(keypad_indev, Player_Group);
-    lv_obj_t * player = player_hld;
     played_time_host = 0;
     #elif defined(HCCHIP_GCC)
-    lv_obj_t* player = creat_video_window();
     m_cur_media_hld = media_open(MEDIA_TYPE_VIDEO);
     media_play(m_cur_media_hld, file_path);
-    //lv_obj_set_style_bg_opa(player, LV_OPA_TRANSP, 50);
     #endif
-    //lv_group_add_obj(Player_Group, player);
-    CreateMoveBarPanel(player);
-    
-    PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
-    lv_timer_set_repeat_count(PlayState_Timer, -1);
+
+    #if 1//def HOST_GCC
+    uint32_t total_time = 1*3600 + 1*60 + 12;
+    #elif defined(HCCHIP_GCC)
+    uint32_t total_time = media_get_playtime(m_cur_media_hld);
+    #endif
+    lv_label_set_text_fmt(lv_obj_get_child(ui_Play_Bar_Panel, TotalTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, (total_time) / 3600, ((total_time) % 3600) / 60, (total_time) % 60);
+    lv_slider_set_range(lv_obj_get_child(ui_Play_Bar_Panel, Progress), 0, total_time);
 }
 
 static void PlayBar_Timer_cb(lv_timer_t * timer)
@@ -475,6 +475,7 @@ static void file_list_handler(lv_event_t* event)
                     lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
                     break;
                 case FILE_VIDEO:
+                    creat_video_window();
                     PlayVideo( ((FileStr *)(target->user_data))->name);
                     break;
                         
@@ -652,6 +653,7 @@ static void ShowFileList(FileList *file_list)
     lv_group_add_obj(File_List_Group, ui_back);
     lv_obj_add_event_cb(ui_back, return_handler, LV_EVENT_ALL, NULL);
     //current_list = GetFileList(path);
+    video_list = CreatVideoList();
     int FileCnt = GetFileNumber(file_list);;
     GetNextFileFromFileList(NULL);//清理前一次使用痕迹
     for (int i = 0; i < FileCnt; i++) {
@@ -673,6 +675,7 @@ static void ShowFileList(FileList *file_list)
                 image = (lv_img_dsc_t* )&ui_img_folder2_png;
             break;
         case FILE_VIDEO:
+            AddToVideoList(video_list, file->name);
             image = (lv_img_dsc_t* )&ui_img_filetype_mp4_png;
             break;
         case FILE_MUSIC:

@@ -36,8 +36,8 @@ typedef enum
 
 typedef struct FileStr
 {
-    FileType type;
     uint8_t len;
+    FileType type;
     char name[100];
 } FileStr;
 

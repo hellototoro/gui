@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:14
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-07 13:39:24
+ * @LastEditTime: 2022-06-12 19:43:16
  * @FilePath: /gui/application/ui/data_struct.h
  * @Description: None
  * @other: None
@@ -30,13 +30,24 @@ typedef struct Node {
 
 typedef Node LNode;
 typedef struct {
-    NodePtr head;
     int len;
+    NodePtr head;
 } LinkList;
 
+typedef struct DNode {
+    ElemType data;
+    struct DNode *pre, *next;
+}DNode, *DNodePtr;
+
+typedef DNode DLNode;
 typedef struct {
-    NodePtr front,rear;
     int len;
+    DNodePtr head;
+} LinkDList;
+
+typedef struct {
+    int len;
+    NodePtr front,rear;
 } LinkQueue;
 
 typedef Node StackNode;
@@ -47,6 +58,12 @@ Status InitList(LinkList *L);
 Status ListAppend(LinkList *L, ElemType e);
 LNode* ListHead(LinkList *L);
 Status DestroyList(LinkList *L);
+
+/* double list */
+Status InitDList(LinkDList *L);
+Status DListAppend(LinkDList *L, ElemType e);
+DLNode* DListHead(LinkDList *L);
+Status DestroyDList(LinkDList *L);
 
 /* Queue */
 Status InitQueue(LinkQueue *Q);
