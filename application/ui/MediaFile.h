@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-10 15:34:32
+ * @LastEditTime: 2022-06-15 15:58:53
  * @FilePath: /gui/application/ui/MediaFile.h
  * @Description: None
  * @other: None
@@ -44,7 +44,7 @@ typedef struct FileStr
 typedef struct FileList 
 {
     LinkList *DirList;
-    LinkList *OtherList;
+    LinkList *NonDirList;
 } FileList;
 
 
@@ -52,8 +52,9 @@ extern FileList *current_list;
 
 extern void MediaFileInit(void);
 extern FileList * GetFileList(char *path);
-extern int GetDirNumber(FileList* file_list);
-extern int GetFileNumber(FileList* file_list);
+extern uint16_t GetDirNumber(FileList* file_list);
+extern uint16_t GetNonDirNumber(FileList* file_list);
+extern uint16_t GetFileNumber(FileList* file_list);
 extern FileStr* GetNextFileFromFileList(FileList* file_list);
 extern FileStr* GetNextFile(LinkList *list);
 extern FileList * GetPreviousFileList(void);
