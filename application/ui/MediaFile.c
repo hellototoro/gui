@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-10 21:46:45
+ * @LastEditTime: 2022-06-15 16:17:54
  * @FilePath: /gui/application/ui/MediaFile.c
  * @Description: None
  * @other: None
@@ -16,7 +16,6 @@
 
 LinkStack* file_list_stack;
 FileList *current_list;
-
 
 static FileType GetFileType(char *file_name);
 
@@ -59,24 +58,27 @@ FileList * GetFileList(char *path)
         }
     }
     file_list->DirList = dir_list;
-    file_list->OtherList = other_list;
+    file_list->NonDirList = other_list;
     Push(file_list_stack, current_list);
     current_list = file_list;
     return file_list;
 }
 
+/* 获取上一个文件列表，并删除当前文件列表 */
 FileList * GetPreviousFileList(void)
 {
-    FileList *file_list = (FileList*) malloc(sizeof(FileList));
+    //FileList *file_list = (FileList*) malloc(sizeof(FileList));
     DestroyList(current_list->DirList);
-    DestroyList(current_list->OtherList);
+    DestroyList(current_list->NonDirList);
     free(current_list);
-    Pop(file_list_stack, (ElemType *)&file_list);
-    current_list = file_list;
-    return file_list;
+    if (Pop(file_list_stack, (ElemType *)&current_list) == OK)
+        return current_list;
+    else 
+        return NULL;
+    //current_list = file_list;
 }
 
-int GetDirNumber(FileList* file_list)
+uint16_t GetDirNumber(FileList* file_list)
 {
     if (file_list)
         return file_list->DirList->len;
@@ -84,10 +86,18 @@ int GetDirNumber(FileList* file_list)
         return 0;
 }
 
-int GetFileNumber(FileList* file_list)
+uint16_t GetNonDirNumber(FileList* file_list)
 {
     if (file_list)
-        return file_list->DirList->len + file_list->OtherList->len;
+        return file_list->NonDirList->len;
+    else
+        return 0;
+}
+
+uint16_t GetFileNumber(FileList* file_list)
+{
+    if (file_list)
+        return file_list->DirList->len + file_list->NonDirList->len;
     else
         return 0;
 }
@@ -106,13 +116,13 @@ FileStr* GetNextFileFromFileList(FileList* file_list)
         last_list = file_list;
         next = file_list->DirList->head->next;
         if (next == NULL) {
-            next = file_list->OtherList->head->next;
+            next = file_list->NonDirList->head->next;
         }
     }
     else {
         next = next->next;
         if (next == NULL)
-            next = file_list->OtherList->head->next;
+            next = file_list->NonDirList->head->next;
     }
     if (next)
         return (FileStr*) next->data;
@@ -124,6 +134,11 @@ FileStr* GetNextFile(LinkList *list)
 {
     static LNode *next = NULL;
     static LinkList* last_list = NULL;
+
+    if (list == NULL) {
+        last_list = NULL;
+        return NULL;
+    }
 
     if (last_list != list) {
         last_list = list;
@@ -142,6 +157,12 @@ FileStr* GetNextFile(LinkList *list)
 bool IsRootPath(const char * path)
 {
     return strcmp(media_dir, path) == 0 ? true : false;
+}
+
+void CloseFileList(FileList* file_list)
+{
+    while (GetPreviousFileList() != NULL);//清理栈里面所有内容
+    DestroyStack(file_list_stack);
 }
 
 static FileType GetFileType(char *file_name)
@@ -194,7 +215,7 @@ static FileType GetFileType(char *file_name)
                   strcasecmp(file_extension, "bmp")  == 0 ||
                   strcasecmp(file_extension, "gif")  == 0 ||
                   strcasecmp(file_extension, "png")  == 0 ) {
-            file_type = FILE_IMAGE;
+            file_type = FILE_PHOTO;
         }
         else if ( strcasecmp(file_extension, "txt")  == 0 || 
                   strcasecmp(file_extension, "log")  == 0 ) {
