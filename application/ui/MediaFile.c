@@ -215,7 +215,7 @@ static FileType GetFileType(char *file_name)
                   strcasecmp(file_extension, "bmp")  == 0 ||
                   strcasecmp(file_extension, "gif")  == 0 ||
                   strcasecmp(file_extension, "png")  == 0 ) {
-            file_type = FILE_IMAGE;
+            file_type = FILE_PHOTO;
         }
         else if ( strcasecmp(file_extension, "txt")  == 0 || 
                   strcasecmp(file_extension, "log")  == 0 ) {

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-15 13:13:19
+ * @LastEditTime: 2022-06-16 13:24:50
  * @FilePath: /gui/application/ui/MediaCom.h
  * @Description: None
  * @other: None
@@ -12,21 +12,13 @@
 
 #include "lvgl/lvgl.h"
 #include "data_struct.h"
+#include "MediaFile.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifdef HOST_GCC
-typedef enum{
-    MEDIA_TYPE_VIDEO,
-    MEDIA_TYPE_MUSIC,
-    MEDIA_TYPE_PHOTO,
-    MEDIA_TYPE_COUNT,
-} media_type_t;
 #endif
 
 typedef enum
@@ -42,16 +34,16 @@ typedef LinkDList MediaList;
 
 extern char current_path[];
 
-MediaList* CreatMediaList(media_type_t media_type);
-bool MediaListIsEmpty(media_type_t media_type);
-void AddToMediaList(media_type_t media_type, char * media_name);
-MediaList* GetMediaList(media_type_t media_type);
+MediaList* CreatMediaList(MediaType media_type);
+bool MediaListIsEmpty(MediaType media_type);
+void AddToMediaList(MediaType media_type, char * media_name);
+MediaList* GetMediaList(MediaType media_type);
 DLNode * GetNextMediaNode(MediaList* media_list, PlayListMode mode);
 DLNode * GetPreMediaNode(MediaList* media_list, PlayListMode mode);
-uint16_t GetMediaListSize(media_type_t media_type);
-void DestroyMediaList(media_type_t media_type);
+uint16_t GetMediaListSize(MediaType media_type);
+void DestroyMediaList(MediaType media_type);
 void DestroyAllMediaList(void);
-void CreatMediaArray(media_type_t media_type);
+void CreatMediaArray(MediaType media_type);
 uint16_t GetMediaArraySize(void);
 uint16_t LocateMediaIndex(char * file_name);
 char* GetCurrentMediaName(void);
@@ -64,7 +56,7 @@ void SetMediaProgress(lv_obj_t * progress_obj_);
 #ifdef HCCHIP_GCC
 int MediaMonitorInit(media_handle_t *media_hld);
 int MediaMonitorDeinit(media_handle_t *media_hld);
-void MediaMonitorTask(media_handle_t *media_hld);
+void MediaMonitorTask(void);
 #endif
 
 #ifdef __cplusplus

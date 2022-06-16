@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-15 16:54:25
+ * @LastEditTime: 2022-06-16 15:59:07
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -59,6 +59,7 @@ static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* p
 static void ReturnUpper(void);
 static void RefreshFileWithFile(CategoryList filter);
 static void return_handler(lv_event_t* event);
+static void FilterFile(CategoryList file_type);
 
 static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
 {
@@ -115,11 +116,11 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
         }
     break;
     case LV_KEY_ESC:
-        /*if (!CurrentMediaWindow && !IsRootPath(current_path)) {
+        if (!lv_obj_is_valid(CurrentMediaWindow) && !IsRootPath(current_path)) {
             ReturnUpper();
             //lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, lsat_focused_item));
             lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
-        }*/
+        }
         break;
 
     default:
@@ -139,84 +140,20 @@ static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
             last_target = target;
         }
     }
+    else if (parents == ui_Category_Panel) {
+        FileFilter = lv_obj_get_index(target);
+        FilterFile(FileFilter);
+    }
 
 }
 
-static void key_handler(lv_event_t* event)
-{
-    lv_obj_t* target = lv_event_get_target(event);
-    lv_obj_t* parents = lv_obj_get_parent(target);
-    key_base_event_handler(target, parents);
-}
-
-static void focused_handler(lv_event_t* event)
+static void category_list_handler(lv_event_t* event)
 {
     lv_event_code_t code = lv_event_get_code(event);
     lv_obj_t* target = lv_event_get_target(event);
     lv_obj_t* parents = lv_obj_get_parent(target);
     if (LV_EVENT_FOCUSED == code) {
-        if (parents == ui_Category_Panel) {
-            FileFilter = lv_obj_get_index(target);
-            switch (FileFilter)
-            {
-            case All:
-                
-                break;
-
-            case Vedio:
-                {
-                    FileStr* file = NULL;
-                    lv_obj_t* child = NULL;
-                    uint16_t obj_number = lv_obj_get_child_cnt(ui_File_List_Panel);
-                    uint16_t video_number = GetMediaListSize(MEDIA_TYPE_VIDEO);
-                    uint16_t dir_number = GetDirNumber(current_list);
-                    uint16_t non_dir_number = obj_number - dir_number - 1;
-                    int first_file_index = dir_number + 1;//第一个对象为返回上一层
-                    int end_index = first_file_index + (video_number < non_dir_number ? video_number : non_dir_number);
-                    GetNextFile(NULL);
-                    for (int i = first_file_index; i < end_index; i++) {
-                        do {
-                            file = GetNextFile(current_list->NonDirList);
-                        } while(file != NULL && file->type != FILE_VIDEO);
-                        child = lv_obj_get_child(ui_File_List_Panel, i);
-                        if (file != NULL) {
-                            child->user_data = file;
-                            lv_img_set_src(child->spec_attr->children[0], &ui_img_filetype_mp4_png);
-                            lv_label_set_text(child->spec_attr->children[1], file->name);
-                        }
-                    }
-                    if (video_number > non_dir_number ? true : false) {
-                        for(int i = 0; i < video_number - non_dir_number; i++) {
-                            file = GetNextFile(current_list->NonDirList);
-                            lv_obj_t* ui_BTN = lv_btn_create(ui_File_List_Panel);
-                            ui_BTN->user_data = file;
-                            DrawCell(ui_BTN, FileWidth, FileHeight, &ui_img_filetype_mp4_png, file->name);
-                        }
-                    }
-                    else {
-                        for(int i = 0; i < non_dir_number - video_number; i++) {
-                            lv_obj_del(lv_obj_get_child(ui_File_List_Panel, obj_number - 1 - i));
-                        }
-                    }
-                }
-                break;
-        
-            case Music:
-                
-                break;
-
-            case Photo:
-                
-                break;
-
-            case Text:
-                
-                break;
-
-            default:
-                break;
-            }
-        }
+        focused_base_event_handler(target, parents);
     }
     else if (LV_EVENT_KEY == code) {
         key_base_event_handler(target, parents);
@@ -253,7 +190,7 @@ static void file_list_handler(lv_event_t* event)
                 case FILE_MUSIC:
 
                     break;
-                case FILE_IMAGE:
+                case FILE_PHOTO:
 
                     break;
                 case FILE_TEXT:
@@ -295,6 +232,55 @@ static void return_handler(lv_event_t* event)
     }
     else if (LV_EVENT_FOCUSED == code) {
         focused_base_event_handler(target,parents);
+    }
+}
+
+static void FilterFile(CategoryList filter_type)
+{
+    static const lv_img_dsc_t* image_src[] = {
+        NULL,
+        &ui_img_filetype_mp4_png,
+        &ui_img_filetype_mp3_png,
+        &ui_img_filetype_jpg_png,
+        &ui_img_filetype_text_png };
+    
+    static CategoryList last_filter_type = All;
+    if (last_filter_type != filter_type) {
+        FileStr* file = NULL;
+        lv_obj_t* child = NULL;
+        uint16_t dir_number = GetDirNumber(current_list);
+        uint16_t non_dir_number = GetNonDirNumber(current_list);
+        uint16_t media_number = GetMediaListSize(filter_type);
+        int first_file_index = dir_number + 1;//第一个非文件夹对象
+        int end_index = first_file_index + ((filter_type == All) ? non_dir_number : media_number);
+        GetNextFile(NULL);
+        for (int i = first_file_index; i < end_index; i++) {
+            file = GetNextFile(current_list->NonDirList);
+            if (file == NULL) return;
+            if (filter_type != All) {//筛选出指定类型
+                while( file != NULL && file->type != filter_type) {
+                    file = GetNextFile(current_list->NonDirList);
+                }
+            }
+            child = lv_obj_get_child(ui_File_List_Panel, i);
+            if (child != NULL) {
+                child->user_data = file;
+                lv_img_set_src(child->spec_attr->children[0], image_src[file->type]);
+                lv_label_set_text(child->spec_attr->children[1], file->name);
+            }
+            else {
+                child = lv_btn_create(ui_File_List_Panel);
+                child->user_data = file;
+                DrawCell(child, FileWidth, FileHeight, image_src[file->type], file->name);
+            }
+        }
+        if (filter_type != All) {
+            uint16_t obj_number = lv_obj_get_child_cnt(ui_File_List_Panel);
+            for (int i = end_index; i < obj_number; i++) {
+                lv_obj_del_async(lv_obj_get_child(ui_File_List_Panel, i));
+            }
+        }
+        last_filter_type = filter_type;
     }
 }
 
@@ -343,7 +329,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_style_shadow_color(ui_BTN, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_shadow_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(Category_Group, ui_BTN);
-        lv_obj_add_event_cb(ui_BTN, focused_handler, LV_EVENT_ALL, NULL);
+        lv_obj_add_event_cb(ui_BTN, category_list_handler, LV_EVENT_ALL, NULL);
 
         // ui_LAB
         lv_obj_t* ui_LAB = lv_label_create(ui_BTN);
@@ -433,11 +419,6 @@ static void ShowFileList(FileList *file_list)
         //lv_coord_t x = FileListPanelStartPos_x + ((i + 1) % FileListPanelRowNumber) * FileListPanelOffset_x;
         //lv_coord_t y = FileListPanelStartPos_y + ((i + 1) / FileListPanelRowNumber) * FileListPanelOffset_y;
         FileStr* file = GetNextFileFromFileList(file_list);
-        if (FileFilter != All) {
-            if ((file->type != FILE_DIR) && ((uint8_t)file->type != (uint8_t)FileFilter)) {
-                continue;
-            }
-        }
         switch (file->type)
         {
         case FILE_DIR:
@@ -448,23 +429,29 @@ static void ShowFileList(FileList *file_list)
             break;
         case FILE_VIDEO:
             //AddToVideoList(video_list, file->name);
-            AddToMediaList(MEDIA_TYPE_VIDEO, file->name);
+            AddToMediaList(MEDIA_VIDEO, file->name);
             image = (lv_img_dsc_t* )&ui_img_filetype_mp4_png;
             break;
         case FILE_MUSIC:
-            AddToMediaList(MEDIA_TYPE_MUSIC, file->name);
+            AddToMediaList(MEDIA_MUSIC, file->name);
             image = (lv_img_dsc_t* )&ui_img_filetype_mp3_png;
             break;
-        case FILE_IMAGE:
-            AddToMediaList(MEDIA_TYPE_PHOTO, file->name);
+        case FILE_PHOTO:
+            AddToMediaList(MEDIA_PHOTO, file->name);
             image = (lv_img_dsc_t* )&ui_img_filetype_jpg_png;
             break;
         case FILE_TEXT:
+            AddToMediaList(MEDIA_TEXT, file->name);
             image = (lv_img_dsc_t* )&ui_img_filetype_text_png;
             break;
         default:
             image = (lv_img_dsc_t* )&ui_img_filetype_other_png;
             break;
+        }
+        if (FileFilter != All) {//必须放在 AddToMediaList 函数后面，因为就算过滤掉此类型，也要将其加入媒体文件列表里面
+            if ((file->type != FILE_DIR) && ((uint8_t)file->type != (uint8_t)FileFilter)) {
+                continue;
+            }
         }
         lv_obj_t* ui_BTN = lv_btn_create(ui_File_List_Panel);
         ui_BTN->user_data = file;
@@ -519,8 +506,7 @@ static void MediaWait(void)
 {
     do {
         #ifdef HCCHIP_GCC
-        if (VideoHandler != NULL)
-            MediaMonitorTask(VideoHandler);
+        MediaMonitorTask();
         #endif
         usleep(5000);
     } while (CurrentScreen == MediaScreen);
@@ -549,7 +535,6 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_obj_set_style_bg_opa(ui_MediaScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui_MediaScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_MediaScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    //lv_obj_add_event_cb(ui_MediaScreen, key_handler, LV_EVENT_KEY, NULL);
 
     // ui_LAB_Path
     lv_obj_t* ui_LAB_Path = lv_label_create(ui_MediaScreen);

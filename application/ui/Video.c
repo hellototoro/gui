@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-15 17:03:15
+ * @LastEditTime: 2022-06-16 13:27:46
  * @FilePath: /gui/application/ui/Video.c
  * @Description: None
  * @other: None
@@ -56,33 +56,29 @@ LV_FONT_DECLARE(ui_font_MyFont38);
 
 lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
 {
-    lv_obj_t* player;
     PreScreen = lv_scr_act();
     #ifdef HOST_GCC
-    VideoScreen = lv_ffmpeg_player_create(lv_scr_act());
+    VideoScreen = lv_ffmpeg_player_create(NULL);
     lv_ffmpeg_player_set_auto_restart(VideoScreen, true);
     lv_obj_center(VideoScreen);
-    player = VideoScreen;
     #elif defined(HCCHIP_GCC)
-    VideoHandler = media_open(MEDIA_TYPE_VIDEO);
+    VideoHandler = media_open(MEDIA_VIDEO);
     MediaMonitorInit(VideoHandler);
     VideoScreen = lv_obj_create(NULL);
-    player = VideoScreen;
-    lv_obj_set_style_bg_opa(player, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_clear_flag(player, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_opa(VideoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
     #endif
+    lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
     default_group = lv_group_get_default();
     Player_Group = lv_group_create();
     lv_group_set_default(Player_Group);
     lv_indev_set_group(keypad_indev, Player_Group);
-    #ifdef HCCHIP_GCC
-    lv_disp_load_scr(player);
-    #endif
-    CreatMediaArray(MEDIA_TYPE_VIDEO);
+    lv_disp_load_scr(VideoScreen);
+    CreatMediaArray(MEDIA_VIDEO);
     LocateMediaIndex(((FileStr *)(foucsed_obj->user_data))->name);
     PlayVideo(GetCurrentMediaName());
-    CreateMoveBarPanel(player);
-    return player;
+    CreateMoveBarPanel(VideoScreen);
+    return VideoScreen;
 
 }
 
@@ -111,16 +107,9 @@ void close_video_window(lv_obj_t* video_window)
     lv_timer_del(PlayBar_Timer);
     lv_timer_del(PlayState_Timer);
 
-    lv_obj_remove_event_cb(lv_obj_get_child(ui_Play_Bar_Panel, 0), play_bar_event_handler);
-    lv_obj_remove_event_cb(lv_obj_get_child(ui_Play_Bar_Panel, 1), play_bar_event_handler);
-    lv_obj_remove_event_cb(lv_obj_get_child(ui_Play_Bar_Panel, 2), play_bar_event_handler);
-
     //step4 关闭窗口
-    #ifdef HCCHIP_GCC
     lv_disp_load_scr(PreScreen);
-    #endif
-    lv_obj_del(video_window);
-    video_window = NULL;
+    lv_obj_del_async(video_window);
 }
 
 static void ShowPlayedState(lv_timer_t * timer)
@@ -323,6 +312,7 @@ static void play_bar_event_handler(lv_event_t* event)
             case LV_KEY_ESC:
                 //lv_event_send(PreScreen, LV_EVENT_KEY, NULL);
                 close_video_window(VideoScreen);
+                VideoScreen = NULL;
                 return;
                 break;
                 

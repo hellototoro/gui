@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-15 15:58:53
+ * @LastEditTime: 2022-06-16 13:51:06
  * @FilePath: /gui/application/ui/MediaFile.h
  * @Description: None
  * @other: None
@@ -23,16 +23,25 @@ extern "C" {
 #define media_dir "/media"
 #endif
 
+
 typedef enum
 { 
     FILE_DIR,
     FILE_VIDEO,
     FILE_MUSIC,
-    FILE_IMAGE,
+    FILE_PHOTO,
     FILE_TEXT,
     FILE_OTHER,
     FILE_ALL,
 } FileType;
+
+typedef enum{
+    MEDIA_VIDEO = FILE_VIDEO,
+    MEDIA_MUSIC,
+    MEDIA_PHOTO,
+    MEDIA_TEXT,
+    MEDIA_MAX
+} MediaType;
 
 typedef struct FileStr
 {

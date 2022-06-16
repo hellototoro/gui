@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-15 15:55:35
+ * @LastEditTime: 2022-06-16 16:07:54
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -21,7 +21,10 @@
 char current_path[100];
 lv_obj_t* total_time_obj;
 lv_obj_t* progress_obj;
-MediaList* media_list[MEDIA_TYPE_COUNT];
+MediaList* media_list[MEDIA_MAX];
+#ifdef HCCHIP_GCC
+media_handle_t* current_media_hdl;
+#endif
 typedef char* file_name;
 file_name* media_file_name_array;
 int current_playing_index;
@@ -30,31 +33,31 @@ int current_playing_index;
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
 #endif
 
-MediaList* CreatMediaList(media_type_t media_type)
+MediaList* CreatMediaList(MediaType media_type)
 {
     media_list[media_type] = (MediaList*) malloc(sizeof(MediaList));
     InitDList(media_list[media_type]);
     return media_list[media_type];
 }
 
-bool MediaListIsEmpty(media_type_t media_type)
+bool MediaListIsEmpty(MediaType media_type)
 {
     return (media_list[media_type]->len ==0 ) ? true : false;
 }
 
-void AddToMediaList(media_type_t media_type, char * media_name)
+void AddToMediaList(MediaType media_type, char * media_name)
 {
     if (media_list[media_type] == NULL)
         CreatMediaList(media_type);
     DListAppend(media_list[media_type], media_name);
 }
 
-MediaList* GetMediaList(media_type_t media_type)
+MediaList* GetMediaList(MediaType media_type)
 {
     return media_list[media_type];
 }
 
-uint16_t GetMediaListSize(media_type_t media_type)
+uint16_t GetMediaListSize(MediaType media_type)
 {
     if (media_list[media_type] != NULL)
         return media_list[media_type]->len;
@@ -124,7 +127,7 @@ DLNode * GetPreMediaNode(MediaList* media_list, PlayListMode mode)
     return pre;
 }
 
-void DestroyMediaList(media_type_t media_type)
+void DestroyMediaList(MediaType media_type)
 {
     if (media_list[media_type] != NULL) {
         DestroyDList(media_list[media_type]);
@@ -134,12 +137,12 @@ void DestroyMediaList(media_type_t media_type)
 
 void DestroyAllMediaList(void)
 {
-    for (int i = 0; i < MEDIA_TYPE_COUNT; i++) {
+    for (int i = 0; i < MEDIA_MAX - MEDIA_VIDEO; i++) {
         DestroyMediaList(i);
     }
 }
 
-void CreatMediaArray(media_type_t media_type)
+void CreatMediaArray(MediaType media_type)
 {
     int n = GetMediaListSize(media_type);
     if (n == 0) return;
@@ -256,6 +259,7 @@ static void SetTotalTimeAndProgress(uint32_t total_time)
 #ifdef HCCHIP_GCC
 int MediaMonitorInit(media_handle_t *media_hld)
 {
+    current_media_hdl = media_hld;
     media_hld->msg_id = api_message_create(CTL_MSG_COUNT, sizeof(HCPlayerMsg));
     return API_SUCCESS;
 }
@@ -268,16 +272,19 @@ int MediaMonitorDeinit(media_handle_t *media_hld)
     media_hld->msg_id = INVALID_ID;
     media_hld->exit = 1;
     media_hld->msg_id = INVALID_ID;
+    current_media_hdl = NULL;
     return API_SUCCESS;
 }
 
-void MediaMonitorTask(media_handle_t *media_hld)
+void MediaMonitorTask(void)
 {
-    if (!media_hld->exit) {
-        HCPlayerMsg msg;
-        if (msgrcv(media_hld->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
-        {
-            MediaMsgProc(media_hld, &msg);
+    if (current_media_hdl != NULL) {
+        if (!current_media_hdl->exit) {
+            HCPlayerMsg msg;
+            if (msgrcv(current_media_hdl->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
+            {
+                MediaMsgProc(current_media_hdl, &msg);
+            }
         }
     }
 }
@@ -416,5 +423,4 @@ static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
         break;
     }
 }
-
 #endif
