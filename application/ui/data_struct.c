@@ -90,7 +90,7 @@ Status DestroyDList(LinkDList *L)
         free(q);
     } while(p != head);
     free(L);
-    L = NULL;
+    //L = NULL;
     return OK;
 }
 

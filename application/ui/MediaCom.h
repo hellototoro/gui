@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-13 15:14:18
+ * @LastEditTime: 2022-06-16 13:24:50
  * @FilePath: /gui/application/ui/MediaCom.h
  * @Description: None
  * @other: None
@@ -10,7 +10,9 @@
 #ifndef __MEDIA_COM_H__
 #define __MEDIA_COM_H__
 
+#include "lvgl/lvgl.h"
 #include "data_struct.h"
+#include "MediaFile.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
@@ -19,20 +21,42 @@
 extern "C" {
 #endif
 
-typedef LinkDList VideoList;
+typedef enum
+{
+    CyclePlay,
+    OrderPlay,
+    OnlyOnePlay,
+    RandPlay
+} PlayListMode;
+
+typedef DLNode MediaNode;
+typedef LinkDList MediaList;
 
 extern char current_path[];
 
-VideoList* CreatVideoList(void);
-bool VideoListIsEmpty(VideoList* video_list);
-void AddToVideoList(VideoList* video_list, char * video_name);
-char * GetNextVideoName(VideoList* video_list);
-char * GetPreVideoName(VideoList* video_list);
+MediaList* CreatMediaList(MediaType media_type);
+bool MediaListIsEmpty(MediaType media_type);
+void AddToMediaList(MediaType media_type, char * media_name);
+MediaList* GetMediaList(MediaType media_type);
+DLNode * GetNextMediaNode(MediaList* media_list, PlayListMode mode);
+DLNode * GetPreMediaNode(MediaList* media_list, PlayListMode mode);
+uint16_t GetMediaListSize(MediaType media_type);
+void DestroyMediaList(MediaType media_type);
+void DestroyAllMediaList(void);
+void CreatMediaArray(MediaType media_type);
+uint16_t GetMediaArraySize(void);
+uint16_t LocateMediaIndex(char * file_name);
+char* GetCurrentMediaName(void);
+char* GetNextMediaName(PlayListMode mode);
+void DestroyMediaArray(void);
+
+void SetMediaTotalTime(lv_obj_t * total_time_obj_);
+void SetMediaProgress(lv_obj_t * progress_obj_);
 
 #ifdef HCCHIP_GCC
 int MediaMonitorInit(media_handle_t *media_hld);
 int MediaMonitorDeinit(media_handle_t *media_hld);
-void MediaMonitorTask(media_handle_t *media_hld);
+void MediaMonitorTask(void);
 #endif
 
 #ifdef __cplusplus
