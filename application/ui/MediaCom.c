@@ -2,12 +2,13 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-13 16:19:12
+ * @LastEditTime: 2022-06-17 14:02:43
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
  */
 #include <stdlib.h>
+#include <string.h>
 #include "MediaCom.h"
 #ifdef HCCHIP_GCC
 #include <sys/msg.h>
@@ -18,36 +19,59 @@
 #endif
 
 char current_path[100];
+lv_obj_t* total_time_obj;
+lv_obj_t* progress_obj;
+MediaList* media_list[MEDIA_MAX];
+#ifdef HCCHIP_GCC
+media_handle_t* current_media_hdl;
+#endif
+typedef char* file_name;
+file_name* media_file_name_array;
+int current_playing_index;
 
 #ifdef HCCHIP_GCC
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
 #endif
-//VideoList* video_list;
 
-VideoList* CreatVideoList(void)
+MediaList* CreatMediaList(MediaType media_type)
 {
-    VideoList* video_list = (VideoList*) malloc(sizeof(VideoList));
-    InitDList(video_list);
-    return video_list;
+    media_list[media_type] = (MediaList*) malloc(sizeof(MediaList));
+    InitDList(media_list[media_type]);
+    return media_list[media_type];
 }
 
-bool VideoListIsEmpty(VideoList* video_list)
+bool MediaListIsEmpty(MediaType media_type)
 {
-    return (video_list->len ==0 ) ? true : false;
+    return (media_list[media_type]->len ==0 ) ? true : false;
 }
 
-void AddToVideoList(VideoList* video_list, char * video_name)
+void AddToMediaList(MediaType media_type, char * media_name)
 {
-    DListAppend(video_list, video_name);
+    if (media_list[media_type] == NULL)
+        CreatMediaList(media_type);
+    DListAppend(media_list[media_type], media_name);
 }
 
-char * GetNextVideoName(VideoList* video_list)
+MediaList* GetMediaList(MediaType media_type)
+{
+    return media_list[media_type];
+}
+
+uint16_t GetMediaListSize(MediaType media_type)
+{
+    if (media_list[media_type] != NULL)
+        return media_list[media_type]->len;
+    else
+        return 0;
+}
+
+DLNode* GetNextMediaNode(MediaList* media_list, PlayListMode mode)
 {
     static DLNode *next = NULL;
     static DLNode *head = NULL;
-    static VideoList* last_list = NULL;
+    static MediaList* last_list = NULL;
 
-    if (video_list == NULL) {//清除获取记录
+    if (media_list == NULL) {//清除获取记录
         last_list = NULL;
         next = NULL;
         head = NULL;
@@ -55,27 +79,30 @@ char * GetNextVideoName(VideoList* video_list)
     }
 
     if ((next == head) && (head != NULL)) { //一个循环结束
-        next = head->next;
+        if (mode == CyclePlay)
+            next = head->next;
+        else
+            return NULL;
     }
 
-    if (last_list != video_list) {
-        last_list = video_list;
-        head = video_list->head;
+    if (last_list != media_list) {
+        last_list = media_list;
+        head = media_list->head;
         next = head->next;
     }
     else {
         next = next->next;
     }
-    return (char*) next->data;
+    return next;
 }
 
-char * GetPreVideoName(VideoList* video_list)
+DLNode * GetPreMediaNode(MediaList* media_list, PlayListMode mode)
 {
     static DLNode *pre = NULL;
     static DLNode *head = NULL;
-    static VideoList* last_list = NULL;
+    static MediaList* last_list = NULL;
 
-    if (video_list == NULL) {//清除获取记录
+    if (media_list == NULL) {//清除获取记录
         last_list = NULL;
         pre = NULL;
         head = NULL;
@@ -83,23 +110,156 @@ char * GetPreVideoName(VideoList* video_list)
     }
 
     if ((pre == head) && (head != NULL)) { //一个循环结束
-        pre = head->pre;
+        if (mode == CyclePlay)
+            pre = head->pre;
+        else
+            return NULL;
     }
 
-    if (last_list != video_list) {
-        last_list = video_list;
-        head = video_list->head;
+    if (last_list != media_list) {
+        last_list = media_list;
+        head = media_list->head;
         pre = head->pre;
     }
     else {
         pre = pre->pre;
     }
-    return (char*) pre->data;
+    return pre;
+}
+
+void DestroyMediaList(MediaType media_type)
+{
+    if (media_list[media_type] != NULL) {
+        DestroyDList(media_list[media_type]);
+        media_list[media_type] = NULL;
+    }
+}
+
+void DestroyAllMediaList(void)
+{
+    for (int i = 0; i < MEDIA_MAX; i++) {
+        DestroyMediaList(i);
+    }
+}
+
+void CreatMediaArray(MediaType media_type)
+{
+    int n = GetMediaListSize(media_type);
+    if (n == 0) return;
+    DestroyMediaArray();
+    current_playing_index = 0;
+    media_file_name_array = (file_name*) malloc(sizeof(file_name) * n);
+    GetNextMediaNode(NULL, OrderPlay);
+    for (int i = 0; i < n; i++) {
+        media_file_name_array[i] = (char*) (GetNextMediaNode(GetMediaList(media_type), OrderPlay))->data;
+    }
+}
+
+uint16_t GetMediaArraySize(MediaType media_type)
+{
+    return GetMediaListSize(media_type);
+}
+
+uint16_t LocateMediaIndex(MediaType media_type, char * file_name)
+{
+    int i;
+    uint16_t n = GetMediaArraySize(media_type);
+    for (i = 0; i < n; i++) {
+        if (strcmp(media_file_name_array[i], file_name) == 0) {
+            current_playing_index = i;
+            break;
+        }
+    }
+    return current_playing_index;
+}
+
+char* GetCurrentMediaName(void)
+{
+    return media_file_name_array[current_playing_index];
+}
+
+char* GetNextMediaName(MediaType media_type, PlayListMode mode)
+{
+    ++current_playing_index;
+    switch (mode)
+    {
+    case CyclePlay:
+        if (current_playing_index >= GetMediaArraySize(media_type))
+            current_playing_index = 0;
+        break;
+    case OrderPlay:
+        if (current_playing_index >= GetMediaArraySize(media_type))
+            return NULL;
+        break;
+    case OnlyOnePlay:
+        /* code */
+        break;
+    case RandPlay:
+        /* code */
+        break;
+    
+    default:
+        break;
+    }
+    return media_file_name_array[current_playing_index];
+}
+
+char* GetPreMediaName(MediaType media_type, PlayListMode mode)
+{
+    --current_playing_index;
+    switch (mode)
+    {
+    case CyclePlay:
+        if (current_playing_index < 0)
+            current_playing_index = GetMediaArraySize(media_type) - 1;
+        break;
+    case OrderPlay:
+        if (current_playing_index < 0)
+            return NULL;
+        break;
+    case OnlyOnePlay:
+        /* code */
+        break;
+    case RandPlay:
+        /* code */
+        break;
+    
+    default:
+        break;
+    }
+    return media_file_name_array[current_playing_index];
+}
+
+void DestroyMediaArray(void)
+{
+    if (media_file_name_array != NULL) {
+        free(media_file_name_array);
+        media_file_name_array = NULL;
+    }
+}
+
+//ui message box
+void SetMediaTotalTime(lv_obj_t * total_time_obj_)
+{
+    total_time_obj = total_time_obj_;
+}
+
+void SetMediaProgress(lv_obj_t * progress_obj_)
+{
+    progress_obj = progress_obj_;
+}
+
+static void SetTotalTimeAndProgress(uint32_t total_time)
+{
+    if (total_time == 0) total_time = 100;
+    lv_label_set_text_fmt(total_time_obj, "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, (total_time) / 3600, ((total_time) % 3600) / 60, (total_time) % 60);
+    lv_slider_set_range(progress_obj, 0, total_time);
 }
 
 #ifdef HCCHIP_GCC
 int MediaMonitorInit(media_handle_t *media_hld)
 {
+    current_media_hdl = media_hld;
     media_hld->msg_id = api_message_create(CTL_MSG_COUNT, sizeof(HCPlayerMsg));
     return API_SUCCESS;
 }
@@ -110,16 +270,21 @@ int MediaMonitorDeinit(media_handle_t *media_hld)
         return API_SUCCESS;
     api_message_delete(media_hld->msg_id);
     media_hld->msg_id = INVALID_ID;
+    media_hld->exit = 1;
+    media_hld->msg_id = INVALID_ID;
+    current_media_hdl = NULL;
     return API_SUCCESS;
 }
 
-void MediaMonitorTask(media_handle_t *media_hld)
+void MediaMonitorTask(void)
 {
-    if (!media_hld->exit) {
-        HCPlayerMsg msg;
-        if (msgrcv(media_hld->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
-        {
-            MediaMsgProc(media_hld, &msg);
+    if (current_media_hdl != NULL) {
+        if (!current_media_hdl->exit) {
+            HCPlayerMsg msg;
+            if (msgrcv(current_media_hdl->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
+            {
+                MediaMsgProc(current_media_hdl, &msg);
+            }
         }
     }
 }
@@ -127,7 +292,6 @@ void MediaMonitorTask(media_handle_t *media_hld)
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
 {
     if (!media_hld || !msg) return;
-    //printf("%s(), msg->type:%d\n", __FUNCTION__, (int)(msg->type));
     switch (msg->type)
     {
     case HCPLAYER_MSG_STATE_EOS:
@@ -162,6 +326,7 @@ static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
         break;
     case HCPLAYER_MSG_STATE_READY:
         printf(">> player ready\n");
+        SetTotalTimeAndProgress(media_get_totaltime(media_hld));
         break;
     case HCPLAYER_MSG_READ_TIMEOUT:
         printf(">> player read timeout\n");
@@ -258,5 +423,4 @@ static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
         break;
     }
 }
-
 #endif
