@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-16 15:59:07
+ * @LastEditTime: 2022-06-17 14:15:53
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -17,11 +17,6 @@
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
-
-static const lv_coord_t FileListPanelStartPos_x = -402;
-static const lv_coord_t FileListPanelStartPos_y = -182;
-static const uint8_t FileListPanelOffset_x = 160;
-static const uint8_t FileListPanelOffset_y = 182;
 
 static const lv_coord_t FileListPanelWidth = 1010;
 static const lv_coord_t FileListPanelHeight = 615;
@@ -63,13 +58,16 @@ static void FilterFile(CategoryList file_type);
 
 static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
 {
+    static uint16_t Category_Panel_Index = 0;
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     switch (value)
     {
     case LV_KEY_UP:
         if (ui_Category_Panel == parents) {
-            lv_group_focus_prev(group);
+            uint16_t number = lv_obj_get_child_cnt(parents);
+            Category_Panel_Index = (Category_Panel_Index == 0) ? number : --Category_Panel_Index;
+            lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, Category_Panel_Index));
         }
         else if (ui_File_List_Panel == parents) {
             int index = lv_obj_get_index(target);
@@ -79,7 +77,9 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
         break;
     case LV_KEY_DOWN:
         if (ui_Category_Panel == parents) {
-            lv_group_focus_next(group);
+            uint16_t number = lv_obj_get_child_cnt(parents);
+            Category_Panel_Index = (++Category_Panel_Index)%number;
+            lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, Category_Panel_Index));
         }
         else if (ui_File_List_Panel == parents) {
             int index = lv_obj_get_index(target);
@@ -96,7 +96,7 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
                 lv_group_focus_prev(group);
             }
             else {
-                lv_group_focus_obj(ui_File_List_Panel);
+                lv_group_focus_obj(ui_File_List_Panel);//隐藏file list panel 的聚焦状态
                 lv_group_set_default(Category_Group);
                 lv_indev_set_group(keypad_indev, Category_Group);
             }
@@ -131,6 +131,10 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
 static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
 {
      if (parents == ui_File_List_Panel) {
+        if (lv_obj_get_child(parents, 0) != target) {
+            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);//LV_LABEL_LONG_SCROLL_CIRCULAR
+        }
+        /*
         static lv_obj_t* last_target = NULL;
         if (lv_obj_is_valid(last_target))//设置上一个对象，为点模式
             lv_label_set_long_mode(last_target->spec_attr->children[1], LV_LABEL_LONG_DOT);//LV_LABEL_LONG_SCROLL_CIRCULAR
@@ -138,7 +142,7 @@ static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
         if (target->spec_attr->children[1] != NULL) {
             lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);//LV_LABEL_LONG_SCROLL_CIRCULAR
             last_target = target;
-        }
+        }*/
     }
     else if (parents == ui_Category_Panel) {
         FileFilter = lv_obj_get_index(target);
@@ -147,16 +151,25 @@ static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
 
 }
 
+static void defocused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
+{
+     if (parents == ui_File_List_Panel) {
+        if (lv_obj_get_child(parents, 0) != target) {
+            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);//LV_LABEL_LONG_SCROLL_CIRCULAR
+        }
+    }
+}
+
 static void category_list_handler(lv_event_t* event)
 {
     lv_event_code_t code = lv_event_get_code(event);
     lv_obj_t* target = lv_event_get_target(event);
     lv_obj_t* parents = lv_obj_get_parent(target);
-    if (LV_EVENT_FOCUSED == code) {
-        focused_base_event_handler(target, parents);
-    }
-    else if (LV_EVENT_KEY == code) {
+    if (LV_EVENT_KEY == code) {
         key_base_event_handler(target, parents);
+    }
+    else if (LV_EVENT_FOCUSED == code) {
+        focused_base_event_handler(target, parents);
     }
 }
 
@@ -210,6 +223,9 @@ static void file_list_handler(lv_event_t* event)
     else if (LV_EVENT_FOCUSED == code) {
         focused_base_event_handler(target,parents);
     }
+    else if (LV_EVENT_DEFOCUSED == code) {
+        defocused_base_event_handler(target,parents);
+    }
 }
 
 static void return_handler(lv_event_t* event)
@@ -243,8 +259,8 @@ static void FilterFile(CategoryList filter_type)
         &ui_img_filetype_mp3_png,
         &ui_img_filetype_jpg_png,
         &ui_img_filetype_text_png };
-    
     static CategoryList last_filter_type = All;
+    
     if (last_filter_type != filter_type) {
         FileStr* file = NULL;
         lv_obj_t* child = NULL;
@@ -272,6 +288,8 @@ static void FilterFile(CategoryList filter_type)
                 child = lv_btn_create(ui_File_List_Panel);
                 child->user_data = file;
                 DrawCell(child, FileWidth, FileHeight, image_src[file->type], file->name);
+                lv_group_add_obj(File_List_Group, child);
+                lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_ALL, NULL);
             }
         }
         if (filter_type != All) {
@@ -311,13 +329,14 @@ static void CreateCategoryPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(ui_Category_Panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_group_remove_all_objs(Category_Group);
     for (int i = 0; i < CategoryNumber; i++) {
         lv_obj_t* ui_BTN = lv_btn_create(ui_Category_Panel);
         lv_obj_set_size(ui_BTN, 265, 50);
         lv_obj_set_pos(ui_BTN, -30, -160 + i * 80);
         lv_obj_set_align(ui_BTN, LV_ALIGN_CENTER);
-        //lv_obj_add_flag(ui_BTN_All, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
-        //lv_obj_clear_flag(ui_BTN_All, LV_OBJ_FLAG_SCROLLABLE);
+        //lv_obj_add_flag(ui_BTN, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_clear_flag(ui_BTN, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_style_radius(ui_BTN, 25, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_color(ui_BTN, lv_color_hex(0xFF3700), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -403,11 +422,10 @@ static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* p
 
 static void ShowFileList(FileList *file_list)
 {
-    static const lv_coord_t obj_area[2] = { 150, 180};//w h
     //lv_group_remove_obj(ui_File_List_Panel);
     lv_obj_t* ui_back = lv_btn_create(ui_File_List_Panel);
     ui_back->user_data = NULL;
-    DrawCell(ui_back, obj_area[0], obj_area[1], &ui_img_delivery_png, "返回上一级");
+    DrawCell(ui_back, FileWidth, FileHeight, &ui_img_delivery_png, "返回上一级");
     lv_group_add_obj(File_List_Group, ui_back);
     lv_obj_add_event_cb(ui_back, return_handler, LV_EVENT_ALL, NULL);
     //current_list = GetFileList(path);
@@ -416,8 +434,6 @@ static void ShowFileList(FileList *file_list)
     GetNextFileFromFileList(NULL);//清理前一次使用痕迹
     for (int i = 0; i < FileCnt; i++) {
         lv_img_dsc_t* image;
-        //lv_coord_t x = FileListPanelStartPos_x + ((i + 1) % FileListPanelRowNumber) * FileListPanelOffset_x;
-        //lv_coord_t y = FileListPanelStartPos_y + ((i + 1) / FileListPanelRowNumber) * FileListPanelOffset_y;
         FileStr* file = GetNextFileFromFileList(file_list);
         switch (file->type)
         {
@@ -455,7 +471,7 @@ static void ShowFileList(FileList *file_list)
         }
         lv_obj_t* ui_BTN = lv_btn_create(ui_File_List_Panel);
         ui_BTN->user_data = file;
-        DrawCell(ui_BTN, obj_area[0], obj_area[1], image, file->name);
+        DrawCell(ui_BTN, FileWidth, FileHeight, image, file->name);
         lv_group_add_obj(File_List_Group, ui_BTN);
         lv_obj_add_event_cb(ui_BTN, file_list_handler, LV_EVENT_ALL, NULL);
     }
@@ -482,7 +498,7 @@ static void CreateFilePanel(lv_obj_t* parent)
 {
     // ui_File_List_Panel
     ui_File_List_Panel = lv_obj_create(parent);
-    lv_obj_set_size(ui_File_List_Panel, 1010, 615);
+    lv_obj_set_size(ui_File_List_Panel, 1010, 600);
     lv_obj_set_pos(ui_File_List_Panel, 110, 40);
     lv_obj_set_align(ui_File_List_Panel, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_File_List_Panel, LV_FLEX_FLOW_ROW_WRAP);

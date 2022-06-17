@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-16 16:07:54
+ * @LastEditTime: 2022-06-17 14:02:43
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -137,7 +137,7 @@ void DestroyMediaList(MediaType media_type)
 
 void DestroyAllMediaList(void)
 {
-    for (int i = 0; i < MEDIA_MAX - MEDIA_VIDEO; i++) {
+    for (int i = 0; i < MEDIA_MAX; i++) {
         DestroyMediaList(i);
     }
 }
@@ -155,15 +155,15 @@ void CreatMediaArray(MediaType media_type)
     }
 }
 
-uint16_t GetMediaArraySize(void)
+uint16_t GetMediaArraySize(MediaType media_type)
 {
-    return sizeof(media_file_name_array) / sizeof(media_file_name_array[0]);
+    return GetMediaListSize(media_type);
 }
 
-uint16_t LocateMediaIndex(char * file_name)
+uint16_t LocateMediaIndex(MediaType media_type, char * file_name)
 {
     int i;
-    uint16_t n = GetMediaArraySize();
+    uint16_t n = GetMediaArraySize(media_type);
     for (i = 0; i < n; i++) {
         if (strcmp(media_file_name_array[i], file_name) == 0) {
             current_playing_index = i;
@@ -178,17 +178,17 @@ char* GetCurrentMediaName(void)
     return media_file_name_array[current_playing_index];
 }
 
-char* GetNextMediaName(PlayListMode mode)
+char* GetNextMediaName(MediaType media_type, PlayListMode mode)
 {
     ++current_playing_index;
     switch (mode)
     {
     case CyclePlay:
-        if (current_playing_index >= GetMediaArraySize())
+        if (current_playing_index >= GetMediaArraySize(media_type))
             current_playing_index = 0;
         break;
     case OrderPlay:
-        if (current_playing_index >= GetMediaArraySize())
+        if (current_playing_index >= GetMediaArraySize(media_type))
             return NULL;
         break;
     case OnlyOnePlay:
@@ -204,14 +204,14 @@ char* GetNextMediaName(PlayListMode mode)
     return media_file_name_array[current_playing_index];
 }
 
-char* GetPreMediaName(PlayListMode mode)
+char* GetPreMediaName(MediaType media_type, PlayListMode mode)
 {
     --current_playing_index;
     switch (mode)
     {
     case CyclePlay:
         if (current_playing_index < 0)
-            current_playing_index = GetMediaArraySize() - 1;
+            current_playing_index = GetMediaArraySize(media_type) - 1;
         break;
     case OrderPlay:
         if (current_playing_index < 0)

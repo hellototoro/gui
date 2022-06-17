@@ -1,12 +1,3 @@
-/*
- * @Author: totoro huangjian921@outlook.com
- * @Date: 2022-05-19 16:05:49
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-08 15:57:23
- * @FilePath: /SOURCE/gui/hcapi/cast_conf.h
- * @Description: None
- * @other: None
- */
 #ifndef __CAST_CONF_H__
 #define __CAST_CONF_H__
 

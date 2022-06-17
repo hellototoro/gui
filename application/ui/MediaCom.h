@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-16 13:24:50
+ * @LastEditTime: 2022-06-17 13:59:56
  * @FilePath: /gui/application/ui/MediaCom.h
  * @Description: None
  * @other: None
@@ -44,10 +44,10 @@ uint16_t GetMediaListSize(MediaType media_type);
 void DestroyMediaList(MediaType media_type);
 void DestroyAllMediaList(void);
 void CreatMediaArray(MediaType media_type);
-uint16_t GetMediaArraySize(void);
-uint16_t LocateMediaIndex(char * file_name);
+uint16_t GetMediaArraySize(MediaType media_type);
+uint16_t LocateMediaIndex(MediaType media_type, char * file_name);
 char* GetCurrentMediaName(void);
-char* GetNextMediaName(PlayListMode mode);
+char* GetNextMediaName(MediaType media_type, PlayListMode mode);
 void DestroyMediaArray(void);
 
 void SetMediaTotalTime(lv_obj_t * total_time_obj_);

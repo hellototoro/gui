@@ -75,7 +75,7 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     lv_indev_set_group(keypad_indev, Player_Group);
     lv_disp_load_scr(VideoScreen);
     CreatMediaArray(MEDIA_VIDEO);
-    LocateMediaIndex(((FileStr *)(foucsed_obj->user_data))->name);
+    LocateMediaIndex(MEDIA_VIDEO, ((FileStr *)(foucsed_obj->user_data))->name);
     PlayVideo(GetCurrentMediaName());
     CreateMoveBarPanel(VideoScreen);
     return VideoScreen;
@@ -295,7 +295,7 @@ static void play_bar_event_handler(lv_event_t* event)
                         
                         break;
                     case Next:
-                        PlayVideo(GetNextMediaName(CyclePlay));
+                        PlayVideo(GetNextMediaName(MEDIA_VIDEO, CyclePlay));
                         break;
                     
                     default:
