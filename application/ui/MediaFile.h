@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-16 13:51:06
+ * @LastEditTime: 2022-06-18 15:09:48
  * @FilePath: /gui/application/ui/MediaFile.h
  * @Description: None
  * @other: None
@@ -22,7 +22,6 @@ extern "C" {
 #else
 #define media_dir "/media"
 #endif
-
 
 typedef enum
 { 

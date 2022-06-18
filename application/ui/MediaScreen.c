@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-17 14:15:53
+ * @LastEditTime: 2022-06-18 18:06:04
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -196,12 +196,10 @@ static void file_list_handler(lv_event_t* event)
                     break;
                 case FILE_VIDEO:
                     CurrentMediaWindow = creat_video_window(target);
-                    //PlayVideo( ((FileStr *)(target->user_data))->name);
-
                     break;
                         
                 case FILE_MUSIC:
-
+                    CurrentMediaWindow = creat_music_window(target);
                     break;
                 case FILE_PHOTO:
 

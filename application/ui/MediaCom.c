@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-17 14:02:43
+ * @LastEditTime: 2022-06-18 17:49:49
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -19,21 +19,63 @@
 #endif
 
 char current_path[100];
-lv_obj_t* total_time_obj;
-lv_obj_t* progress_obj;
+lv_obj_t* PlayBar;
+lv_obj_t* CurrentMediaScreen;
+MediaType CurrentPlayingType;
+MediaHandle* current_media_hdl;
 MediaList* media_list[MEDIA_MAX];
-#ifdef HCCHIP_GCC
-media_handle_t* current_media_hdl;
+#ifdef HOST_GCC
+uint32_t played_time_host;
+lv_ffmpeg_player_cmd_t play_state;
 #endif
-typedef char* file_name;
 file_name* media_file_name_array;
 int current_playing_index;
+
+lv_group_t* default_group;
+lv_group_t* Player_Group;
+lv_timer_t* PlayBar_Timer;
+lv_timer_t* PlayState_Timer;
+
+extern lv_indev_t* keypad_indev;
+LV_FONT_DECLARE(ui_font_MyFont30);
+LV_FONT_DECLARE(ui_font_MyFont34);
+LV_FONT_DECLARE(ui_font_MyFont38);
+LV_IMG_DECLARE(ui_img_move_pause_png);    // assets\move_pause.png
+LV_IMG_DECLARE(ui_img_move_next_png);    // assets\move_next.png
+LV_IMG_DECLARE(ui_img_move_previous_png);    // assets\move_previous.png
+LV_IMG_DECLARE(ui_img_move_play_png);    // assets\move_play.png
+LV_IMG_DECLARE(ui_img_music_order_mode_png);    // assets\move_play.png
+LV_IMG_DECLARE(ui_img_music_list_png);    // assets\move_play.png
 
 #ifdef HCCHIP_GCC
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
 #endif
 
-MediaList* CreatMediaList(MediaType media_type)
+void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
+{
+    CurrentPlayingType = media_type;
+    current_media_hdl = media_hdl;
+    #ifdef HCCHIP_GCC
+    MediaMonitorInit(current_media_hdl);
+    #endif
+}
+
+void MediaComDeinit(void)
+{
+    //step3 恢复默认组
+    lv_group_set_default(default_group);
+    lv_indev_set_group(keypad_indev, default_group);
+    lv_group_remove_all_objs(Player_Group);
+    lv_group_del(Player_Group);
+
+    //step4 清除定时器
+    if (CurrentPlayingType == MEDIA_VIDEO)
+        lv_timer_del(PlayBar_Timer);
+    lv_timer_del(PlayState_Timer);
+}
+
+
+MediaList* CreateMediaList(MediaType media_type)
 {
     media_list[media_type] = (MediaList*) malloc(sizeof(MediaList));
     InitDList(media_list[media_type]);
@@ -48,7 +90,7 @@ bool MediaListIsEmpty(MediaType media_type)
 void AddToMediaList(MediaType media_type, char * media_name)
 {
     if (media_list[media_type] == NULL)
-        CreatMediaList(media_type);
+        CreateMediaList(media_type);
     DListAppend(media_list[media_type], media_name);
 }
 
@@ -142,7 +184,7 @@ void DestroyAllMediaList(void)
     }
 }
 
-void CreatMediaArray(MediaType media_type)
+void CreateMediaArray(MediaType media_type)
 {
     int n = GetMediaListSize(media_type);
     if (n == 0) return;
@@ -230,6 +272,11 @@ char* GetPreMediaName(MediaType media_type, PlayListMode mode)
     return media_file_name_array[current_playing_index];
 }
 
+file_name* GetMediaArray(void)
+{
+    return media_file_name_array;
+}
+
 void DestroyMediaArray(void)
 {
     if (media_file_name_array != NULL) {
@@ -238,28 +285,238 @@ void DestroyMediaArray(void)
     }
 }
 
-//ui message box
-void SetMediaTotalTime(lv_obj_t * total_time_obj_)
+void PlayMedia(MediaHandle* media_hal, char * file_name)
 {
-    total_time_obj = total_time_obj_;
+    if (file_name != NULL) {
+        char file_path[100] = {0};
+        strcat(file_path, current_path);
+        strcat(file_path, "/");
+        strcat(file_path,  file_name);
+        #ifdef HOST_GCC
+        lv_ffmpeg_player_set_src(media_hal, file_path);
+        lv_ffmpeg_player_set_cmd(media_hal, LV_FFMPEG_PLAYER_CMD_START);
+        play_state = LV_FFMPEG_PLAYER_CMD_START;
+        played_time_host = 0;
+        #elif defined(HCCHIP_GCC)
+        media_play(media_hal, file_path);
+        #endif
+    }
 }
 
-void SetMediaProgress(lv_obj_t * progress_obj_)
+//公共ui部分
+static void play_bar_event_handler(lv_event_t* event)
 {
-    progress_obj = progress_obj_;
+    lv_event_code_t code = lv_event_get_code(event);
+    lv_obj_t* target = lv_event_get_target(event);
+    if (LV_EVENT_KEY == code) {
+        uint32_t value = lv_indev_get_key(lv_indev_get_act());
+        lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+        switch (value)
+        {
+            case LV_KEY_ENTER:
+                switch (lv_obj_get_index(target))
+                {
+                    case Play:
+                    {
+                        #ifdef HOST_GCC
+                        lv_ffmpeg_player_cmd_t state = play_state;
+                        #define __MEDIA_PLAY    LV_FFMPEG_PLAYER_CMD_START
+                        #define __MEDIA_PAUSE   LV_FFMPEG_PLAYER_CMD_PAUSE
+                        #elif defined(HCCHIP_GCC)
+                        media_state_t state = current_media_hdl->state;
+                        #define __MEDIA_PLAY    MEDIA_PLAY
+                        #define __MEDIA_PAUSE   MEDIA_PAUSE
+                        #endif
+                        if (state == __MEDIA_PLAY) {
+                            lv_img_set_src(target, &ui_img_move_play_png);
+                            #ifdef HOST_GCC
+                            play_state = __MEDIA_PAUSE;
+                            lv_ffmpeg_player_set_cmd(current_media_hdl, __MEDIA_PAUSE);
+                            #elif defined(HCCHIP_GCC)
+                            current_media_hdl->state = __MEDIA_PAUSE;
+                            media_pause(current_media_hdl);
+                            #endif
+                        }
+                        else if (state == __MEDIA_PAUSE) {
+                            lv_img_set_src(target, &ui_img_move_pause_png);
+                            #ifdef HOST_GCC
+                            play_state = __MEDIA_PLAY;
+                            lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_RESUME);
+                            #elif defined(HCCHIP_GCC)
+                            current_media_hdl->state = __MEDIA_PLAY;
+                            media_resume(current_media_hdl);
+                            #endif
+                        }
+                    }
+                    break;
+                    case Previous:
+                        
+                        break;
+                    case Next:
+                        PlayMedia(current_media_hdl, GetNextMediaName(MEDIA_VIDEO, CyclePlay));
+                        break;
+                    
+                    default:
+                        break;
+                }
+                break;
+        
+            case LV_KEY_LEFT:
+                lv_group_focus_prev(group);
+                break;
+            case LV_KEY_RIGHT:
+                lv_group_focus_next(group);
+                break;
+            case LV_KEY_ESC:
+                //close_video_window(CurrentMediaScreen);
+                //CurrentMediaScreen = NULL;
+                lv_event_send(CurrentMediaScreen, LV_EVENT_KEY, NULL);
+                return;
+                break;
+                
+            default:
+                break;
+        }
+        if (CurrentPlayingType == MEDIA_VIDEO) {
+            if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
+                lv_timer_reset(PlayBar_Timer);
+            }
+            else {
+                lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);
+                lv_timer_resume(PlayBar_Timer);
+            }
+        }
+    }
+}
+
+static void PlayBar_Timer_cb(lv_timer_t * timer)
+{
+    lv_obj_add_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);// | LV_OBJ_FLAG_ADV_HITTEST
+    lv_timer_reset(timer);
+    lv_timer_pause(timer);
+}
+
+static void ShowPlayedState(lv_timer_t * timer)
+{
+    #ifdef HOST_GCC
+    if (play_state == LV_FFMPEG_PLAYER_CMD_START)
+        played_time_host++;
+    #endif
+    if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
+        #ifdef HOST_GCC
+        uint32_t played_time = played_time_host;
+        #elif defined(HCCHIP_GCC)
+        uint32_t played_time = 0;
+        if (current_media_hdl != NULL)
+            played_time = media_get_playtime(current_media_hdl);
+        #endif
+        lv_label_set_text_fmt(lv_obj_get_child(PlayBar, PlayedTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, played_time / 3600, (played_time % 3600) / 60, played_time % 60);
+        lv_slider_set_value(lv_obj_get_child(PlayBar, ProgressSlider), played_time, LV_ANIM_ON);
+    }
+}
+
+lv_obj_t* CreatePlayBar(lv_obj_t* parent)
+{
+    static const lv_coord_t img_area[][2] = {//{ x, y}
+        { -200, 15},
+        { -100, 15},
+        {    0, 15},
+        {  100, 15},
+        {  200, 15}
+    };
+    static const lv_img_dsc_t* image_src[] = {
+        & ui_img_music_order_mode_png,
+        & ui_img_move_previous_png,
+        & ui_img_move_pause_png,
+        & ui_img_move_next_png,
+        & ui_img_music_list_png
+    };
+
+    // PlayBar
+    PlayBar = lv_obj_create(parent);
+    lv_obj_set_width(PlayBar, 1260);
+    lv_obj_set_height(PlayBar, 150);
+    lv_obj_set_x(PlayBar, 0);
+    lv_obj_set_y(PlayBar, 300);
+    lv_obj_set_align(PlayBar, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_SCROLLABLE);
+
+    // PlayedTime
+    lv_obj_t* PlayedTime = lv_label_create(PlayBar);
+    lv_obj_set_width(PlayedTime, LV_SIZE_CONTENT);
+    lv_obj_set_height(PlayedTime, LV_SIZE_CONTENT);
+    lv_obj_set_x(PlayedTime, -550);
+    lv_obj_set_y(PlayedTime, -50);
+    lv_obj_set_align(PlayedTime, LV_ALIGN_CENTER);
+    lv_label_set_text(PlayedTime, "00:00:00");
+    lv_obj_set_style_text_font(PlayedTime, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // ProgressSlider
+    lv_obj_t* ProgressSlider = lv_slider_create(PlayBar);
+    //lv_slider_set_range(ProgressSlider, 0, 100);
+    lv_slider_set_value(ProgressSlider, 0, LV_ANIM_OFF);
+    if(lv_slider_get_mode(ProgressSlider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(ProgressSlider, 0, LV_ANIM_OFF);
+    lv_obj_set_width(ProgressSlider, 900);
+    lv_obj_set_height(ProgressSlider, 7);
+    lv_obj_set_x(ProgressSlider, 0);
+    lv_obj_set_y(ProgressSlider, -50);
+    lv_obj_set_align(ProgressSlider, LV_ALIGN_CENTER);
+
+    // TotalTime
+    lv_obj_t* TotalTime = lv_label_create(PlayBar);
+    lv_obj_set_width(TotalTime, LV_SIZE_CONTENT);
+    lv_obj_set_height(TotalTime, LV_SIZE_CONTENT);
+    lv_obj_set_x(TotalTime, 540);
+    lv_obj_set_y(TotalTime, -50);
+    lv_obj_set_align(TotalTime, LV_ALIGN_CENTER);
+    lv_label_set_text(TotalTime, "00:00:00");
+    lv_obj_set_style_text_font(TotalTime, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    //设置组
+    default_group = lv_group_get_default();
+    Player_Group = lv_group_create();
+    lv_group_set_default(Player_Group);
+    lv_indev_set_group(keypad_indev, Player_Group);
+    lv_group_remove_all_objs(Player_Group);
+    for (int i = 0; i < PlayBarNumber - PlayMode; i++) {
+        // ctrl_bar
+        lv_obj_t* ctrl_bar = lv_img_create(PlayBar);
+        lv_img_set_src(ctrl_bar, image_src[i]);
+        lv_obj_set_width(ctrl_bar, LV_SIZE_CONTENT);
+        lv_obj_set_height(ctrl_bar, LV_SIZE_CONTENT);
+        lv_obj_set_x(ctrl_bar, img_area[i][0]);
+        lv_obj_set_y(ctrl_bar, img_area[i][1]);
+        lv_obj_set_align(ctrl_bar, LV_ALIGN_CENTER);
+        lv_obj_add_flag(ctrl_bar, LV_OBJ_FLAG_ADV_HITTEST);
+        lv_obj_clear_flag(ctrl_bar, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_radius(ctrl_bar, 30, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_color(ctrl_bar, lv_color_hex(0x08AED2), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_group_add_obj(Player_Group, ctrl_bar);
+        lv_obj_add_event_cb(ctrl_bar, play_bar_event_handler, LV_EVENT_ALL, NULL);
+    }
+    lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
+
+    if (CurrentPlayingType == MEDIA_VIDEO) {
+        PlayBar_Timer = lv_timer_create(PlayBar_Timer_cb, 5*1000, NULL);
+    }
+    PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
+    lv_timer_set_repeat_count(PlayState_Timer, -1);
+    CurrentMediaScreen = parent;
+    return PlayBar;
 }
 
 static void SetTotalTimeAndProgress(uint32_t total_time)
 {
     if (total_time == 0) total_time = 100;
-    lv_label_set_text_fmt(total_time_obj, "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, (total_time) / 3600, ((total_time) % 3600) / 60, (total_time) % 60);
-    lv_slider_set_range(progress_obj, 0, total_time);
+    lv_label_set_text_fmt(lv_obj_get_child(PlayBar, TotalTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, (total_time) / 3600, ((total_time) % 3600) / 60, (total_time) % 60);
+    lv_slider_set_range(lv_obj_get_child(PlayBar, ProgressSlider), 0, total_time);
 }
 
 #ifdef HCCHIP_GCC
 int MediaMonitorInit(media_handle_t *media_hld)
 {
-    current_media_hdl = media_hld;
+    //current_media_hdl = media_hld;
     media_hld->msg_id = api_message_create(CTL_MSG_COUNT, sizeof(HCPlayerMsg));
     return API_SUCCESS;
 }
