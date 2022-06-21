@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-11 15:49:47
+ * @LastEditTime: 2022-06-21 21:13:49
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -16,7 +16,6 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include "lvgl/lvgl.h"
-#include "application/init.h"
 #include "application/windows.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
@@ -26,6 +25,9 @@
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
 #endif
+
+#define HOR_RES         1280
+#define VER_RES         720
 
 static void exit_console(int signo);
 static void* lgvl_task(void* arg);

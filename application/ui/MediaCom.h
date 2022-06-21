@@ -11,7 +11,7 @@
 #define __MEDIA_COM_H__
 
 #include "lvgl/lvgl.h"
-#include "data_struct.h"
+#include "media_list.h"
 #include "MediaFile.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
