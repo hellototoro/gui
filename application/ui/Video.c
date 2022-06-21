@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-18 17:46:52
+ * @LastEditTime: 2022-06-18 19:01:32
  * @FilePath: /gui/application/ui/Video.c
  * @Description: None
  * @other: None
@@ -45,7 +45,7 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     return VideoScreen;
 }
 
-void close_video_window(lv_obj_t* video_window)
+void close_video_window(void)
 {
     //step1 停止播放
     #ifdef HOST_GCC
@@ -64,13 +64,13 @@ void close_video_window(lv_obj_t* video_window)
 
     //step4 关闭窗口
     lv_disp_load_scr(PreScreen);
-    lv_obj_del_async(video_window);
+    lv_obj_del_async(VideoScreen);
 }
 
 static void event_handler(lv_event_t* event)
 {
     (void)event;
-    close_video_window(VideoScreen);
+    close_video_window();
 }
 
 static void SetStyleForPlayBar(lv_obj_t* bar)

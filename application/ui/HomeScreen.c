@@ -38,14 +38,6 @@ enum SourceList {
 
 static void event_handler(lv_event_t* event);
 
-/*
-static void ui_event_BTN_Source(lv_event_t* event);
-static void SetDefaultGroup(lv_group_t* group) {
-    lv_group_set_default(group);
-    lv_indev_set_group(lv_indev_get_act(), group);
-    //lv_indev_set_group(lv_win32_keypad_device_object, group);
-}*/
-
 static void CreateMainPanel(lv_obj_t* parent)
 {
     static const lv_coord_t btn_area[CategoryNumber][4] = {//{ x, y, w, h}
