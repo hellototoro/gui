@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-17 14:15:53
+ * @LastEditTime: 2022-06-20 12:08:36
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -14,14 +14,15 @@
 #include "MediaFile.h"
 #include "MediaCom.h"
 #include "Video.h"
+#include "Music.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
 
-static const lv_coord_t FileListPanelWidth = 1010;
-static const lv_coord_t FileListPanelHeight = 615;
-static const lv_coord_t FileWidth = 150;
-static const lv_coord_t FileHeight = 180;
+#define FileListPanelWidth 1010
+#define FileListPanelHeight 615
+#define FileWidth 150
+#define FileHeight 180
 static const uint16_t FileListPanelRowNumber = FileListPanelWidth/FileWidth;
 
 int lsat_focused_item = 0;
@@ -66,7 +67,8 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
     case LV_KEY_UP:
         if (ui_Category_Panel == parents) {
             uint16_t number = lv_obj_get_child_cnt(parents);
-            Category_Panel_Index = (Category_Panel_Index == 0) ? number : --Category_Panel_Index;
+            uint16_t index = (0 == Category_Panel_Index) ? number : --Category_Panel_Index;
+            Category_Panel_Index = index;
             lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, Category_Panel_Index));
         }
         else if (ui_File_List_Panel == parents) {
@@ -78,7 +80,8 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
     case LV_KEY_DOWN:
         if (ui_Category_Panel == parents) {
             uint16_t number = lv_obj_get_child_cnt(parents);
-            Category_Panel_Index = (++Category_Panel_Index)%number;
+            ++Category_Panel_Index;
+            Category_Panel_Index %= number;
             lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, Category_Panel_Index));
         }
         else if (ui_File_List_Panel == parents) {
@@ -196,12 +199,10 @@ static void file_list_handler(lv_event_t* event)
                     break;
                 case FILE_VIDEO:
                     CurrentMediaWindow = creat_video_window(target);
-                    //PlayVideo( ((FileStr *)(target->user_data))->name);
-
                     break;
                         
                 case FILE_MUSIC:
-
+                    CurrentMediaWindow = creat_music_window(target);
                     break;
                 case FILE_PHOTO:
 
@@ -274,7 +275,7 @@ static void FilterFile(CategoryList filter_type)
             file = GetNextFile(current_list->NonDirList);
             if (file == NULL) return;
             if (filter_type != All) {//筛选出指定类型
-                while( file != NULL && file->type != filter_type) {
+                while( (file != NULL) && (file->type != (FileType)filter_type)) {
                     file = GetNextFile(current_list->NonDirList);
                 }
             }
