@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 20:58:51
+ * @LastEditTime: 2022-06-21 22:58:31
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <unistd.h>
 #include "MediaCom.h"
 #include "Music.h"
 #ifdef HCCHIP_GCC
@@ -35,6 +36,7 @@ lv_ffmpeg_player_cmd_t play_state;
 #endif
 file_name_t* media_file_name_array;
 int current_playing_index;
+bool PlayingAnimation_Flag;
 
 lv_group_t* default_group;
 lv_group_t* Player_Group;
@@ -75,6 +77,7 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
     #ifdef HCCHIP_GCC
     MediaMonitorInit(current_media_hdl);
     #endif
+    PlayingAnimation_Flag = false;
 }
 
 void MediaComDeinit(void)
@@ -418,11 +421,14 @@ static void key_event_handler(lv_event_t* event)
                 lv_group_focus_next(group);
                 break;
             case LV_KEY_ESC:
-                if (lv_obj_is_valid(PlayListPanel))
-                    ShowOffPlayList();
-                else {
-                    lv_event_send(CurrentMediaScreen, LV_EVENT_KEY, NULL);
-                    return;
+                if (!PlayingAnimation_Flag) {
+                    if (lv_obj_is_valid(PlayListPanel)) {
+                        ShowOffPlayList();
+                    }
+                    else {
+                        lv_event_send(CurrentMediaScreen, LV_EVENT_KEY, NULL);
+                        return;
+                    }
                 }
                 break;
                 
@@ -687,6 +693,7 @@ static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_nu
 static void ShowOffPlayList(void)
 {
     ShowDownAnimation(PlayListPanel, 300);
+    PlayingAnimation_Flag = true;
 }
 
 /************动画*************/
@@ -704,6 +711,7 @@ static void anim_callback_delete_obj(struct _lv_anim_t *a)
 {
     Player_Group = delete_group(Player_Group, keypad_indev);
     lv_obj_del_async((lv_obj_t *)a->user_data);
+    PlayingAnimation_Flag = false;
 }
 
 static void ShowUpAnimation(lv_obj_t * TargetObject, int delay)
