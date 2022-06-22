@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 21:13:49
+ * @LastEditTime: 2022-06-22 14:12:18
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -21,6 +21,7 @@
 #include "hcapi/com_api.h"
 #include "hcapi/key/key.h"
 #endif
+#include "application/ui/ui_com.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
@@ -57,12 +58,13 @@ int main(void)
     //lvgl_init();
     api_lvgl_init(HOR_RES, VER_RES);
     key_init();
-    key_regist(NULL);
+    //key_regist(NULL);
     #endif
 
     #ifdef HOST_GCC
     sdl_init_2();
     #endif
+    get_keypad_indev();
 
     draw_mutex = (pthread_mutex_t* ) malloc(sizeof(pthread_mutex_t));
     res = pthread_mutex_init(draw_mutex, NULL);

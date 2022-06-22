@@ -2,13 +2,13 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 12:24:58
- * @FilePath: /gui/application/ui/music_irc.h
+ * @LastEditTime: 2022-06-22 13:50:58
+ * @FilePath: /gui/application/ui/music_lyric.h
  * @Description: None
  * @other: None
  */
-#ifndef __MUSIC_IRC_H__
-#define __MUSIC_IRC_H__
+#ifndef __MUSIC_LYRIC_H__
+#define __MUSIC_LYRIC_H__
 
 #include "lvgl/lvgl.h"
 #ifdef HCCHIP_GCC

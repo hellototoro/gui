@@ -2,14 +2,14 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:54
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 12:25:22
- * @FilePath: /gui/application/ui/music_irc.cpp
+ * @LastEditTime: 2022-06-22 13:50:32
+ * @FilePath: /gui/application/ui/music_lyric.cpp
  * @Description: None
  * @other: None
  */
 #include <fstream>
 #include <iostream>
-#include "music_irc.h"
+#include "music_lyric.h"
 
 using namespace std;
 

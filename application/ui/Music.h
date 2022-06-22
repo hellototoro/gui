@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:20:58
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-18 21:53:35
+ * @LastEditTime: 2022-06-22 00:13:09
  * @FilePath: /gui/application/ui/Music.h
  * @Description: None
  * @other: None
@@ -26,7 +26,8 @@ media_handle_t *MusicHandler;
 lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj);
 void close_music_window(lv_obj_t* music_window);
 void PlayMusic(char * file_name);
-void SetCurrentMusicInfo(char* file_name, const lv_img_dsc_t* cover);
+void SetCurrentMusicTitle(char* file_name);
+void SetCurrentMusicCover(const lv_img_dsc_t* cover);
 void ShowPlayList(void);
 
 #ifdef __cplusplus

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 20:56:03
+ * @LastEditTime: 2022-06-22 14:03:48
  * @FilePath: /gui/application/ui/Music.c
  * @Description: None
  * @other: None
@@ -18,7 +18,7 @@ MediaHandle* MusicHandler;
 lv_obj_t* MusicScreen;
 lv_obj_t* MusicName;
 lv_obj_t* MusicCover;
-//lv_obj_t* PlayListPanel;
+lv_obj_t* lyricPanel;
 //lv_obj_t* FileListPanel;
 
 lv_group_t* old_group;
@@ -45,9 +45,7 @@ LV_IMG_DECLARE(ui_img_music_cover_png);    // assets\move_play.png
 static void key_event_handler(lv_event_t* event);
 static lv_obj_t* CreateMusicScreen(lv_obj_t* parent);
 static void SetStyleForPlayBar(lv_obj_t* bar);
-//static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int file_number);
-//static void ShowUpAnimation(lv_obj_t * TargetObject, int delay);
-//static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
+static void CreatelyricPanel(lv_obj_t* parent, char** lrc_list, int number);
 
 lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj)
 {
@@ -57,8 +55,8 @@ lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj)
     lv_ffmpeg_player_set_auto_restart(Player, true);
     lv_obj_set_x(Player, 50);
     lv_obj_set_y(Player, 100);
-    lv_obj_set_width(Player, 400);
-    lv_obj_set_height(Player, 400);
+    lv_obj_set_width(Player, LV_SIZE_CONTENT);
+    lv_obj_set_height(Player, LV_SIZE_CONTENT);
     //lv_obj_center(Player);
     MusicHandler = Player;
     #elif defined(HCCHIP_GCC)
@@ -69,7 +67,8 @@ lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj)
     CreateMediaArray(MEDIA_MUSIC);
     LocateMediaIndex(MEDIA_MUSIC, ((FileStr *)(foucsed_obj->user_data))->name);
     PlayMedia(MusicHandler, GetCurrentMediaName());
-    SetCurrentMusicInfo(GetCurrentMediaName(), &ui_img_music_cover_png);
+    SetCurrentMusicTitle(GetCurrentMediaName());
+    SetCurrentMusicCover(&ui_img_music_cover_png);
 
     SetStyleForPlayBar(CreatePlayBar(MusicScreen));
     //CreatePlayListPanel(MusicScreen, GetMediaArray(), GetMediaArraySize(MEDIA_MUSIC));
@@ -99,10 +98,21 @@ void close_music_window(lv_obj_t* music_window)
     lv_obj_del_async(music_window);
 }
 
-void SetCurrentMusicInfo(char* file_name, const lv_img_dsc_t* cover)
+void SetCurrentMusicTitle(char* file_name)
 {
     //step1 设置文件名
     lv_label_set_text(MusicName, file_name);
+
+    //step2 设置封面
+    //lv_img_set_src(MusicCover, cover);
+
+    //step3 设置歌词
+}
+
+void SetCurrentMusicCover(const lv_img_dsc_t* cover)
+{
+    //step1 设置文件名
+    //lv_label_set_text(MusicName, file_name);
 
     //step2 设置封面
     lv_img_set_src(MusicCover, cover);
@@ -110,11 +120,12 @@ void SetCurrentMusicInfo(char* file_name, const lv_img_dsc_t* cover)
     //step3 设置歌词
 }
 
+
 /*void ShowPlayList(void)
 {
     ShowPlayList_Flag = true;
     ShowUpAnimation(PlayListPanel, 300);
-    set_group_activity(ListPanel_Group, keypad_indev);
+    set_group_activity(ListPanel_Group);
     lv_group_focus_obj(lv_obj_get_child(FileListPanel, 0));
 }*/
 
@@ -137,7 +148,7 @@ static void key_event_handler(lv_event_t* event)
             /*if (ShowPlayList_Flag) {
                 //ShowDownAnimation(PlayListPanel, 300);
                 //ShowPlayList_Flag = false;
-                set_group_activity(old_group, keypad_indev);
+                set_group_activity(old_group);
             }
             else */{
                 close_music_window(MusicScreen);
@@ -190,6 +201,40 @@ static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
     lv_obj_clear_flag(MusicCover, LV_OBJ_FLAG_SCROLLABLE);
 
     return MusicScreen;
+}
+
+static void CreatelyricPanel(lv_obj_t* parent, char** lrc_list, int number)
+{
+    // lyricPanel
+    lyricPanel = lv_obj_create(parent);
+    lv_obj_set_width(lyricPanel, 500);
+    lv_obj_set_height(lyricPanel, 456);
+    lv_obj_set_x(lyricPanel, 320);
+    lv_obj_set_y(lyricPanel, -15);
+    lv_obj_set_align(lyricPanel, LV_ALIGN_CENTER);
+    lv_obj_set_scrollbar_mode(lyricPanel, LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_scroll_dir(lyricPanel, LV_DIR_VER);
+    lv_obj_set_style_bg_color(lyricPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(lyricPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(lyricPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(lyricPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    for (int i = 0; i < number; i++) {
+        // lrc
+        lv_obj_t*  lrc = lv_label_create(lyricPanel);
+        lv_obj_set_width(lrc, 500);
+        lv_obj_set_height(lrc, LV_SIZE_CONTENT);
+        lv_obj_set_x(lrc, 0);
+        lv_obj_set_y(lrc, 0);
+        lv_obj_set_align(lrc, LV_ALIGN_CENTER);
+        lv_label_set_text(lrc, lrc_list[i]);
+        lv_obj_set_style_text_color(lrc, lv_color_hex(0x89A29E), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(lrc, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_align(lrc, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(lrc, &ui_font_MyFont24, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_color(lrc, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_text_opa(lrc, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+    }
 }
 
 #endif

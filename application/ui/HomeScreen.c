@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-03 14:59:38
+ * @LastEditTime: 2022-06-22 14:42:08
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -11,14 +11,14 @@
 #include <stdio.h>
 #include "HomeScreen.h"
 #include "application/windows.h"
+#include "ui_com.h"
 //#include "lv_i18n/src/lv_i18n.h"
-//#include "application/key/key.h"
 
 lv_obj_t* ui_HomeScreen;
 lv_obj_t* ui_Main_Panel;
 lv_obj_t* ui_Source_Panel;
-//static lv_group_t* Main_Group;
-//static lv_group_t* Source_Group;
+lv_group_t * HomeScreenGroup;
+int LastFocusedObjIndex;
 
 enum CategoryList {
     UDisk,
@@ -37,6 +37,7 @@ enum SourceList {
 };
 
 static void event_handler(lv_event_t* event);
+static void ExitHome(ActiveScreen screen);
 
 static void CreateMainPanel(lv_obj_t* parent)
 {
@@ -74,6 +75,9 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(ui_Main_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Main_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    //HomeScreenGroup = create_new_group(lv_group_get_default());
+    HomeScreenGroup = lv_group_create();
+    set_group_activity(HomeScreenGroup);
     for (int i = 0; i < CategoryNumber; i++) {
         // ui_btn
         lv_obj_t* ui_btn = lv_btn_create(ui_Main_Panel);
@@ -86,6 +90,7 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_obj_set_style_shadow_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_img_src(ui_btn, image_src[i][0], LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_img_src(ui_btn, image_src[i][1], LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_group_add_obj(HomeScreenGroup, ui_btn);
         lv_obj_add_event_cb(ui_btn, event_handler, LV_EVENT_KEY, NULL);
         // ui_lab
         lv_obj_t* ui_lab = lv_label_create(ui_btn);
@@ -95,6 +100,7 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_label_set_text(ui_lab, str[i]);
         lv_obj_set_style_text_font(ui_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
+    lv_group_focus_obj(lv_obj_get_child(parent, LastFocusedObjIndex));
 }
 
 static void CreateSourcePanel(lv_obj_t* parent)
@@ -203,7 +209,8 @@ static void event_handler(lv_event_t* event)
             switch (lv_obj_get_index(ta))
             {
             case UDisk:
-                CurrentScreen = MediaScreen;
+                //CurrentScreen = MediaScreen;
+                ExitHome(MediaScreen);
                 //printf("enter media\r\n");
                 break;
             default:
@@ -219,6 +226,12 @@ static void event_handler(lv_event_t* event)
     }
 }
 
+static void ExitHome(ActiveScreen screen)
+{
+    LastFocusedObjIndex = lv_obj_get_index(lv_group_get_focused(HomeScreenGroup));
+    CurrentScreen = screen;
+}
+
 static void HomeWait(void)
 {
     do {
@@ -228,6 +241,7 @@ static void HomeWait(void)
 
 static void HomeClose(void)
 {
+    lv_group_del(HomeScreenGroup);
     lv_obj_del(ui_HomeScreen);
 }
 

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 22:58:31
+ * @LastEditTime: 2022-06-22 15:13:40
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -24,6 +24,7 @@
 #include "ui_com.h"
 
 char current_path[100];
+int current_path_size = sizeof(current_path);
 lv_obj_t* PlayBar;
 lv_obj_t* PlayListPanel;
 lv_obj_t* CurrentMediaScreen;
@@ -83,7 +84,7 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
 void MediaComDeinit(void)
 {
     //step3 恢复默认组
-    delete_group(Player_Group, keypad_indev);
+    delete_group(Player_Group);
     /*lv_group_set_default(default_group);
     lv_indev_set_group(keypad_indev, default_group);
     lv_group_remove_all_objs(Player_Group);
@@ -331,13 +332,23 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
             ID3v2_frame_text_content* title_content = parse_text_frame_content(title_frame);
             if (title_content) {
                 printf("TITLE: %s\n", title_content->data);
-                SetCurrentMusicInfo(title_content->data, &ui_img_music_cover_png);
+                SetCurrentMusicTitle(title_content->data);
             }
 
             ID3v2_frame* cover_frame = tag_get_album_cover(tag);
             ID3v2_frame_text_content* cover_content = parse_text_frame_content(cover_frame);
-            if (cover_frame)
+            if (cover_frame) {
+                lv_img_dsc_t ui_img_cover = {
+                    .header.always_zero = 0,
+                    .header.w = 256,
+                    .header.h = 256,
+                    .data_size = cover_frame->size,
+                    .header.cf = LV_IMG_CF_TRUE_COLOR_ALPHA,
+                    .data = cover_frame->data
+                };
+                SetCurrentMusicCover(&ui_img_cover);
                 printf("size: %d\n", cover_frame->size);
+            }
         }
         #else
         lv_ffmpeg_player_set_src(media_hal, file_path);
@@ -533,7 +544,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
 
     //设置组
     Player_Group = create_new_group(lv_group_get_default());
-    set_group_activity(Player_Group, keypad_indev);
+    set_group_activity(Player_Group);
     /*default_group = lv_group_get_default();
     Player_Group = lv_group_create();
     lv_group_set_default(Player_Group);
@@ -637,7 +648,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
 
     //设置组
     Player_Group = create_new_group(lv_group_get_default());
-    set_group_activity(Player_Group, keypad_indev);
+    set_group_activity(Player_Group);
     for(int i = 0; i < file_number; i++) {
         // file_panel
         lv_obj_t* file_panel = lv_obj_create(FileListPanel);
@@ -709,7 +720,7 @@ static int32_t anim_callback_get_y(lv_anim_t * a)
 
 static void anim_callback_delete_obj(struct _lv_anim_t *a)
 {
-    Player_Group = delete_group(Player_Group, keypad_indev);
+    Player_Group = delete_group(Player_Group);
     lv_obj_del_async((lv_obj_t *)a->user_data);
     PlayingAnimation_Flag = false;
 }

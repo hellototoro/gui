@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:07
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 21:19:38
+ * @LastEditTime: 2022-06-22 19:45:11
  * @FilePath: /gui/application/ui/media_list.c
  * @Description: None
  * @other: None
@@ -168,7 +168,7 @@ Status Pop(LinkStack *S, ElemType *e)
 
 bool StackIsEmpty(LinkStack S)
 {
-    return S == NULL ? true : false;
+    return (S == NULL) ? true : false;
 }
 
 Status DestroyStack(LinkStack *S)

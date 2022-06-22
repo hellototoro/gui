@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 21:09:37
+ * @LastEditTime: 2022-06-22 18:52:18
  * @FilePath: /gui/application/ui/MediaFile.h
  * @Description: None
  * @other: None
@@ -67,6 +67,8 @@ extern FileStr* GetNextFileFromFileList(FileList* file_list);
 extern FileStr* GetNextFile(LinkList *list);
 extern FileList * GetPreviousFileList(void);
 extern bool IsRootPath(const char * path);
+extern void CloseFileList(void);
+extern void MediaFileDeInit(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
