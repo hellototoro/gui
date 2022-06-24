@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-18 19:01:32
+ * @LastEditTime: 2022-06-23 14:05:30
  * @FilePath: /gui/application/ui/Video.c
  * @Description: None
  * @other: None
@@ -35,7 +35,8 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
     lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
-    MediaComInit(MEDIA_VIDEO, VideoHandler);
+    lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
+    MediaComInit(MEDIA_VIDEO, VideoHandler, old_group);
     CreateMediaArray(MEDIA_VIDEO);
     LocateMediaIndex(MEDIA_VIDEO, ((FileStr *)(foucsed_obj->user_data))->name);
     PlayMedia(VideoHandler, GetCurrentMediaName());

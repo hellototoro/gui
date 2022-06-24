@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 15:13:51
+ * @LastEditTime: 2022-06-23 18:43:51
  * @FilePath: /gui/application/ui/MediaCom.h
  * @Description: None
  * @other: None
@@ -52,7 +52,7 @@ typedef media_handle_t MediaHandle;
 
 extern char current_path[];
 extern int current_path_size;
-extern void MediaComInit(MediaType media_type, MediaHandle* media_hdl);
+extern void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group);
 extern void MediaComDeinit(void);
 extern MediaList* CreateMediaList(MediaType media_type);
 extern bool MediaListIsEmpty(MediaType media_type);

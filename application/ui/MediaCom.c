@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 15:13:40
+ * @LastEditTime: 2022-06-24 16:04:59
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -39,7 +39,7 @@ file_name_t* media_file_name_array;
 int current_playing_index;
 bool PlayingAnimation_Flag;
 
-lv_group_t* default_group;
+lv_group_t* Old_Group;
 lv_group_t* Player_Group;
 lv_timer_t* PlayBar_Timer;
 lv_timer_t* PlayState_Timer;
@@ -71,7 +71,7 @@ static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
 static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_number);
 static void ShowOffPlayList(void);
 
-void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
+void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group)
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
@@ -79,16 +79,18 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
     MediaMonitorInit(current_media_hdl);
     #endif
     PlayingAnimation_Flag = false;
+    
+    //设置组
+    Old_Group = old_group;
+    Player_Group = lv_group_create();
+    set_group_activity(Player_Group);
 }
 
 void MediaComDeinit(void)
 {
     //step3 恢复默认组
-    delete_group(Player_Group);
-    /*lv_group_set_default(default_group);
-    lv_indev_set_group(keypad_indev, default_group);
-    lv_group_remove_all_objs(Player_Group);
-    lv_group_del(Player_Group);*/
+    set_group_activity(Old_Group);
+    lv_group_del(Player_Group);
 
     //step4 清除定时器
     if (CurrentPlayingType == MEDIA_VIDEO)
@@ -479,6 +481,9 @@ static void ShowPlayedState(lv_timer_t * timer)
         if (current_media_hdl != NULL)
             played_time = media_get_playtime(current_media_hdl);
         #endif
+        if(CurrentPlayingType == MEDIA_MUSIC) { //刷新歌词
+            RefreshLyric(played_time);
+        }
         lv_label_set_text_fmt(lv_obj_get_child(PlayBar, PlayedTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, played_time / 3600, (played_time % 3600) / 60, played_time % 60);
         lv_slider_set_value(lv_obj_get_child(PlayBar, ProgressSlider), played_time, LV_ANIM_ON);
     }
@@ -542,14 +547,6 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_label_set_text(lv_obj, "00:00:00");
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    //设置组
-    Player_Group = create_new_group(lv_group_get_default());
-    set_group_activity(Player_Group);
-    /*default_group = lv_group_get_default();
-    Player_Group = lv_group_create();
-    lv_group_set_default(Player_Group);
-    lv_indev_set_group(keypad_indev, Player_Group);
-    lv_group_remove_all_objs(Player_Group);*/
     for (int i = 0; i < PlayBarNumber - PlayMode; i++) {
         // ctrl_bar
         lv_obj_t* ctrl_bar = lv_img_create(PlayBar);
@@ -647,7 +644,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_style_border_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //设置组
-    Player_Group = create_new_group(lv_group_get_default());
+    Player_Group = create_new_group(Player_Group);
     set_group_activity(Player_Group);
     for(int i = 0; i < file_number; i++) {
         // file_panel

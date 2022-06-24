@@ -70,6 +70,9 @@ static void keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
         case KEY_PREVIOUS:
             act_key = LV_KEY_PREV;
             break;
+        case KEY_EXIT:
+            act_key = LV_KEY_ESC;
+            break;
         default:
             act_key = USER_KEY_FLAG | act_key;
             break;

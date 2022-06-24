@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 14:12:18
+ * @LastEditTime: 2022-06-23 22:23:34
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -125,7 +125,7 @@ void* lgvl_task(void* arg)
         pthread_mutex_lock(draw_mutex);
         lv_timer_handler();
         pthread_mutex_unlock(draw_mutex);
-        usleep(5000);
+        usleep(1000);
     }
     return NULL;
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 18:14:07
+ * @LastEditTime: 2022-06-24 16:30:41
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -100,16 +100,12 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
             else {
                 lv_group_focus_obj(ui_File_List_Panel);//隐藏file list panel 的聚焦状态
                 set_group_activity(Category_Group);
-                //lv_group_set_default(Category_Group);
-                //lv_indev_set_group(keypad_indev, Category_Group);
             }
         }
     break;
     case LV_KEY_RIGHT:
         if (ui_Category_Panel == parents) {
             set_group_activity(File_List_Group);
-            //lv_group_set_default(File_List_Group);
-            //lv_indev_set_group(keypad_indev, File_List_Group);
             lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
         }
         else if (ui_File_List_Panel == parents) {
@@ -517,8 +513,7 @@ static void LoadMedia(void)
 
 static void ExitMedia(void)
 {
-    //DestroyAllMediaList();
-    //CloseFileList();
+    DestroyAllMediaList();
     MediaFileDeInit();
     memset(current_path, 0, current_path_size );
     CurrentScreen = HomeScreen;

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:20:58
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 00:13:09
+ * @LastEditTime: 2022-06-24 16:14:43
  * @FilePath: /gui/application/ui/Music.h
  * @Description: None
  * @other: None
@@ -20,15 +20,16 @@ extern "C" {
 #endif
 
 #ifdef HCCHIP_GCC
-media_handle_t *MusicHandler;
+extern media_handle_t *MusicHandler;
 #endif
 
-lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj);
-void close_music_window(lv_obj_t* music_window);
-void PlayMusic(char * file_name);
-void SetCurrentMusicTitle(char* file_name);
-void SetCurrentMusicCover(const lv_img_dsc_t* cover);
-void ShowPlayList(void);
+extern lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj);
+extern void close_music_window(lv_obj_t* music_window);
+extern void SetCurrentMusicTitle(char* file_name);
+extern void SetCurrentMusicCover(const lv_img_dsc_t* cover);
+extern void LoadLyric(char* music_file_name);
+extern void RefreshLyric(uint32_t played_time);
+extern void LyricTask(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

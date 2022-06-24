@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 13:50:58
+ * @LastEditTime: 2022-06-24 15:06:00
  * @FilePath: /gui/application/ui/music_lyric.h
  * @Description: None
  * @other: None
@@ -18,20 +18,22 @@
 #include <vector>
 #include <string>
 
-class music_irc
+class music_lyric
 {
 private:
-    std::vector<std::string> irc_list;
+    std::vector<std::string> lic_list;
     std::vector<int> start_time_list;
     
 public:
-    music_irc(/* args */);
-    ~music_irc();
+    music_lyric(/* args */);
+    ~music_lyric();
 
-    void load_irc(char* file_name);
-    std::string get_one_line_irc(int start_time);
+    bool load(const char* file_name);
+    void clean(void);
+    int size(void);
+    int get_start_time(int index);
+    std::string& get_one_line(int index);
 };
-
 
 #ifdef __cplusplus
 extern "C" {
