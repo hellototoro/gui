@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-24 15:06:00
+ * @LastEditTime: 2022-06-25 12:42:19
  * @FilePath: /gui/application/ui/music_lyric.h
  * @Description: None
  * @other: None
@@ -28,7 +28,7 @@ public:
     music_lyric(/* args */);
     ~music_lyric();
 
-    bool load(const char* file_name);
+    void load(const char* file_name);
     void clean(void);
     int size(void);
     int get_start_time(int index);

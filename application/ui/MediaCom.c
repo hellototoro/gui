@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-24 16:04:59
+ * @LastEditTime: 2022-06-26 01:53:04
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -79,7 +79,7 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_
     MediaMonitorInit(current_media_hdl);
     #endif
     PlayingAnimation_Flag = false;
-    
+
     //设置组
     Old_Group = old_group;
     Player_Group = lv_group_create();
@@ -238,6 +238,17 @@ uint16_t LocateMediaIndex(MediaType media_type, char * file_name)
     return current_playing_index;
 }
 
+void SetMediaIndex(int index)
+{
+    if (index < GetMediaArraySize(CurrentPlayingType))
+        current_playing_index = index;
+}
+
+int GetMediaIndex(void)
+{
+    return current_playing_index;
+}
+
 char* GetCurrentMediaName(void)
 {
     return media_file_name_array[current_playing_index];
@@ -361,6 +372,10 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
         #elif defined(HCCHIP_GCC)
         media_play(media_hal, file_path);
         #endif
+        if(CurrentPlayingType == MEDIA_MUSIC) {
+            SetCurrentMusicTitle(file_name);
+            LoadLyric(file_name);
+        }
     }
 }
 
@@ -411,7 +426,7 @@ static void key_event_handler(lv_event_t* event)
                     }
                     break;
                     case Previous:
-                        
+                        PlayMedia(current_media_hdl, GetPreMediaName(CurrentPlayingType, CyclePlay));
                         break;
                     case Next:
                         PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CyclePlay));
@@ -425,23 +440,16 @@ static void key_event_handler(lv_event_t* event)
                 }
                 break;
         
-            case LV_KEY_UP:
             case LV_KEY_LEFT:
                 lv_group_focus_prev(group);
                 break;
-            case LV_KEY_DOWN:
             case LV_KEY_RIGHT:
                 lv_group_focus_next(group);
                 break;
             case LV_KEY_ESC:
                 if (!PlayingAnimation_Flag) {
-                    if (lv_obj_is_valid(PlayListPanel)) {
-                        ShowOffPlayList();
-                    }
-                    else {
-                        lv_event_send(CurrentMediaScreen, LV_EVENT_KEY, NULL);
-                        return;
-                    }
+                    lv_event_send(CurrentMediaScreen, LV_EVENT_KEY, NULL);
+                    return;
                 }
                 break;
                 
@@ -457,6 +465,35 @@ static void key_event_handler(lv_event_t* event)
                 lv_timer_resume(PlayBar_Timer);
             }
         }
+    }
+}
+
+static void play_list_event_handler(lv_event_t* event)
+{
+    lv_obj_t* target = lv_event_get_target(event);
+    lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+    uint32_t value = lv_indev_get_key(lv_indev_get_act());
+    switch (value)
+    {
+        case LV_KEY_ENTER:
+            SetMediaIndex(lv_obj_get_index(target));
+            PlayMedia(current_media_hdl, GetCurrentMediaName());
+            break;
+        case LV_KEY_UP:
+            lv_group_focus_prev(group);
+            break;
+        case LV_KEY_DOWN:
+            lv_group_focus_next(group);
+            break;
+        case LV_KEY_ESC:
+            if (!PlayingAnimation_Flag) {
+                if (lv_obj_is_valid(PlayListPanel)) {
+                    ShowOffPlayList();
+                }
+            }
+            break;
+        default:
+            break;
     }
 }
 
@@ -666,7 +703,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_style_border_color(file_panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_opa(file_panel, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(Player_Group, file_panel);
-        lv_obj_add_event_cb(file_panel, key_event_handler, LV_EVENT_KEY, NULL);
+        lv_obj_add_event_cb(file_panel, play_list_event_handler, LV_EVENT_KEY, NULL);
 
         // file_name
         lv_obj_t* file_name = lv_label_create(file_panel);
@@ -689,7 +726,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_style_text_opa(file_info, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(file_info, &ui_font_MyFont24, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
-    lv_group_focus_obj(lv_obj_get_child(FileListPanel, 0));
+    lv_group_focus_obj(lv_obj_get_child(FileListPanel, current_playing_index));
 }
 
 static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_number)
