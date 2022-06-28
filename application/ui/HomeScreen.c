@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 16:21:44
+ * @LastEditTime: 2022-06-28 15:48:47
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -12,13 +12,15 @@
 #include "HomeScreen.h"
 #include "application/windows.h"
 #include "ui_com.h"
+#include "Volume.h"
+#include "application/key_map.h"
 //#include "lv_i18n/src/lv_i18n.h"
 
 lv_obj_t* ui_HomeScreen;
 lv_obj_t* ui_Main_Panel;
 lv_obj_t* ui_Source_Panel;
 lv_obj_t* ui_IMG_SourceType;
-lv_group_t * HomeScreenGroup;
+lv_group_t* HomeScreenGroup;
 int LastFocusedObjIndex;
 
 LV_IMG_DECLARE(ui_img_udisk_n_png);    // assets\udisk_n.png
@@ -257,6 +259,11 @@ static void event_handler(lv_event_t* event)
                 break;
             }
             break;
+        case LV_KEY_VOLUME_UP:
+        case LV_KEY_VOLUME_DOWN:
+            SetVolume(value);
+            break;
+
         default:
             break;
         }
