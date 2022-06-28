@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 12:23:08
+ * @LastEditTime: 2022-06-26 01:51:53
  * @FilePath: /gui/application/ui/MediaCom.h
  * @Description: None
  * @other: None
@@ -11,7 +11,7 @@
 #define __MEDIA_COM_H__
 
 #include "lvgl/lvgl.h"
-#include "data_struct.h"
+#include "media_list.h"
 #include "MediaFile.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
@@ -51,8 +51,8 @@ typedef media_handle_t MediaHandle;
 #endif
 
 extern char current_path[];
-
-extern void MediaComInit(MediaType media_type, MediaHandle* media_hdl);
+extern int current_path_size;
+extern void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group);
 extern void MediaComDeinit(void);
 extern MediaList* CreateMediaList(MediaType media_type);
 extern bool MediaListIsEmpty(MediaType media_type);
@@ -63,6 +63,8 @@ extern void DestroyAllMediaList(void);
 extern void CreateMediaArray(MediaType media_type);
 extern uint16_t GetMediaArraySize(MediaType media_type);
 extern uint16_t LocateMediaIndex(MediaType media_type, char * file_name);
+extern void SetMediaIndex(int index);
+extern int GetMediaIndex(void);
 extern char* GetCurrentMediaName(void);
 extern char* GetPreMediaName(MediaType media_type, PlayListMode mode);
 extern char* GetNextMediaName(MediaType media_type, PlayListMode mode);

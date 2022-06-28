@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:14
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-12 19:43:16
- * @FilePath: /gui/application/ui/data_struct.h
+ * @LastEditTime: 2022-06-21 21:08:57
+ * @FilePath: /gui/application/ui/media_list.h
  * @Description: None
  * @other: None
  */
@@ -11,7 +11,6 @@
 #define __GUI_QUEUE_H__
 
 #include <stdbool.h>
-#include "FileType.h"
 
 #ifdef __cplusplus
 extern "C" {

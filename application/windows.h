@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:45
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-03 14:28:17
+ * @LastEditTime: 2022-06-26 01:15:24
  * @FilePath: /gui/application/windows.h
  * @Description: None
  * @other: None
@@ -16,6 +16,7 @@ typedef enum  {
     LanguageScreen,
     HomeScreen,
     MediaScreen,
+    SettingScreen,
     ScreenNumber
 } ActiveScreen;
 

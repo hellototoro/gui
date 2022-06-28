@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-11 15:49:47
+ * @LastEditTime: 2022-06-23 22:23:34
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -16,16 +16,19 @@
 #include <pthread.h>
 #include <semaphore.h>
 #include "lvgl/lvgl.h"
-#include "application/init.h"
 #include "application/windows.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
 #include "hcapi/key/key.h"
 #endif
+#include "application/ui/ui_com.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
 #endif
+
+#define HOR_RES         1280
+#define VER_RES         720
 
 static void exit_console(int signo);
 static void* lgvl_task(void* arg);
@@ -55,12 +58,13 @@ int main(void)
     //lvgl_init();
     api_lvgl_init(HOR_RES, VER_RES);
     key_init();
-    key_regist(NULL);
+    //key_regist(NULL);
     #endif
 
     #ifdef HOST_GCC
     sdl_init_2();
     #endif
+    get_keypad_indev();
 
     draw_mutex = (pthread_mutex_t* ) malloc(sizeof(pthread_mutex_t));
     res = pthread_mutex_init(draw_mutex, NULL);
@@ -121,7 +125,7 @@ void* lgvl_task(void* arg)
         pthread_mutex_lock(draw_mutex);
         lv_timer_handler();
         pthread_mutex_unlock(draw_mutex);
-        usleep(5000);
+        usleep(1000);
     }
     return NULL;
 }
