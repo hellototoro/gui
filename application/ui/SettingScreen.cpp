@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 11:48:37
+ * @LastEditTime: 2022-06-28 16:06:05
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -55,13 +55,13 @@ void CreateSettingScreen(lv_obj_t* parent)
     };
     static const char* str[CategoryNumber] =  { "网络设置", "投影设置", "图像设置", "声音设置", "系统设置", "系统升级", "关于投影"};
     static const lv_img_dsc_t* image_src[CategoryNumber] = {
-        {& ui_img_network_setting_png},
-        {& ui_img_projector_setting_png},
-        {& ui_img_pic_setting_png},
-        {& ui_img_sound_setting_png},
-        {& ui_img_system_setting_png},
-        {& ui_img_update_setting_png},
-        {& ui_img_projector_info_png}
+        & ui_img_network_setting_png,
+        & ui_img_projector_setting_png,
+        & ui_img_pic_setting_png,
+        & ui_img_sound_setting_png,
+        & ui_img_system_setting_png,
+        & ui_img_update_setting_png,
+        & ui_img_projector_info_png,
     };
     // ui_SettingScreen
     ui_SettingScreen = lv_obj_create(parent);

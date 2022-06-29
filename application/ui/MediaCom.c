@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 01:53:04
+ * @LastEditTime: 2022-06-28 18:33:32
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -22,6 +22,8 @@
 #endif
 #include "id3v2lib/include/id3v2lib.h"
 #include "ui_com.h"
+#include "Volume.h"
+#include "application/key_map.h"
 
 char current_path[100];
 int current_path_size = sizeof(current_path);
@@ -452,7 +454,12 @@ static void key_event_handler(lv_event_t* event)
                     return;
                 }
                 break;
-                
+
+            case LV_KEY_VOLUME_UP:
+            case LV_KEY_VOLUME_DOWN:
+                SetVolume(value);
+                break;
+
             default:
                 break;
         }
@@ -767,7 +774,7 @@ static void ShowUpAnimation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_user_data(&PropertyAnimation, TargetObject);
     lv_anim_set_custom_exec_cb(&PropertyAnimation, anim_callback_set_y);
     lv_anim_set_values(&PropertyAnimation, lv_obj_get_y(TargetObject), -605);
-    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_overshoot);
+    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_ease_in_out);
     lv_anim_set_delay(&PropertyAnimation, delay + 0);
     lv_anim_set_early_apply(&PropertyAnimation, false);
     lv_anim_set_get_value_cb(&PropertyAnimation, &anim_callback_get_y);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-28 15:48:47
+ * @LastEditTime: 2022-06-29 08:42:04
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -289,7 +289,7 @@ static void HomeWait(void)
 static void HomeClose(void)
 {
     lv_group_del(HomeScreenGroup);
-    lv_obj_del(ui_HomeScreen);
+    //lv_obj_del(ui_HomeScreen);
 }
 
 static void HomeInit(lv_obj_t* parent, void *param)
@@ -306,7 +306,8 @@ static void HomeInit(lv_obj_t* parent, void *param)
 
 static void LoadHome(void)
 {
-    lv_disp_load_scr(ui_HomeScreen);
+    //lv_disp_load_scr(ui_HomeScreen);
+    lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 window HomeWindow = {

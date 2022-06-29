@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 15:50:53
+ * @LastEditTime: 2022-06-29 08:41:21
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -19,6 +19,8 @@
 #include "hcapi/media_player.h"
 #endif
 #include "ui_com.h"
+#include "Volume.h"
+#include "application/key_map.h"
 
 #define FileListPanelWidth 1010
 #define FileListPanelHeight 615
@@ -116,6 +118,10 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
             ReturnUpper();
             lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
         }
+        break;
+    case LV_KEY_VOLUME_UP:
+    case LV_KEY_VOLUME_DOWN:
+        SetVolume(value);
         break;
 
     default:
@@ -461,7 +467,8 @@ static void CreateFilePanel(lv_obj_t* parent)
 
 static void LoadMedia(void)
 {
-    lv_disp_load_scr(ui_MediaScreen);
+    //lv_disp_load_scr(ui_MediaScreen);
+    lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 static void ExitMedia(void)
@@ -486,7 +493,7 @@ static void MediaClose(void)
 {
     lv_group_del(Category_Group);
     lv_group_del(File_List_Group);
-    lv_obj_del(ui_MediaScreen);
+    //lv_obj_del(ui_MediaScreen);
 }
 
 static void MediaInit(lv_obj_t* parent, void *param)
