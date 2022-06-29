@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-28 18:33:32
+ * @LastEditTime: 2022-06-29 16:04:15
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -372,6 +372,8 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
         play_state = LV_FFMPEG_PLAYER_CMD_START;
         played_time_host = 0;
         #elif defined(HCCHIP_GCC)
+        if (media_hal->state == MEDIA_PLAY)
+            media_stop(media_hal);
         media_play(media_hal, file_path);
         #endif
         if(CurrentPlayingType == MEDIA_MUSIC) {

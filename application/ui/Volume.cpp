@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-28 18:46:17
+ * @LastEditTime: 2022-06-29 14:12:59
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
@@ -59,12 +59,10 @@ void SetVolume(uint32_t value)
         PlayingAnimation_Flag = false;
     }
     else {
-        if (PlayingAnimation_Flag) {
-            lv_anim_del(VolumePanel, NULL);
-            fade_up_Animation(VolumePanel, 300);
-            PlayingAnimation_Flag = false;
-        }
-        lv_timer_reset(VolumeTimer);
+        if (PlayingAnimation_Flag)
+            return;
+        else 
+            lv_timer_reset(VolumeTimer);
     }
     if (Volume == 0)
         VolumeImg = &ui_img_audio_mute_volume_png;
@@ -76,7 +74,7 @@ void SetVolume(uint32_t value)
     }
     lv_slider_set_value(VolumeSlider, Volume, LV_ANIM_ON);
     #ifdef HCCHIP_GCC
-    //media_set_vol(Volume);
+    media_set_vol(Volume);
     #endif
 }
 
@@ -126,7 +124,6 @@ static int32_t anim_callback_get_opacity(lv_anim_t * a)
 {
     return lv_obj_get_style_opa((lv_obj_t *)a->user_data, 0);
 }
-
 
 static void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
 {

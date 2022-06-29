@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 08:41:21
+ * @LastEditTime: 2022-06-29 13:04:08
  * @FilePath: /gui/application/ui/MediaScreen.c
  * @Description: None
  * @other: None
@@ -245,7 +245,8 @@ static void FilterFile(CategoryList filter_type)
         &ui_img_filetype_mp4_png,
         &ui_img_filetype_mp3_png,
         &ui_img_filetype_jpg_png,
-        &ui_img_filetype_text_png };
+        &ui_img_filetype_text_png,
+        &ui_img_filetype_other_png };
     static CategoryList last_filter_type = All;
     
     if (last_filter_type != filter_type) {
@@ -258,13 +259,10 @@ static void FilterFile(CategoryList filter_type)
         int end_index = first_file_index + ((filter_type == All) ? non_dir_number : media_number);
         GetNextFile(NULL);
         for (int i = first_file_index; i < end_index; i++) {
-            file = GetNextFile(current_list->NonDirList);
-            if (file == NULL) return;
-            if (filter_type != All) {//筛选出指定类型
-                while( (file != NULL) && (file->type != (FileType)filter_type)) {
-                    file = GetNextFile(current_list->NonDirList);
-                }
-            }
+            do {
+                file = GetNextFile(current_list->NonDirList);
+            } while ((file != NULL) && (filter_type != All) && (file->type != (FileType)filter_type));
+            if (file == NULL) break;
             child = lv_obj_get_child(ui_File_List_Panel, i);
             if (child != NULL) {
                 child->user_data = file;
