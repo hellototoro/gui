@@ -2,13 +2,15 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 13:04:08
- * @FilePath: /gui/application/ui/MediaScreen.c
+ * @LastEditTime: 2022-06-30 14:31:44
+ * @FilePath: /gui/application/ui/MediaScreen.cpp
  * @Description: None
  * @other: None
  */
 #include <unistd.h>
 #include <string.h>
+#include <stack>
+#include <list>
 #include "MediaScreen.h"
 #include "application/windows.h"
 #include "MediaFile.h"
@@ -28,8 +30,6 @@
 #define FileHeight 180
 static const uint16_t FileListPanelRowNumber = FileListPanelWidth/FileWidth;
 
-int lsat_focused_item = 0;
-
 typedef enum {
     All,
     Vedio = FILE_VIDEO,
@@ -48,7 +48,9 @@ lv_obj_t* ui_LAB_Real_Path;
 lv_group_t* Category_Group;
 lv_group_t* File_List_Group;
 lv_obj_t* CurrentMediaWindow;
+std::stack<lv_obj_t*, std::list<lv_obj_t*>> FileListPanelStack;
 
+static void CreateFilePanel(lv_obj_t* parent);
 static void ShowDisk(void);
 static void ShowFileList(FileList *file_list);
 static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* pic, const char* str);
@@ -116,7 +118,6 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
         }
         else if (!lv_obj_is_valid(CurrentMediaWindow)) {
             ReturnUpper();
-            lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
         }
         break;
     case LV_KEY_VOLUME_UP:
@@ -137,7 +138,7 @@ static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
         }
     }
     else if (parents == ui_Category_Panel) {
-        FileFilter = lv_obj_get_index(target);
+        FileFilter = static_cast<CategoryList>(lv_obj_get_index(target));
         FilterFile(FileFilter);
     }
 
@@ -178,8 +179,9 @@ static void file_list_handler(lv_event_t* event)
                 switch (((FileStr *)(target->user_data))->type)
                 {
                 case FILE_DIR:
-                    lsat_focused_item = lv_obj_get_index(target);
-                    lv_obj_clean(ui_File_List_Panel);
+                    FileListPanelStack.push(ui_File_List_Panel);
+                    CreateFilePanel(ui_MediaScreen);
+                    set_group_activity(File_List_Group);
                     strcat(current_path, "/");
                     strcat(current_path, ((FileStr *)(target->user_data))->name);
                     ShowFileList(GetFileList(current_path));
@@ -226,7 +228,6 @@ static void return_handler(lv_event_t* event)
         if (LV_KEY_ENTER == value) {
             if ( !IsRootPath(current_path)) {
                 ReturnUpper();
-                lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
             }
         }
         else {
@@ -254,7 +255,7 @@ static void FilterFile(CategoryList filter_type)
         lv_obj_t* child = NULL;
         uint16_t dir_number = GetDirNumber(current_list);
         uint16_t non_dir_number = GetNonDirNumber(current_list);
-        uint16_t media_number = GetMediaListSize(filter_type);
+        uint16_t media_number = GetMediaListSize(static_cast<MediaType>(filter_type));
         int first_file_index = dir_number + 1;//第一个非文件夹对象
         int end_index = first_file_index + ((filter_type == All) ? non_dir_number : media_number);
         GetNextFile(NULL);
@@ -436,14 +437,34 @@ static void ShowFileList(FileList *file_list)
 
 static void ReturnUpper(void)
 {
-    lv_obj_clean(ui_File_List_Panel);
+    File_List_Group = delete_group(File_List_Group);
+    lv_obj_del_async(ui_File_List_Panel);
+    ui_File_List_Panel = FileListPanelStack.top();
+    FileListPanelStack.pop();
     char *file_extension = strrchr(current_path, '/');
     while(*file_extension != 0) {
         *file_extension = 0;
         file_extension++;
     }
+    lv_label_set_text(ui_LAB_Real_Path, current_path);
+    FileList* file_list = GetPreviousFileList();
+    int FileCnt = GetFileNumber(file_list);
     DestroyAllMediaList();
-    ShowFileList(GetPreviousFileList());
+    GetNextFileFromFileList(NULL);//清理前一次使用痕迹
+    for (int i = 0; i < FileCnt; i++) {
+        FileStr* file = GetNextFileFromFileList(file_list);
+        switch (file->type)
+        {
+        case FILE_VIDEO:
+        case FILE_MUSIC:
+        case FILE_PHOTO:
+        case FILE_TEXT:
+            AddToMediaList(static_cast<MediaType>(file->type), file->name);
+
+        default:
+            break;
+        }
+    }
 }
 
 static void CreateFilePanel(lv_obj_t* parent)
@@ -459,7 +480,8 @@ static void CreateFilePanel(lv_obj_t* parent)
     lv_obj_set_style_border_opa(ui_File_List_Panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_File_List_Panel, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    File_List_Group = lv_group_create();
+    //File_List_Group = lv_group_create();
+    File_List_Group = create_new_group(File_List_Group);
     lv_group_add_obj(File_List_Group, ui_File_List_Panel);
 }
 
@@ -477,18 +499,12 @@ static void ExitMedia(void)
     CurrentScreen = HomeScreen;
 }
 
-static void MediaWait(void)
-{
-    do {
-        #ifdef HCCHIP_GCC
-        MediaMonitorTask();
-        #endif
-        usleep(5000);
-    } while (CurrentScreen == MediaScreen);
-}
-
 static void MediaClose(void)
 {
+    if (!FileListPanelStack.empty()) {
+        File_List_Group = delete_group(File_List_Group);
+        FileListPanelStack.pop();
+    }
     lv_group_del(Category_Group);
     lv_group_del(File_List_Group);
     //lv_obj_del(ui_MediaScreen);
@@ -538,6 +554,5 @@ static void MediaInit(lv_obj_t* parent, void *param)
 window MediaWindow = {
     .ScreenInit = MediaInit,
     .ScreenLoad = LoadMedia,
-    .ScreenWait = MediaWait,
     .ScreenClose = MediaClose
 };

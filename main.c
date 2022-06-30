@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 17:00:03
+ * @LastEditTime: 2022-06-30 14:41:37
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -35,7 +35,6 @@ static void exit_console(int signo);
 int main(void)
 {
     ActiveScreen DefaultScreen;
-    window *LastWindow = NULL;
 
     signal(SIGTERM, exit_console); //kill signal
     signal(SIGINT, exit_console); //Ctrl+C signal
@@ -63,16 +62,7 @@ int main(void)
     DefaultScreen = HomeScreen;
     CurrentScreen = DefaultScreen;
     while(1) {
-        CurrentWindow = Windows[CurrentScreen];
-        if (LastWindow != CurrentWindow) {
-            if(CurrentWindow) {
-                CurrentWindow->ScreenInit(NULL, NULL);
-                CurrentWindow->ScreenLoad();
-                if(LastWindow)
-                    LastWindow->ScreenClose();
-            }
-            LastWindow = CurrentWindow;
-        }
+        WindowsManager();
         lv_task_handler();
         usleep(1000);
     }

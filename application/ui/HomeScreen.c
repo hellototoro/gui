@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 16:44:52
+ * @LastEditTime: 2022-06-30 14:43:48
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -297,17 +297,11 @@ static void source_event_handler(lv_event_t* event)
         break;
     }
 }
+
 static void ExitHome(ActiveScreen screen)
 {
     LastFocusedObjIndex = lv_obj_get_index(lv_group_get_focused(HomeScreenGroup));
     CurrentScreen = screen;
-}
-
-static void HomeWait(void)
-{
-    do {
-        usleep(5000);
-    } while (CurrentScreen == HomeScreen);
 }
 
 static void HomeClose(void)
@@ -330,13 +324,12 @@ static void HomeInit(lv_obj_t* parent, void *param)
 
 static void LoadHome(void)
 {
-    lv_disp_load_scr(ui_HomeScreen);
-    //lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    //lv_disp_load_scr(ui_HomeScreen);
+    lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 window HomeWindow = {
     .ScreenInit = HomeInit,
     .ScreenLoad = LoadHome,
-    .ScreenWait = HomeWait,
     .ScreenClose = HomeClose
 };
