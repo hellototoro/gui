@@ -7,6 +7,7 @@
 #include "lvgl/src/misc/lv_types.h"
 #include "key.h"
 #include "hcapi/com_api.h"
+#include "application/key_map.h"
 
 static int fd_key;
 static lv_indev_t * indev_keypad;
@@ -69,6 +70,15 @@ static void keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
             break;
         case KEY_PREVIOUS:
             act_key = LV_KEY_PREV;
+            break;
+        case KEY_EXIT:
+            act_key = LV_KEY_ESC;
+            break;
+        case KEY_VOLUMEUP:
+            act_key = LV_KEY_VOLUME_UP;
+            break;
+        case KEY_VOLUMEDOWN:
+            act_key = LV_KEY_VOLUME_DOWN;
             break;
         default:
             act_key = USER_KEY_FLAG | act_key;

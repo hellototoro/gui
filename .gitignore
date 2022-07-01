@@ -1,5 +1,9 @@
 build/
 application/ui/resource/
 .vscode/
-/.metadata/
+.metadata/
 lv_host_sim/
+ffmpeg/
+lv_drivers/
+lv_i18n/
+lvgl/
