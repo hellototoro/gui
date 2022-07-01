@@ -45,14 +45,9 @@ media_handle_t *media_open(media_type_t type)
 void media_close(media_handle_t *media_hld)
 {
 	ASSERT_API(media_hld);
-	pthread_mutex_lock(&media_hld->api_lock);
-
-	free((void*)media_hld);
-	pthread_mutex_unlock(&media_hld->api_lock);
-
 	pthread_mutex_destroy(&media_hld->api_lock);
-	free(media_hld);
-}
+	free((void*)media_hld);
+ }
 
 int media_play(media_handle_t *media_hld, const char *media_src)
 {

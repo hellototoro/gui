@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-15 16:17:54
+ * @LastEditTime: 2022-06-30 13:02:18
  * @FilePath: /gui/application/ui/MediaFile.c
  * @Description: None
  * @other: None
@@ -19,12 +19,17 @@ FileList *current_list;
 
 static FileType GetFileType(char *file_name);
 
-
 void MediaFileInit(void)
 {
     file_list_stack = (LinkStack *) malloc(sizeof (LinkStack));
     InitStack(file_list_stack);
     current_list = NULL;
+}
+
+void MediaFileDeInit(void)
+{
+    CloseFileList();
+    free(file_list_stack);
 }
 
 FileList * GetFileList(char *path)
@@ -61,13 +66,13 @@ FileList * GetFileList(char *path)
     file_list->NonDirList = other_list;
     Push(file_list_stack, current_list);
     current_list = file_list;
+    closedir(dir);
     return file_list;
 }
 
 /* 获取上一个文件列表，并删除当前文件列表 */
 FileList * GetPreviousFileList(void)
 {
-    //FileList *file_list = (FileList*) malloc(sizeof(FileList));
     DestroyList(current_list->DirList);
     DestroyList(current_list->NonDirList);
     free(current_list);
@@ -75,7 +80,6 @@ FileList * GetPreviousFileList(void)
         return current_list;
     else 
         return NULL;
-    //current_list = file_list;
 }
 
 uint16_t GetDirNumber(FileList* file_list)
@@ -159,7 +163,7 @@ bool IsRootPath(const char * path)
     return strcmp(media_dir, path) == 0 ? true : false;
 }
 
-void CloseFileList(FileList* file_list)
+void CloseFileList(void)
 {
     while (GetPreviousFileList() != NULL);//清理栈里面所有内容
     DestroyStack(file_list_stack);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-16 13:51:06
+ * @LastEditTime: 2022-06-22 18:52:18
  * @FilePath: /gui/application/ui/MediaFile.h
  * @Description: None
  * @other: None
@@ -10,8 +10,8 @@
 #ifndef __UI_MEDIA_FILE_H__
 #define __UI_MEDIA_FILE_H__
 
-#include "FileType.h"
-#include "data_struct.h"
+#include <stdint.h>
+#include "media_list.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +22,6 @@ extern "C" {
 #else
 #define media_dir "/media"
 #endif
-
 
 typedef enum
 { 
@@ -68,6 +67,8 @@ extern FileStr* GetNextFileFromFileList(FileList* file_list);
 extern FileStr* GetNextFile(LinkList *list);
 extern FileList * GetPreviousFileList(void);
 extern bool IsRootPath(const char * path);
+extern void CloseFileList(void);
+extern void MediaFileDeInit(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

@@ -2,13 +2,13 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:07
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-12 20:00:31
- * @FilePath: /gui/application/ui/data_struct.c
+ * @LastEditTime: 2022-06-22 19:45:11
+ * @FilePath: /gui/application/ui/media_list.c
  * @Description: None
  * @other: None
  */
 #include <stdlib.h>
-#include "data_struct.h"
+#include "media_list.h"
 
 
 /* list */
@@ -168,7 +168,7 @@ Status Pop(LinkStack *S, ElemType *e)
 
 bool StackIsEmpty(LinkStack S)
 {
-    return S == NULL ? true : false;
+    return (S == NULL) ? true : false;
 }
 
 Status DestroyStack(LinkStack *S)
