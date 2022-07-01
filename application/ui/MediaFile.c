@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 19:43:30
+ * @LastEditTime: 2022-06-30 13:02:18
  * @FilePath: /gui/application/ui/MediaFile.c
  * @Description: None
  * @other: None
@@ -66,6 +66,7 @@ FileList * GetFileList(char *path)
     file_list->NonDirList = other_list;
     Push(file_list_stack, current_list);
     current_list = file_list;
+    closedir(dir);
     return file_list;
 }
 

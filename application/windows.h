@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:45
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 01:15:24
+ * @LastEditTime: 2022-06-30 14:36:30
  * @FilePath: /gui/application/windows.h
  * @Description: None
  * @other: None
@@ -25,7 +25,6 @@ typedef struct window
 	void (*ScreenInit) (lv_obj_t* parent, void *param);
     void (*ScreenLoad) (void);
     void (*ScreenClose) (void);
-    void (*ScreenWait) (void);
     void *param;
 }window;
 
@@ -33,5 +32,7 @@ typedef struct window
 extern ActiveScreen CurrentScreen;
 extern window *CurrentWindow;
 extern window *Windows[];
+
+extern void WindowsManager(void);
 
 #endif

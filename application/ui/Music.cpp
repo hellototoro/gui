@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 15:43:05
+ * @LastEditTime: 2022-07-01 09:50:54
  * @FilePath: /gui/application/ui/Music.cpp
  * @Description: None
  * @other: None
@@ -24,7 +24,7 @@ lv_group_t* Lyric_Group;
 music_lyric* lyric;
 int lyric_index;
 
-LV_FONT_DECLARE(ui_font_MyFont24);
+//LV_FONT_DECLARE(ui_font_MyFont24);
 LV_FONT_DECLARE(ui_font_MyFont30);
 LV_FONT_DECLARE(ui_font_MyFont34);
 LV_FONT_DECLARE(ui_font_MyFont38);
@@ -78,7 +78,7 @@ void close_music_window(lv_obj_t* music_window)
     #elif defined(HCCHIP_GCC)
     media_stop(MusicHandler);
     MediaMonitorDeinit(MusicHandler);
-    //media_close(MusicHandler);
+    media_close(MusicHandler);
     MusicHandler = NULL;
     #endif
 
@@ -128,7 +128,7 @@ void LoadLyric(char* music_file_name)
             lv_obj_set_style_text_color(lrc, lv_color_hex(0x89A29E), LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_opa(lrc, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_align(lrc, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
-            lv_obj_set_style_text_font(lrc, &ui_font_MyFont24, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_set_style_text_font(lrc, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
             lv_obj_set_style_text_color(lrc, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
             lv_obj_set_style_text_opa(lrc, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
             //lv_obj_set_style_text_font(lrc, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_FOCUSED);

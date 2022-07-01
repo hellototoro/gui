@@ -2,30 +2,35 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-28 15:47:27
+ * @LastEditTime: 2022-07-01 16:11:57
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
  */
 #include "Volume.h"
 #include "application/key_map.h"
+#ifdef HCCHIP_GCC
+#include "hcapi/media_player.h"
+#endif
 
 lv_obj_t* VolumePanel;
 lv_obj_t* VolumeSlider;
 lv_obj_t* VolumeImage;
 lv_timer_t* VolumeTimer;
 const lv_img_dsc_t* VolumeImg;
-
+bool PlayingFadeDownAnimation_Flag;
 uint8_t Volume;
 
 LV_IMG_DECLARE(ui_img_audio_volume_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_bluetooth_connect_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_decrease_volume_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_increase_volume_png);    // assets\dlna_cast_f.png
 LV_IMG_DECLARE(ui_img_audio_mute_volume_png);    // assets\dlna_cast_f.png
 
 static void CreateVolumePanel(lv_obj_t* parent);
 static void VolumeTimer_cb(lv_timer_t * timer);
+static int32_t anim_callback_get_opacity(lv_anim_t * a);
+static void anim_callback_set_opacity(lv_anim_t * a, int32_t v);
+static void fade_up_Animation(lv_obj_t * TargetObject, int delay);
+static void fade_down_Animation(lv_obj_t * TargetObject, int delay);
+static void anim_callback_delete_obj(struct _lv_anim_t *a);
 
 void SetVolume(uint32_t value)
 {
@@ -45,11 +50,16 @@ void SetVolume(uint32_t value)
     }
     if (!lv_obj_is_valid(VolumePanel)) {
         CreateVolumePanel(lv_scr_act());
-        VolumeTimer = lv_timer_create(VolumeTimer_cb, 3*1000, NULL);
+        fade_up_Animation(VolumePanel, 300);
+        VolumeTimer = lv_timer_create(VolumeTimer_cb, 2*1000, NULL);
         LastVolumeImg = NULL;
+        PlayingFadeDownAnimation_Flag = false;
     }
     else {
-        lv_timer_reset(VolumeTimer);
+        if (PlayingFadeDownAnimation_Flag)
+            return;
+        else 
+            lv_timer_reset(VolumeTimer);
     }
     if (Volume == 0)
         VolumeImg = &ui_img_audio_mute_volume_png;
@@ -60,6 +70,9 @@ void SetVolume(uint32_t value)
         lv_img_set_src(VolumeImage, VolumeImg);
     }
     lv_slider_set_value(VolumeSlider, Volume, LV_ANIM_ON);
+    #ifdef HCCHIP_GCC
+    media_set_vol(Volume);
+    #endif
 }
 
 static void CreateVolumePanel(lv_obj_t* parent)
@@ -94,10 +107,59 @@ static void CreateVolumePanel(lv_obj_t* parent)
     lv_obj_set_align(VolumeImage, LV_ALIGN_CENTER);
     lv_obj_add_flag(VolumeImage, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(VolumeImage, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_opa(VolumePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
 static void VolumeTimer_cb(lv_timer_t * timer)
 {
-    lv_obj_del_async(VolumePanel);
+    fade_down_Animation(VolumePanel, 300);
+    PlayingFadeDownAnimation_Flag = true;
     lv_timer_del(VolumeTimer);
+}
+
+static int32_t anim_callback_get_opacity(lv_anim_t * a)
+{
+    return lv_obj_get_style_opa((lv_obj_t *)a->user_data, 0);
+}
+
+static void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
+{
+    lv_obj_set_style_opa((lv_obj_t *)a->user_data, v, 0);
+}
+
+static void fade_up_Animation(lv_obj_t * TargetObject, int delay)
+{
+    lv_anim_t Animation;
+    lv_anim_init(&Animation);
+    lv_anim_set_time(&Animation, 300);
+    lv_anim_set_user_data(&Animation, TargetObject);
+    lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    lv_anim_set_values(&Animation, 0, 255);
+    lv_anim_set_path_cb(&Animation, lv_anim_path_ease_in);
+    lv_anim_set_delay(&Animation, delay + 0);
+    lv_anim_set_early_apply(&Animation, false);
+    lv_anim_set_get_value_cb(&Animation, &anim_callback_get_opacity);
+    lv_anim_start(&Animation);
+}
+
+static void anim_callback_delete_obj(struct _lv_anim_t *a)
+{
+    lv_obj_del_async((lv_obj_t *)a->user_data);
+    PlayingFadeDownAnimation_Flag = false;
+}
+
+static void fade_down_Animation(lv_obj_t * TargetObject, int delay)
+{
+    lv_anim_t Animation;
+    lv_anim_init(&Animation);
+    lv_anim_set_time(&Animation, 300);
+    lv_anim_set_user_data(&Animation, TargetObject);
+    lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    lv_anim_set_values(&Animation, 255, 0);
+    lv_anim_set_path_cb(&Animation, lv_anim_path_ease_out);
+    lv_anim_set_delay(&Animation, delay + 0);
+    lv_anim_set_early_apply(&Animation, false);
+    lv_anim_set_get_value_cb(&Animation, &anim_callback_get_opacity);
+    lv_anim_set_deleted_cb(&Animation, anim_callback_delete_obj);
+    lv_anim_start(&Animation);
 }

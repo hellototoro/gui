@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-23 13:43:38
+ * @LastEditTime: 2022-06-29 18:58:42
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -47,6 +47,11 @@ lv_group_t* create_new_group(lv_group_t* old_group)
 void set_group_activity(lv_group_t* group)
 {
     lv_indev_set_group(keypad_indev, group);
+}
+
+bool group_stack_is_empty(void)
+{
+    return group_stack.empty();
 }
 
 lv_group_t* delete_group(lv_group_t* group)

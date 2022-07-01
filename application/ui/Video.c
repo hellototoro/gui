@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 15:36:53
+ * @LastEditTime: 2022-06-29 15:25:05
  * @FilePath: /gui/application/ui/Video.c
  * @Description: None
  * @other: None
@@ -54,7 +54,7 @@ void close_video_window(void)
     #elif defined(HCCHIP_GCC)
     media_stop(VideoHandler);
     MediaMonitorDeinit(VideoHandler);
-    //media_close(VideoHandler);
+    media_close(VideoHandler);
     VideoHandler = NULL;
     #endif
 

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 01:53:04
+ * @LastEditTime: 2022-07-01 15:46:33
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -14,6 +14,7 @@
 #include "MediaCom.h"
 #include "Music.h"
 #ifdef HCCHIP_GCC
+#include <pthread.h>
 #include <sys/msg.h>
 #include <ffplayer.h>
 #include <hcuapi/codec_id.h>
@@ -22,6 +23,8 @@
 #endif
 #include "id3v2lib/include/id3v2lib.h"
 #include "ui_com.h"
+#include "Volume.h"
+#include "application/key_map.h"
 
 char current_path[100];
 int current_path_size = sizeof(current_path);
@@ -29,6 +32,7 @@ lv_obj_t* PlayBar;
 lv_obj_t* PlayListPanel;
 lv_obj_t* CurrentMediaScreen;
 MediaType CurrentPlayingType;
+PlayListMode CurrentPlayMode;
 MediaHandle* current_media_hdl;
 MediaList* media_list[MEDIA_MAX];
 #ifdef HOST_GCC
@@ -44,7 +48,7 @@ lv_group_t* Player_Group;
 lv_timer_t* PlayBar_Timer;
 lv_timer_t* PlayState_Timer;
 
-extern lv_indev_t* keypad_indev;
+
 LV_FONT_DECLARE(ui_font_MyFont24);
 LV_FONT_DECLARE(ui_font_MyFont30);
 LV_FONT_DECLARE(ui_font_MyFont34);
@@ -53,9 +57,18 @@ LV_IMG_DECLARE(ui_img_move_pause_png);    // assets\move_pause.png
 LV_IMG_DECLARE(ui_img_move_next_png);    // assets\move_next.png
 LV_IMG_DECLARE(ui_img_move_previous_png);    // assets\move_previous.png
 LV_IMG_DECLARE(ui_img_move_play_png);    // assets\move_play.png
+LV_IMG_DECLARE(ui_img_music_repeat_mode_png);    // assets\move_play.png
 LV_IMG_DECLARE(ui_img_music_order_mode_png);    // assets\move_play.png
+LV_IMG_DECLARE(ui_img_music_once_repeat_mode_png);    // assets\move_play.png
+LV_IMG_DECLARE(ui_img_music_rand_mode_png);    // assets\move_play.png
 LV_IMG_DECLARE(ui_img_music_list_png);    // assets\move_play.png
 LV_IMG_DECLARE(ui_img_music_cover_png);    // assets\move_play.png
+
+static const lv_img_dsc_t* play_mode_image_src[PlayModeNumber] = {
+    &ui_img_music_repeat_mode_png,
+    &ui_img_music_order_mode_png,
+    &ui_img_music_once_repeat_mode_png,
+    &ui_img_music_rand_mode_png };
 
 #ifdef HCCHIP_GCC
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
@@ -70,11 +83,13 @@ static void ShowUpAnimation(lv_obj_t * TargetObject, int delay);
 static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
 static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_number);
 static void ShowOffPlayList(void);
+static void SetTotalTimeAndProgress(uint32_t total_time);
 
 void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group)
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
+    CurrentPlayMode = CyclePlay;
     #ifdef HCCHIP_GCC
     MediaMonitorInit(current_media_hdl);
     #endif
@@ -370,6 +385,8 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
         play_state = LV_FFMPEG_PLAYER_CMD_START;
         played_time_host = 0;
         #elif defined(HCCHIP_GCC)
+        if (media_hal->state == MEDIA_PLAY)
+            media_stop(media_hal);
         media_play(media_hal, file_path);
         #endif
         if(CurrentPlayingType == MEDIA_MUSIC) {
@@ -434,7 +451,12 @@ static void key_event_handler(lv_event_t* event)
                     case PlayList:
                         ShowOnPlayList(CurrentMediaScreen, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
                         break;
-                    
+                    case PlayMode:
+                        CurrentPlayMode++;
+                        CurrentPlayMode %= PlayModeNumber;
+                        lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
+                        //CyclePlay
+                        break;
                     default:
                         break;
                 }
@@ -452,7 +474,12 @@ static void key_event_handler(lv_event_t* event)
                     return;
                 }
                 break;
-                
+
+            case LV_KEY_VOLUME_UP:
+            case LV_KEY_VOLUME_DOWN:
+                SetVolume(value);
+                return;
+
             default:
                 break;
         }
@@ -500,8 +527,8 @@ static void play_list_event_handler(lv_event_t* event)
 static void PlayBar_Timer_cb(lv_timer_t * timer)
 {
     lv_obj_add_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);// | LV_OBJ_FLAG_ADV_HITTEST
-    lv_timer_reset(timer);
     lv_timer_pause(timer);
+    lv_timer_reset(timer);
 }
 
 static void ShowPlayedState(lv_timer_t * timer)
@@ -518,6 +545,14 @@ static void ShowPlayedState(lv_timer_t * timer)
         if (current_media_hdl != NULL)
             played_time = media_get_playtime(current_media_hdl);
         #endif
+        if (played_time > lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
+            lv_timer_pause(timer);
+            PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode));
+            #ifdef HOST_GCC
+            SetTotalTimeAndProgress(20);
+            #endif
+            return;
+        }
         if(CurrentPlayingType == MEDIA_MUSIC) { //刷新歌词
             RefreshLyric(played_time);
         }
@@ -537,7 +572,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         {  200, 10}
     };
     static const lv_img_dsc_t* image_src[] = {
-        & ui_img_music_order_mode_png,
+        NULL,
         & ui_img_move_previous_png,
         & ui_img_move_pause_png,
         & ui_img_move_next_png,
@@ -583,7 +618,6 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj_set_align(lv_obj, LV_ALIGN_CENTER);
     lv_label_set_text(lv_obj, "00:00:00");
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-
     for (int i = 0; i < PlayBarNumber - PlayMode; i++) {
         // ctrl_bar
         lv_obj_t* ctrl_bar = lv_img_create(PlayBar);
@@ -601,6 +635,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         lv_group_add_obj(Player_Group, ctrl_bar);
         lv_obj_add_event_cb(ctrl_bar, key_event_handler, LV_EVENT_ALL, NULL);
     }
+    lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
 
     if (CurrentPlayingType == MEDIA_VIDEO) {
@@ -608,7 +643,11 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     }
     PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
     lv_timer_set_repeat_count(PlayState_Timer, -1);
+    lv_timer_pause(PlayState_Timer);
     CurrentMediaScreen = parent;
+    #ifdef HOST_GCC
+    SetTotalTimeAndProgress(20);
+    #endif
     return PlayBar;
 }
 
@@ -617,6 +656,8 @@ static void SetTotalTimeAndProgress(uint32_t total_time)
     if (total_time == 0) total_time = 100;
     lv_label_set_text_fmt(lv_obj_get_child(PlayBar, TotalTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, (total_time) / 3600, ((total_time) % 3600) / 60, (total_time) % 60);
     lv_slider_set_range(lv_obj_get_child(PlayBar, ProgressSlider), 0, total_time);
+    lv_timer_reset(PlayState_Timer);
+    lv_timer_resume(PlayState_Timer);
 }
 
 static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int file_number)
@@ -647,7 +688,8 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
 
     // PlayListMode_IMG
     lv_obj_t* PlayListMode_IMG = lv_img_create(PlayListInfo);
-    lv_img_set_src(PlayListMode_IMG, &ui_img_music_order_mode_png);
+    //lv_img_set_src(PlayListMode_IMG, &ui_img_music_order_mode_png);
+    lv_img_set_src(PlayListMode_IMG, play_mode_image_src[CurrentPlayMode]);
     lv_obj_set_width(PlayListMode_IMG, LV_SIZE_CONTENT);
     lv_obj_set_height(PlayListMode_IMG, LV_SIZE_CONTENT);
     lv_obj_set_x(PlayListMode_IMG, 0);
@@ -767,7 +809,7 @@ static void ShowUpAnimation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_user_data(&PropertyAnimation, TargetObject);
     lv_anim_set_custom_exec_cb(&PropertyAnimation, anim_callback_set_y);
     lv_anim_set_values(&PropertyAnimation, lv_obj_get_y(TargetObject), -605);
-    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_overshoot);
+    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_ease_in_out);
     lv_anim_set_delay(&PropertyAnimation, delay + 0);
     lv_anim_set_early_apply(&PropertyAnimation, false);
     lv_anim_set_get_value_cb(&PropertyAnimation, &anim_callback_get_y);
@@ -791,10 +833,34 @@ static void ShowDownAnimation(lv_obj_t * TargetObject, int delay)
 }
 
 #ifdef HCCHIP_GCC
+static void* MediaMonitorTask(void* arg);
 int MediaMonitorInit(media_handle_t *media_hld)
 {
+    int res;
+    pthread_t thread_id = 0;
+    pthread_attr_t attr;
     //current_media_hdl = media_hld;
     media_hld->msg_id = api_message_create(CTL_MSG_COUNT, sizeof(HCPlayerMsg));
+    pthread_mutex_init(&media_hld->msg_task_mutex, NULL);
+    pthread_cond_init(&media_hld->msg_task_cond, NULL);
+
+    res = pthread_attr_init(&attr);
+    if (res != 0) {
+        perror("Attribute creation failed");
+        exit(EXIT_FAILURE);
+    }
+    res = pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+    if (res != 0) {
+        perror("Setting detached attribute failed");
+        exit(EXIT_FAILURE);
+    }
+    res = pthread_create(&thread_id, &attr, MediaMonitorTask, NULL);
+    if (res != 0) {
+        perror("Thread creation failed");
+        exit(EXIT_FAILURE);
+    }
+    (void)pthread_attr_destroy(&attr);
+
     return API_SUCCESS;
 }
 
@@ -806,21 +872,26 @@ int MediaMonitorDeinit(media_handle_t *media_hld)
     media_hld->msg_id = INVALID_ID;
     media_hld->exit = 1;
     media_hld->msg_id = INVALID_ID;
+    pthread_cond_wait(&media_hld->msg_task_cond, &media_hld->msg_task_mutex);
+    pthread_mutex_destroy(&media_hld->msg_task_mutex);
+    pthread_cond_destroy(&media_hld->msg_task_cond);
     current_media_hdl = NULL;
     return API_SUCCESS;
 }
 
-void MediaMonitorTask(void)
+void* MediaMonitorTask(void* arg)
 {
-    if (current_media_hdl != NULL) {
-        if (!current_media_hdl->exit) {
-            HCPlayerMsg msg;
-            if (msgrcv(current_media_hdl->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
-            {
-                MediaMsgProc(current_media_hdl, &msg);
-            }
+    (void)arg;
+    HCPlayerMsg msg;
+    while (!current_media_hdl->exit) {
+        if (msgrcv(current_media_hdl->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
+        {
+            MediaMsgProc(current_media_hdl, &msg);
         }
+        api_sleep_ms(10);
     }
+    pthread_cond_signal(&current_media_hdl->msg_task_cond);
+    pthread_exit(NULL);
 }
 
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)

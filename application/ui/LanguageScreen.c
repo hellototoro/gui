@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-04 13:53:40
+ * @LastEditTime: 2022-06-30 14:32:19
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -115,13 +115,6 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     lv_group_focus_obj(lv_obj_get_child(ui_LanguagePanel, English));
 }
 
-static void LanguageWait(void)
-{
-    do {
-        usleep(5000);
-    } while (CurrentScreen == LanguageScreen);
-}
-
 static void LanguageClose(void)
 {
     lv_obj_del(ui_LanguageScreen);
@@ -174,6 +167,5 @@ static void LoadLanguage(void)
 window LanguageWindow = {
     .ScreenInit = LanguageInit,
     .ScreenLoad = LoadLanguage,
-    .ScreenWait = LanguageWait,
     .ScreenClose = LanguageClose
 };

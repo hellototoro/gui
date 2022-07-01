@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-26 01:51:53
+ * @LastEditTime: 2022-06-30 15:04:29
  * @FilePath: /gui/application/ui/MediaCom.h
  * @Description: None
  * @other: None
@@ -38,7 +38,8 @@ typedef enum
     CyclePlay,
     OrderPlay,
     OnlyOnePlay,
-    RandPlay
+    RandPlay,
+    PlayModeNumber
 } PlayListMode;
 
 typedef DLNode MediaNode;
@@ -78,7 +79,6 @@ extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);
 #ifdef HCCHIP_GCC
 extern int MediaMonitorInit(media_handle_t *media_hld);
 extern int MediaMonitorDeinit(media_handle_t *media_hld);
-extern void MediaMonitorTask(void);
 #endif
 
 #ifdef __cplusplus
