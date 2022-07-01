@@ -1,21 +1,23 @@
 /*
  * @Author: totoro huangjian921@outlook.com
- * @Date: 2022-06-05 20:35:12
+ * @Date: 2022-06-27 21:52:32
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-05 21:02:01
- * @FilePath: /gui/application/ui/FileType.h
+ * @LastEditTime: 2022-06-28 15:47:11
+ * @FilePath: /gui/application/ui/Volume.h
  * @Description: None
  * @other: None
  */
-#ifndef __FILE_TYPE_H__
-#define __FILE_TYPE_H__
+#ifndef __VOLUME_H__
+#define __VOLUME_H__
 
-#include <stdint.h>
+#include "lvgl/lvgl.h"
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+extern void SetVolume(uint32_t value);
 
 #ifdef __cplusplus
 } /*extern "C"*/
