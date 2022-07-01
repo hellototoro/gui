@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 13:41:11
+ * @LastEditTime: 2022-07-01 19:39:29
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -73,6 +73,7 @@ void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
     lv_obj_set_style_radius(ui_SettingScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_SettingScreen, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_SettingScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_SettingScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //HomeScreenGroup = lv_group_create();
     //set_group_activity(HomeScreenGroup);

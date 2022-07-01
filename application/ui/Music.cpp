@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 09:50:54
+ * @LastEditTime: 2022-07-01 19:42:34
  * @FilePath: /gui/application/ui/Music.cpp
  * @Description: None
  * @other: None
@@ -231,9 +231,7 @@ static void key_event_handler(lv_event_t* event)
 
 static void SetStyleForPlayBar(lv_obj_t* bar)
 {
-    lv_obj_set_style_bg_color(bar, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(bar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
@@ -280,9 +278,7 @@ static void CreateLyricPanel(lv_obj_t* parent)
     lv_obj_set_align(LyricPanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(LyricPanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(LyricPanel, LV_DIR_VER);
-    lv_obj_set_style_bg_color(LyricPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(LyricPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(LyricPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(LyricPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_scroll_snap_y(LyricPanel, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_flex_flow(LyricPanel, LV_FLEX_FLOW_COLUMN);

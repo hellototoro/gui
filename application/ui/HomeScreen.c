@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 16:49:04
+ * @LastEditTime: 2022-07-01 19:38:10
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -136,6 +136,7 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_style_radius(ui_Source_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_Source_Panel, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Source_Panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_Source_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // ui_IMG_SourceType
     ui_IMG_SourceType = lv_img_create(ui_Source_Panel);
@@ -164,7 +165,6 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_align(ui_BTN_Source_USB, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_BTN_Source_USB, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(ui_BTN_Source_USB, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_BTN_Source_USB, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BTN_Source_USB, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_BTN_Source_USB, &ui_img_usb2_n_png, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_BTN_Source_USB, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -182,7 +182,6 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_align(ui_BTN_Source_HDMI, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_BTN_Source_HDMI, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(ui_BTN_Source_HDMI, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_BTN_Source_HDMI, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_BTN_Source_HDMI, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(ui_BTN_Source_HDMI, &ui_img_hdmi_n_png, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_BTN_Source_HDMI, 0, LV_PART_MAIN | LV_STATE_DEFAULT);

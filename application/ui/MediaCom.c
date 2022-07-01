@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 15:46:33
+ * @LastEditTime: 2022-07-01 19:38:27
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -13,6 +13,7 @@
 #include <unistd.h>
 #include "MediaCom.h"
 #include "Music.h"
+#include "Photo.h"
 #ifdef HCCHIP_GCC
 #include <pthread.h>
 #include <sys/msg.h>
@@ -108,7 +109,7 @@ void MediaComDeinit(void)
     lv_group_del(Player_Group);
 
     //step4 清除定时器
-    if (CurrentPlayingType == MEDIA_VIDEO)
+    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO)
         lv_timer_del(PlayBar_Timer);
     lv_timer_del(PlayState_Timer);
 }
@@ -483,7 +484,7 @@ static void key_event_handler(lv_event_t* event)
             default:
                 break;
         }
-        if (CurrentPlayingType == MEDIA_VIDEO) {
+        if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
             if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
                 lv_timer_reset(PlayBar_Timer);
             }
@@ -638,7 +639,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
 
-    if (CurrentPlayingType == MEDIA_VIDEO) {
+    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
         PlayBar_Timer = lv_timer_create(PlayBar_Timer_cb, 5*1000, NULL);
     }
     PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
@@ -681,9 +682,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_y(PlayListInfo, -300);
     lv_obj_set_align(PlayListInfo, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayListInfo, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(PlayListInfo, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(PlayListInfo, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(PlayListInfo, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(PlayListInfo, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // PlayListMode_IMG
@@ -717,9 +716,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_y(FileListPanel, -5);
     lv_obj_set_align(FileListPanel, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(FileListPanel, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_bg_color(FileListPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(FileListPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //设置组
@@ -742,7 +739,6 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_style_radius(file_panel, 15, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_color(file_panel, lv_color_hex(0xA5CAC3), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(file_panel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_color(file_panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_opa(file_panel, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(Player_Group, file_panel);
         lv_obj_add_event_cb(file_panel, play_list_event_handler, LV_EVENT_KEY, NULL);
