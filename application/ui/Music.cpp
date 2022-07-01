@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 16:04:49
+ * @LastEditTime: 2022-07-01 09:50:54
  * @FilePath: /gui/application/ui/Music.cpp
  * @Description: None
  * @other: None
@@ -24,7 +24,7 @@ lv_group_t* Lyric_Group;
 music_lyric* lyric;
 int lyric_index;
 
-LV_FONT_DECLARE(ui_font_MyFont24);
+//LV_FONT_DECLARE(ui_font_MyFont24);
 LV_FONT_DECLARE(ui_font_MyFont30);
 LV_FONT_DECLARE(ui_font_MyFont34);
 LV_FONT_DECLARE(ui_font_MyFont38);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 14:31:44
+ * @LastEditTime: 2022-07-01 16:48:03
  * @FilePath: /gui/application/ui/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -485,29 +485,12 @@ static void CreateFilePanel(lv_obj_t* parent)
     lv_group_add_obj(File_List_Group, ui_File_List_Panel);
 }
 
-static void LoadMedia(void)
-{
-    //lv_disp_load_scr(ui_MediaScreen);
-    lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
-}
-
 static void ExitMedia(void)
 {
     DestroyAllMediaList();
     MediaFileDeInit();
     memset(current_path, 0, current_path_size );
     CurrentScreen = HomeScreen;
-}
-
-static void MediaClose(void)
-{
-    if (!FileListPanelStack.empty()) {
-        File_List_Group = delete_group(File_List_Group);
-        FileListPanelStack.pop();
-    }
-    lv_group_del(Category_Group);
-    lv_group_del(File_List_Group);
-    //lv_obj_del(ui_MediaScreen);
 }
 
 static void MediaInit(lv_obj_t* parent, void *param)
@@ -549,6 +532,23 @@ static void MediaInit(lv_obj_t* parent, void *param)
     MediaFileInit();
     strcat(current_path, media_dir);
     ShowFileList(GetFileList(current_path));
+}
+
+static void LoadMedia(void)
+{
+    //lv_disp_load_scr(ui_MediaScreen);
+    lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+}
+
+static void MediaClose(void)
+{
+    if (!FileListPanelStack.empty()) {
+        File_List_Group = delete_group(File_List_Group);
+        FileListPanelStack.pop();
+    }
+    lv_group_del(Category_Group);
+    lv_group_del(File_List_Group);
+    //lv_obj_del(ui_MediaScreen);
 }
 
 window MediaWindow = {

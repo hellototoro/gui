@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 15:47:08
+ * @LastEditTime: 2022-07-01 15:46:33
  * @FilePath: /gui/application/ui/MediaCom.c
  * @Description: None
  * @other: None
@@ -49,7 +49,6 @@ lv_timer_t* PlayBar_Timer;
 lv_timer_t* PlayState_Timer;
 
 
-extern lv_indev_t* keypad_indev;
 LV_FONT_DECLARE(ui_font_MyFont24);
 LV_FONT_DECLARE(ui_font_MyFont30);
 LV_FONT_DECLARE(ui_font_MyFont34);
@@ -453,8 +452,8 @@ static void key_event_handler(lv_event_t* event)
                         ShowOnPlayList(CurrentMediaScreen, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
                         break;
                     case PlayMode:
-                        //CurrentPlayMode++;
-                        CurrentPlayMode = (++CurrentPlayMode)%PlayModeNumber;
+                        CurrentPlayMode++;
+                        CurrentPlayMode %= PlayModeNumber;
                         lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
                         //CyclePlay
                         break;
@@ -479,7 +478,7 @@ static void key_event_handler(lv_event_t* event)
             case LV_KEY_VOLUME_UP:
             case LV_KEY_VOLUME_DOWN:
                 SetVolume(value);
-                break;
+                return;
 
             default:
                 break;
@@ -528,8 +527,8 @@ static void play_list_event_handler(lv_event_t* event)
 static void PlayBar_Timer_cb(lv_timer_t * timer)
 {
     lv_obj_add_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);// | LV_OBJ_FLAG_ADV_HITTEST
-    lv_timer_reset(timer);
     lv_timer_pause(timer);
+    lv_timer_reset(timer);
 }
 
 static void ShowPlayedState(lv_timer_t * timer)

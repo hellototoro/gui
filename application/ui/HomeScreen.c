@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 14:43:48
+ * @LastEditTime: 2022-07-01 16:49:04
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -25,23 +25,15 @@ lv_group_t* HomeScreenGroup;
 int LastFocusedObjIndex;
 
 LV_IMG_DECLARE(ui_img_udisk_n_png);    // assets\udisk_n.png
-LV_IMG_DECLARE(ui_img_udisk_f_png);    // assets\udisk_f.png
 LV_IMG_DECLARE(ui_img_setting_n_png);    // assets\setting_n.png
-LV_IMG_DECLARE(ui_img_setting_f_png);    // assets\setting_f.png
 LV_IMG_DECLARE(ui_img_source_n_png);    // assets\source_n.png
-LV_IMG_DECLARE(ui_img_source_f_png);    // assets\source_f.png
 LV_IMG_DECLARE(ui_img_ios_cast_n_png);    // assets\ios_cast_n.png
-LV_IMG_DECLARE(ui_img_ios_cast_f_png);    // assets\ios_cast_f.png
 LV_IMG_DECLARE(ui_img_android_cast_n_png);    // assets\android_cast_n.png
-LV_IMG_DECLARE(ui_img_android_cast_f_png);    // assets\android_cast_f.png
 LV_IMG_DECLARE(ui_img_dlna_cast_n_png);    // assets\dlna_cast_n.png
-LV_IMG_DECLARE(ui_img_dlna_cast_f_png);    // assets\dlna_cast_f.png
 LV_IMG_DECLARE(ui_img_usb2_big_png);    // assets\dlna_cast_f.png
 LV_IMG_DECLARE(ui_img_hdmi_big_png);    // assets\dlna_cast_f.png
 LV_IMG_DECLARE(ui_img_usb2_n_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_usb2_f_png);    // assets\dlna_cast_f.png
 LV_IMG_DECLARE(ui_img_hdmi_n_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_hdmi_f_png);    // assets\dlna_cast_f.png
 
 LV_FONT_DECLARE(ui_font_MyFont30);
 LV_FONT_DECLARE(ui_font_MyFont34);
@@ -91,13 +83,13 @@ static void CreateMainPanel(lv_obj_t* parent)
         {   -8,  -38}
     };
     static const char* str[] =  { "U Disk", "Setting", "Source", "IOS", "Android", "DLNA"};
-    static const lv_img_dsc_t* image_src[][2] = {
-        {& ui_img_udisk_n_png ,        &ui_img_udisk_f_png},
-        {& ui_img_setting_n_png ,      &ui_img_setting_f_png},
-        {& ui_img_source_n_png ,       &ui_img_source_f_png},
-        {& ui_img_ios_cast_n_png ,     &ui_img_ios_cast_f_png},
-        {& ui_img_android_cast_n_png , &ui_img_android_cast_f_png},
-        {& ui_img_dlna_cast_n_png ,    &ui_img_dlna_cast_f_png}
+    static const lv_img_dsc_t* image_src[] = {
+        & ui_img_udisk_n_png,
+        & ui_img_setting_n_png,
+        & ui_img_source_n_png,
+        & ui_img_ios_cast_n_png,
+        & ui_img_android_cast_n_png,
+        & ui_img_dlna_cast_n_png
     };
 
     // ui_Main_Panel
@@ -119,7 +111,7 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_obj_set_style_bg_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_border_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_shadow_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_bg_img_src(ui_btn, image_src[i][0], LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_src(ui_btn, image_src[i], LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_border_color(ui_btn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_opa(ui_btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_width(ui_btn, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
@@ -304,12 +296,6 @@ static void ExitHome(ActiveScreen screen)
     CurrentScreen = screen;
 }
 
-static void HomeClose(void)
-{
-    lv_group_del(HomeScreenGroup);
-    //lv_obj_del(ui_HomeScreen);
-}
-
 static void HomeInit(lv_obj_t* parent, void *param)
 {
     (void)param;
@@ -326,6 +312,12 @@ static void LoadHome(void)
 {
     //lv_disp_load_scr(ui_HomeScreen);
     lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+}
+
+static void HomeClose(void)
+{
+    lv_group_del(HomeScreenGroup);
+    //lv_obj_del(ui_HomeScreen);
 }
 
 window HomeWindow = {

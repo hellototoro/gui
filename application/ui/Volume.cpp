@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 14:12:59
+ * @LastEditTime: 2022-07-01 16:11:57
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
@@ -18,13 +18,10 @@ lv_obj_t* VolumeSlider;
 lv_obj_t* VolumeImage;
 lv_timer_t* VolumeTimer;
 const lv_img_dsc_t* VolumeImg;
-bool PlayingAnimation_Flag;
+bool PlayingFadeDownAnimation_Flag;
 uint8_t Volume;
 
 LV_IMG_DECLARE(ui_img_audio_volume_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_bluetooth_connect_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_decrease_volume_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_increase_volume_png);    // assets\dlna_cast_f.png
 LV_IMG_DECLARE(ui_img_audio_mute_volume_png);    // assets\dlna_cast_f.png
 
 static void CreateVolumePanel(lv_obj_t* parent);
@@ -56,10 +53,10 @@ void SetVolume(uint32_t value)
         fade_up_Animation(VolumePanel, 300);
         VolumeTimer = lv_timer_create(VolumeTimer_cb, 2*1000, NULL);
         LastVolumeImg = NULL;
-        PlayingAnimation_Flag = false;
+        PlayingFadeDownAnimation_Flag = false;
     }
     else {
-        if (PlayingAnimation_Flag)
+        if (PlayingFadeDownAnimation_Flag)
             return;
         else 
             lv_timer_reset(VolumeTimer);
@@ -116,7 +113,7 @@ static void CreateVolumePanel(lv_obj_t* parent)
 static void VolumeTimer_cb(lv_timer_t * timer)
 {
     fade_down_Animation(VolumePanel, 300);
-    PlayingAnimation_Flag = true;
+    PlayingFadeDownAnimation_Flag = true;
     lv_timer_del(VolumeTimer);
 }
 
@@ -132,37 +129,37 @@ static void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
 
 static void fade_up_Animation(lv_obj_t * TargetObject, int delay)
 {
-    lv_anim_t PropertyAnimation_0;
-    lv_anim_init(&PropertyAnimation_0);
-    lv_anim_set_time(&PropertyAnimation_0, 300);
-    lv_anim_set_user_data(&PropertyAnimation_0, TargetObject);
-    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, anim_callback_set_opacity);
-    lv_anim_set_values(&PropertyAnimation_0, 0, 255);
-    lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_ease_in);
-    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
-    lv_anim_set_early_apply(&PropertyAnimation_0, false);
-    lv_anim_set_get_value_cb(&PropertyAnimation_0, &anim_callback_get_opacity);
-    lv_anim_start(&PropertyAnimation_0);
+    lv_anim_t Animation;
+    lv_anim_init(&Animation);
+    lv_anim_set_time(&Animation, 300);
+    lv_anim_set_user_data(&Animation, TargetObject);
+    lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    lv_anim_set_values(&Animation, 0, 255);
+    lv_anim_set_path_cb(&Animation, lv_anim_path_ease_in);
+    lv_anim_set_delay(&Animation, delay + 0);
+    lv_anim_set_early_apply(&Animation, false);
+    lv_anim_set_get_value_cb(&Animation, &anim_callback_get_opacity);
+    lv_anim_start(&Animation);
 }
 
 static void anim_callback_delete_obj(struct _lv_anim_t *a)
 {
     lv_obj_del_async((lv_obj_t *)a->user_data);
-    PlayingAnimation_Flag = false;
+    PlayingFadeDownAnimation_Flag = false;
 }
 
 static void fade_down_Animation(lv_obj_t * TargetObject, int delay)
 {
-    lv_anim_t PropertyAnimation_0;
-    lv_anim_init(&PropertyAnimation_0);
-    lv_anim_set_time(&PropertyAnimation_0, 300);
-    lv_anim_set_user_data(&PropertyAnimation_0, TargetObject);
-    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, anim_callback_set_opacity);
-    lv_anim_set_values(&PropertyAnimation_0, 255, 0);
-    lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_ease_out);
-    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
-    lv_anim_set_early_apply(&PropertyAnimation_0, false);
-    lv_anim_set_get_value_cb(&PropertyAnimation_0, &anim_callback_get_opacity);
-    lv_anim_set_deleted_cb(&PropertyAnimation_0, anim_callback_delete_obj);
-    lv_anim_start(&PropertyAnimation_0);
+    lv_anim_t Animation;
+    lv_anim_init(&Animation);
+    lv_anim_set_time(&Animation, 300);
+    lv_anim_set_user_data(&Animation, TargetObject);
+    lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    lv_anim_set_values(&Animation, 255, 0);
+    lv_anim_set_path_cb(&Animation, lv_anim_path_ease_out);
+    lv_anim_set_delay(&Animation, delay + 0);
+    lv_anim_set_early_apply(&Animation, false);
+    lv_anim_set_get_value_cb(&Animation, &anim_callback_get_opacity);
+    lv_anim_set_deleted_cb(&Animation, anim_callback_delete_obj);
+    lv_anim_start(&Animation);
 }
