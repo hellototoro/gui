@@ -2,14 +2,15 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 19:38:27
- * @FilePath: /gui/application/ui/MediaCom.c
+ * @LastEditTime: 2022-07-04 15:37:38
+ * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
  */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
 #include "MediaCom.h"
 #include "Music.h"
@@ -23,8 +24,8 @@
 #include "hcapi/os_api.h"
 #endif
 #include "id3v2lib/include/id3v2lib.h"
-#include "ui_com.h"
-#include "Volume.h"
+#include "application/ui/ui_com.h"
+#include "application/ui/Volume.h"
 #include "application/key_map.h"
 
 char current_path[100];
@@ -90,10 +91,11 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
-    CurrentPlayMode = CyclePlay;
+    CurrentPlayMode = RandPlay;
     #ifdef HCCHIP_GCC
     MediaMonitorInit(current_media_hdl);
     #endif
+    srand(time(0));
     PlayingAnimation_Flag = false;
 
     //设置组
@@ -270,55 +272,50 @@ char* GetCurrentMediaName(void)
     return media_file_name_array[current_playing_index];
 }
 
-char* GetNextMediaName(MediaType media_type, PlayListMode mode)
+char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode)
 {
-    ++current_playing_index;
-    switch (mode)
-    {
-    case CyclePlay:
-        if (current_playing_index >= GetMediaArraySize(media_type))
-            current_playing_index = 0;
-        break;
-    case OrderPlay:
-        if (current_playing_index >= GetMediaArraySize(media_type))
-            return NULL;
-        break;
-    case OnlyOnePlay:
-        /* code */
-        break;
-    case RandPlay:
-        /* code */
-        break;
-    
-    default:
-        break;
+    switch (next_mode) {
+        case ManualPlay:
+            ++current_playing_index;
+            current_playing_index %= GetMediaArraySize(media_type);
+            break;
+
+        case AutoPlay:
+            switch (mode) {
+                case CyclePlay:
+                    ++current_playing_index;
+                    current_playing_index %= GetMediaArraySize(media_type);
+                    break;
+
+                case OrderPlay:
+                    if (current_playing_index < GetMediaArraySize(media_type)-1)
+                        ++current_playing_index;
+                    else
+                        return NULL;
+                    break;
+
+                case OnlyOnePlay:
+                    break;
+
+                case RandPlay:
+                    current_playing_index = rand() % GetMediaArraySize(media_type);
+                    break;
+                
+                default:
+                    break;
+            }
+        default:
+            break;
     }
     return media_file_name_array[current_playing_index];
 }
 
 char* GetPreMediaName(MediaType media_type, PlayListMode mode)
 {
+    (void)mode;
     --current_playing_index;
-    switch (mode)
-    {
-    case CyclePlay:
-        if (current_playing_index < 0)
-            current_playing_index = GetMediaArraySize(media_type) - 1;
-        break;
-    case OrderPlay:
-        if (current_playing_index < 0)
-            return NULL;
-        break;
-    case OnlyOnePlay:
-        /* code */
-        break;
-    case RandPlay:
-        /* code */
-        break;
-    
-    default:
-        break;
-    }
+    if (current_playing_index < 0)
+        current_playing_index = GetMediaArraySize(media_type) - 1;
     return media_file_name_array[current_playing_index];
 }
 
@@ -444,10 +441,10 @@ static void key_event_handler(lv_event_t* event)
                     }
                     break;
                     case Previous:
-                        PlayMedia(current_media_hdl, GetPreMediaName(CurrentPlayingType, CyclePlay));
+                        PlayMedia(current_media_hdl, GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
                         break;
                     case Next:
-                        PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CyclePlay));
+                        PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
                         break;
                     case PlayList:
                         ShowOnPlayList(CurrentMediaScreen, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
@@ -548,9 +545,10 @@ static void ShowPlayedState(lv_timer_t * timer)
         #endif
         if (played_time > lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
             lv_timer_pause(timer);
-            PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode));
+            PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
             #ifdef HOST_GCC
-            SetTotalTimeAndProgress(20);
+            if (played_time_host == 0)
+                SetTotalTimeAndProgress(20);
             #endif
             return;
         }

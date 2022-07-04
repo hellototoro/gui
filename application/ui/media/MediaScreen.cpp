@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 19:38:50
- * @FilePath: /gui/application/ui/MediaScreen.cpp
+ * @LastEditTime: 2022-07-04 14:30:39
+ * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
  */
@@ -21,8 +21,8 @@
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
-#include "ui_com.h"
-#include "Volume.h"
+#include "application/ui/ui_com.h"
+#include "application/ui/Volume.h"
 #include "application/key_map.h"
 
 #define FileListPanelWidth 1010
