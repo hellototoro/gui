@@ -2,17 +2,19 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 15:46:33
- * @FilePath: /gui/application/ui/MediaCom.c
+ * @LastEditTime: 2022-07-04 15:37:38
+ * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
  */
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <time.h>
 #include <unistd.h>
 #include "MediaCom.h"
 #include "Music.h"
+#include "Photo.h"
 #ifdef HCCHIP_GCC
 #include <pthread.h>
 #include <sys/msg.h>
@@ -22,8 +24,8 @@
 #include "hcapi/os_api.h"
 #endif
 #include "id3v2lib/include/id3v2lib.h"
-#include "ui_com.h"
-#include "Volume.h"
+#include "application/ui/ui_com.h"
+#include "application/ui/Volume.h"
 #include "application/key_map.h"
 
 char current_path[100];
@@ -89,10 +91,11 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
-    CurrentPlayMode = CyclePlay;
+    CurrentPlayMode = RandPlay;
     #ifdef HCCHIP_GCC
     MediaMonitorInit(current_media_hdl);
     #endif
+    srand(time(0));
     PlayingAnimation_Flag = false;
 
     //设置组
@@ -108,7 +111,7 @@ void MediaComDeinit(void)
     lv_group_del(Player_Group);
 
     //step4 清除定时器
-    if (CurrentPlayingType == MEDIA_VIDEO)
+    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO)
         lv_timer_del(PlayBar_Timer);
     lv_timer_del(PlayState_Timer);
 }
@@ -269,55 +272,50 @@ char* GetCurrentMediaName(void)
     return media_file_name_array[current_playing_index];
 }
 
-char* GetNextMediaName(MediaType media_type, PlayListMode mode)
+char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode)
 {
-    ++current_playing_index;
-    switch (mode)
-    {
-    case CyclePlay:
-        if (current_playing_index >= GetMediaArraySize(media_type))
-            current_playing_index = 0;
-        break;
-    case OrderPlay:
-        if (current_playing_index >= GetMediaArraySize(media_type))
-            return NULL;
-        break;
-    case OnlyOnePlay:
-        /* code */
-        break;
-    case RandPlay:
-        /* code */
-        break;
-    
-    default:
-        break;
+    switch (next_mode) {
+        case ManualPlay:
+            ++current_playing_index;
+            current_playing_index %= GetMediaArraySize(media_type);
+            break;
+
+        case AutoPlay:
+            switch (mode) {
+                case CyclePlay:
+                    ++current_playing_index;
+                    current_playing_index %= GetMediaArraySize(media_type);
+                    break;
+
+                case OrderPlay:
+                    if (current_playing_index < GetMediaArraySize(media_type)-1)
+                        ++current_playing_index;
+                    else
+                        return NULL;
+                    break;
+
+                case OnlyOnePlay:
+                    break;
+
+                case RandPlay:
+                    current_playing_index = rand() % GetMediaArraySize(media_type);
+                    break;
+                
+                default:
+                    break;
+            }
+        default:
+            break;
     }
     return media_file_name_array[current_playing_index];
 }
 
 char* GetPreMediaName(MediaType media_type, PlayListMode mode)
 {
+    (void)mode;
     --current_playing_index;
-    switch (mode)
-    {
-    case CyclePlay:
-        if (current_playing_index < 0)
-            current_playing_index = GetMediaArraySize(media_type) - 1;
-        break;
-    case OrderPlay:
-        if (current_playing_index < 0)
-            return NULL;
-        break;
-    case OnlyOnePlay:
-        /* code */
-        break;
-    case RandPlay:
-        /* code */
-        break;
-    
-    default:
-        break;
-    }
+    if (current_playing_index < 0)
+        current_playing_index = GetMediaArraySize(media_type) - 1;
     return media_file_name_array[current_playing_index];
 }
 
@@ -443,10 +441,10 @@ static void key_event_handler(lv_event_t* event)
                     }
                     break;
                     case Previous:
-                        PlayMedia(current_media_hdl, GetPreMediaName(CurrentPlayingType, CyclePlay));
+                        PlayMedia(current_media_hdl, GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
                         break;
                     case Next:
-                        PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CyclePlay));
+                        PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
                         break;
                     case PlayList:
                         ShowOnPlayList(CurrentMediaScreen, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
@@ -483,7 +481,7 @@ static void key_event_handler(lv_event_t* event)
             default:
                 break;
         }
-        if (CurrentPlayingType == MEDIA_VIDEO) {
+        if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
             if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
                 lv_timer_reset(PlayBar_Timer);
             }
@@ -547,9 +545,10 @@ static void ShowPlayedState(lv_timer_t * timer)
         #endif
         if (played_time > lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
             lv_timer_pause(timer);
-            PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode));
+            PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
             #ifdef HOST_GCC
-            SetTotalTimeAndProgress(20);
+            if (played_time_host == 0)
+                SetTotalTimeAndProgress(20);
             #endif
             return;
         }
@@ -638,7 +637,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
 
-    if (CurrentPlayingType == MEDIA_VIDEO) {
+    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
         PlayBar_Timer = lv_timer_create(PlayBar_Timer_cb, 5*1000, NULL);
     }
     PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
@@ -681,9 +680,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_y(PlayListInfo, -300);
     lv_obj_set_align(PlayListInfo, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayListInfo, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(PlayListInfo, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(PlayListInfo, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(PlayListInfo, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(PlayListInfo, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // PlayListMode_IMG
@@ -717,9 +714,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_y(FileListPanel, -5);
     lv_obj_set_align(FileListPanel, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(FileListPanel, LV_FLEX_FLOW_COLUMN);
-    lv_obj_set_style_bg_color(FileListPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(FileListPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //设置组
@@ -742,7 +737,6 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_style_radius(file_panel, 15, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_color(file_panel, lv_color_hex(0xA5CAC3), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(file_panel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_color(file_panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_opa(file_panel, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(Player_Group, file_panel);
         lv_obj_add_event_cb(file_panel, play_list_event_handler, LV_EVENT_KEY, NULL);

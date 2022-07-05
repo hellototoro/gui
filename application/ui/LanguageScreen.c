@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 14:32:19
+ * @LastEditTime: 2022-07-01 19:38:23
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -74,9 +74,7 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     lv_obj_set_align(ui_LanguagePanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(ui_LanguagePanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(ui_LanguagePanel, LV_DIR_VER);
-    lv_obj_set_style_bg_color(ui_LanguagePanel, lv_color_hex(0x19060C), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_LanguagePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_LanguagePanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_LanguagePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_group_t* group = lv_group_get_default();
