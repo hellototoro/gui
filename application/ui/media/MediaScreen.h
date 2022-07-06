@@ -10,7 +10,11 @@
 #ifndef __UI_MEDIA_SCREEN_H__
 #define __UI_MEDIA_SCREEN_H__
 
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
 #endif

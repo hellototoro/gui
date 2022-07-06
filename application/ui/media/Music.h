@@ -10,7 +10,11 @@
 #ifndef __MUSIC_H__
 #define __MUSIC_H__
 
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif

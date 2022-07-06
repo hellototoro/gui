@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 14:41:37
+ * @LastEditTime: 2022-07-06 14:24:28
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -15,11 +15,15 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 #include "application/windows.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
-#include "hcapi/key/key.h"
+#include "hcapi/key.h"
 #endif
 #include "application/ui/ui_com.h"
 

@@ -28,9 +28,12 @@
 
 //#define NETWORK_SUPPORT
 
-//#define CAST_DLNA_ENABLE    0
+//#define CAST_DLNA_ENABLE
 //#define CAST_AIRPLAY_ENABLE
 //#define CAST_MIRACAST_ENABLE
+
+//Change/delete LVGL objects and frush/draw LVGL objects in same main task, 
+//to avoid access LVGL objects conflict.
 #define DRAW_UI_SYNC
 
 

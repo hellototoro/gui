@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-04 15:37:38
+ * @LastEditTime: 2022-07-06 14:46:54
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -402,6 +402,20 @@ static void key_event_handler(lv_event_t* event)
     if (LV_EVENT_KEY == code) {
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+        if (lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
+            switch (value)
+            {
+                case LV_KEY_ENTER:
+                case LV_KEY_LEFT:
+                case LV_KEY_RIGHT:
+                        lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);
+                        lv_timer_reset(PlayBar_Timer);
+                        lv_timer_resume(PlayBar_Timer);
+                    return;
+                default:
+                break;
+            }
+        }
         switch (value)
         {
             case LV_KEY_ENTER:
@@ -484,10 +498,6 @@ static void key_event_handler(lv_event_t* event)
         if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
             if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
                 lv_timer_reset(PlayBar_Timer);
-            }
-            else {
-                lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);
-                lv_timer_resume(PlayBar_Timer);
             }
         }
     }

@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 19:39:38
- * @FilePath: /gui/application/ui/Video.c
+ * @LastEditTime: 2022-07-06 15:16:17
+ * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
  */

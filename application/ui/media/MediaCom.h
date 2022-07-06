@@ -10,7 +10,11 @@
 #ifndef __MEDIA_COM_H__
 #define __MEDIA_COM_H__
 
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 #include "media_list.h"
 #include "MediaFile.h"
 #ifdef HCCHIP_GCC

@@ -10,7 +10,11 @@
 #ifndef __VOLUME_H__
 #define __VOLUME_H__
 
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 
 
 #ifdef __cplusplus

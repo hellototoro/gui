@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-04 14:30:39
+ * @LastEditTime: 2022-07-06 14:25:13
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -18,6 +18,7 @@
 #include "Video.h"
 #include "Music.h"
 #include "Photo.h"
+#include "Text.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
@@ -199,7 +200,7 @@ static void file_list_handler(lv_event_t* event)
                     CurrentMediaWindow = creat_photo_window(target);
                     break;
                 case FILE_TEXT:
-
+                    CurrentMediaWindow = creat_text_window(target);
                     break;
                 
                 default:
@@ -534,8 +535,8 @@ static void MediaInit(lv_obj_t* parent, void *param)
 
 static void LoadMedia(void)
 {
-    //lv_disp_load_scr(ui_MediaScreen);
-    lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    lv_disp_load_scr(ui_MediaScreen);
+    //lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 static void MediaClose(void)
@@ -546,7 +547,7 @@ static void MediaClose(void)
     }
     lv_group_del(Category_Group);
     lv_group_del(File_List_Group);
-    //lv_obj_del(ui_MediaScreen);
+    lv_obj_del(ui_MediaScreen);
 }
 
 window MediaWindow = {
