@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-04 14:34:09
+ * @LastEditTime: 2022-07-15 14:00:31
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -23,18 +23,6 @@ lv_group_t* Lyric_Group;
 
 music_lyric* lyric;
 int lyric_index;
-
-//LV_FONT_DECLARE(ui_font_MyFont24);
-LV_FONT_DECLARE(ui_font_MyFont30);
-LV_FONT_DECLARE(ui_font_MyFont34);
-LV_FONT_DECLARE(ui_font_MyFont38);
-LV_IMG_DECLARE(ui_img_move_pause_png);    // assets\move_pause.png
-LV_IMG_DECLARE(ui_img_move_next_png);    // assets\move_next.png
-LV_IMG_DECLARE(ui_img_move_previous_png);    // assets\move_previous.png
-LV_IMG_DECLARE(ui_img_move_play_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_order_mode_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_list_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_cover_png);    // assets\move_play.png
 
 static void key_event_handler(lv_event_t* event);
 static lv_obj_t* CreateMusicScreen(lv_obj_t* parent);

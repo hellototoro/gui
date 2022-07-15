@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-06 14:25:13
+ * @LastEditTime: 2022-07-15 17:42:34
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -513,7 +513,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_label_set_text(ui_LAB_Path, "路径：");
     lv_obj_set_style_text_color(ui_LAB_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LAB_Path, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LAB_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // ui_LAB_Real_Path
     ui_LAB_Real_Path = lv_label_create(ui_MediaScreen);
@@ -524,7 +524,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_obj_set_style_text_color(ui_LAB_Real_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_Real_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_LAB_Real_Path, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     CreateCategoryPanel(ui_MediaScreen);
     CreateFilePanel(ui_MediaScreen);
@@ -535,8 +535,8 @@ static void MediaInit(lv_obj_t* parent, void *param)
 
 static void LoadMedia(void)
 {
-    lv_disp_load_scr(ui_MediaScreen);
-    //lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    //lv_disp_load_scr(ui_MediaScreen);
+    lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 static void MediaClose(void)
@@ -547,7 +547,7 @@ static void MediaClose(void)
     }
     lv_group_del(Category_Group);
     lv_group_del(File_List_Group);
-    lv_obj_del(ui_MediaScreen);
+    //lv_obj_del(ui_MediaScreen);
 }
 
 window MediaWindow = {

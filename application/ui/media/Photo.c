@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 19:39:22
- * @FilePath: /gui/application/ui/Photo.c
+ * @LastEditTime: 2022-07-15 14:38:17
+ * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
  */
@@ -76,8 +76,8 @@ static void event_handler(lv_event_t* event)
 
 static void SetStyleForPlayBar(lv_obj_t* bar)
 {
-    lv_obj_set_height(bar, 80);
-    lv_obj_set_y(bar, 320);
+    lv_obj_set_height(bar, 100);
+    lv_obj_set_y(bar, 310);
     lv_obj_set_style_bg_color(bar, lv_color_hex(0x303030), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(bar, LV_OPA_90, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-06 14:46:54
+ * @LastEditTime: 2022-07-15 14:30:43
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -50,27 +50,20 @@ lv_group_t* Player_Group;
 lv_timer_t* PlayBar_Timer;
 lv_timer_t* PlayState_Timer;
 
-
-LV_FONT_DECLARE(ui_font_MyFont24);
-LV_FONT_DECLARE(ui_font_MyFont30);
-LV_FONT_DECLARE(ui_font_MyFont34);
-LV_FONT_DECLARE(ui_font_MyFont38);
-LV_IMG_DECLARE(ui_img_move_pause_png);    // assets\move_pause.png
-LV_IMG_DECLARE(ui_img_move_next_png);    // assets\move_next.png
-LV_IMG_DECLARE(ui_img_move_previous_png);    // assets\move_previous.png
-LV_IMG_DECLARE(ui_img_move_play_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_repeat_mode_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_order_mode_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_once_repeat_mode_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_rand_mode_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_list_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_cover_png);    // assets\move_play.png
-
 static const lv_img_dsc_t* play_mode_image_src[PlayModeNumber] = {
-    &ui_img_music_repeat_mode_png,
-    &ui_img_music_order_mode_png,
-    &ui_img_music_once_repeat_mode_png,
-    &ui_img_music_rand_mode_png };
+    &ui_img_play_repeat_mode_new_png,
+    &ui_img_play_order_mode_new_png,
+    &ui_img_play_one_repeat_mode_new_png,
+    &ui_img_play_rand_mode_new_png
+};
+
+static const lv_img_dsc_t* play_list_image_src[MEDIA_MAX] = {
+    NULL,
+    &ui_img_movie_list_png,
+    &ui_img_music_list_png,
+    &ui_img_photo_list_png,
+    NULL
+};
 
 #ifdef HCCHIP_GCC
 static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
@@ -433,7 +426,8 @@ static void key_event_handler(lv_event_t* event)
                         #define __MEDIA_PAUSE   MEDIA_PAUSE
                         #endif
                         if (state == __MEDIA_PLAY) {
-                            lv_img_set_src(target, &ui_img_move_play_png);
+                            //lv_img_set_src(target, &ui_img_play_start_png);
+                            lv_obj_set_style_bg_img_src(target, &ui_img_play_start_png, LV_PART_MAIN | LV_STATE_DEFAULT);
                             #ifdef HOST_GCC
                             play_state = __MEDIA_PAUSE;
                             lv_ffmpeg_player_set_cmd(current_media_hdl, __MEDIA_PAUSE);
@@ -443,7 +437,8 @@ static void key_event_handler(lv_event_t* event)
                             #endif
                         }
                         else if (state == __MEDIA_PAUSE) {
-                            lv_img_set_src(target, &ui_img_move_pause_png);
+                            //lv_img_set_src(target, &ui_img_play_pause_png);
+                            lv_obj_set_style_bg_img_src(target, &ui_img_play_pause_png, LV_PART_MAIN | LV_STATE_DEFAULT);
                             #ifdef HOST_GCC
                             play_state = __MEDIA_PLAY;
                             lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_RESUME);
@@ -466,7 +461,8 @@ static void key_event_handler(lv_event_t* event)
                     case PlayMode:
                         CurrentPlayMode++;
                         CurrentPlayMode %= PlayModeNumber;
-                        lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
+                        //lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
+                        lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
                         //CyclePlay
                         break;
                     default:
@@ -581,11 +577,11 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         {  200, 10}
     };
     static const lv_img_dsc_t* image_src[] = {
-        NULL,
-        & ui_img_move_previous_png,
-        & ui_img_move_pause_png,
-        & ui_img_move_next_png,
-        & ui_img_music_list_png
+        & ui_img_play_rand_mode_new_png,
+        & ui_img_play_pre_png,
+        & ui_img_play_pause_png,
+        & ui_img_play_next_png,
+        & ui_img_music_list_png,
     };
 
     // PlayBar
@@ -629,7 +625,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     for (int i = 0; i < PlayBarNumber - PlayMode; i++) {
         // ctrl_bar
-        lv_obj_t* ctrl_bar = lv_img_create(PlayBar);
+        /*lv_obj_t* ctrl_bar = lv_img_create(PlayBar);
         lv_img_set_src(ctrl_bar, image_src[i]);
         lv_obj_set_width(ctrl_bar, LV_SIZE_CONTENT);
         lv_obj_set_height(ctrl_bar, LV_SIZE_CONTENT);
@@ -641,10 +637,30 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         lv_obj_set_style_radius(ctrl_bar, 30, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_color(ctrl_bar, lv_color_hex(0x08AED2), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_img_recolor(ctrl_bar, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_img_recolor_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_img_recolor(ctrl_bar, lv_color_hex(0xBE3906), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_img_recolor_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_FOCUSED);*/
+        lv_obj_t* ctrl_bar = lv_btn_create(PlayBar);
+        lv_obj_set_size(ctrl_bar, 75, 75);
+        lv_obj_set_pos(ctrl_bar, img_area[i][0], img_area[i][1]);
+        lv_obj_set_align(ctrl_bar, LV_ALIGN_CENTER);
+        lv_obj_set_style_radius(ctrl_bar, 35, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_radius(ctrl_bar, 35, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_color(ctrl_bar, lv_color_hex(0x08AED2), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_opa(ctrl_bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_opa(ctrl_bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_shadow_opa(ctrl_bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_src(ctrl_bar, image_src[i], LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_recolor(ctrl_bar, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_recolor_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+
         lv_group_add_obj(Player_Group, ctrl_bar);
         lv_obj_add_event_cb(ctrl_bar, key_event_handler, LV_EVENT_ALL, NULL);
     }
-    lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
+    lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayList), play_list_image_src[CurrentPlayingType], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
 
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
@@ -756,12 +772,12 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_width(file_name, LV_SIZE_CONTENT);
         lv_obj_set_height(file_name, LV_SIZE_CONTENT);
         lv_obj_set_x(file_name, -12);
-        lv_obj_set_y(file_name, -20);
+        lv_obj_set_y(file_name, 0);
         lv_label_set_text(file_name, name_list[i]);
         lv_obj_set_style_text_font(file_name, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         // file_info
-        lv_obj_t* file_info = lv_label_create(file_panel);
+        /*lv_obj_t* file_info = lv_label_create(file_panel);
         lv_obj_set_width(file_info, LV_SIZE_CONTENT);
         lv_obj_set_height(file_info, LV_SIZE_CONTENT);
         lv_obj_set_x(file_info, -10);
@@ -770,7 +786,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_label_set_text(file_info, "");
         lv_obj_set_style_text_color(file_info, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(file_info, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(file_info, &ui_font_MyFont24, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(file_info, &ui_font_MyFont24, LV_PART_MAIN | LV_STATE_DEFAULT);*/
     }
     lv_group_focus_obj(lv_obj_get_child(FileListPanel, current_playing_index));
 }

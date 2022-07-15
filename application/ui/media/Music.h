@@ -2,19 +2,15 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:20:58
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-24 16:14:43
- * @FilePath: /gui/application/ui/Music.h
+ * @LastEditTime: 2022-07-14 12:54:05
+ * @FilePath: /gui/application/ui/media/Music.h
  * @Description: None
  * @other: None
  */
 #ifndef __MUSIC_H__
 #define __MUSIC_H__
 
-#ifdef HCCHIP_GCC
-#include "hcapi/lvgl/lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "application/ui/resource/ui.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif

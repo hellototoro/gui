@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:55
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 13:21:55
+ * @LastEditTime: 2022-07-14 12:47:30
  * @FilePath: /gui/application/ui/SettingScreen.h
  * @Description: None
  * @other: None
@@ -10,11 +10,7 @@
 #ifndef __SETTING_SCREEN_H__
 #define __SETTING_SCREEN_H__
 
-#ifdef HCCHIP_GCC
-#include "hcapi/lvgl/lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
+#include "application/ui/resource/ui.h"
 
 #ifdef __cplusplus
 extern "C" {

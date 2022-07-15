@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-06 14:24:28
+ * @LastEditTime: 2022-07-07 12:00:42
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -68,7 +68,7 @@ int main(void)
     while(1) {
         WindowsManager();
         lv_task_handler();
-        usleep(1000);
+        usleep(5000);
     }
     return 0;
 }

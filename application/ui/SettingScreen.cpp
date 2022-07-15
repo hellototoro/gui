@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 19:39:29
+ * @LastEditTime: 2022-07-15 19:18:06
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -23,16 +23,6 @@ enum CategoryList {
     ProjectorInfo,
     CategoryNumber
 };
-
-LV_IMG_DECLARE(ui_img_network_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_projector_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_pic_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_sound_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_system_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_update_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_projector_info_png);    // assets\dlna_cast_f.png
-
-LV_FONT_DECLARE(ui_font_MyFont34);
 
 static void event_handler(lv_event_t* event);
 
