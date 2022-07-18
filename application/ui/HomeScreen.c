@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-15 19:30:13
- * @FilePath: /gui/application/ui/HomeScreen.c
+ * @LastEditTime: 2022-07-18 12:34:21
+ * @FilePath: /SOURCE/gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
  */
@@ -302,14 +302,14 @@ static void HomeInit(lv_obj_t* parent, void *param)
 
 static void LoadHome(void)
 {
-    //lv_disp_load_scr(ui_HomeScreen);
-    lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    lv_disp_load_scr(ui_HomeScreen);
+    //lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 static void HomeClose(void)
 {
     lv_group_del(HomeScreenGroup);
-    //lv_obj_del(ui_HomeScreen);
+    lv_obj_del(ui_HomeScreen);
 }
 
 window HomeWindow = {
