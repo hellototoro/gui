@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 16:11:57
+ * @LastEditTime: 2022-07-14 12:49:52
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
@@ -20,9 +20,6 @@ lv_timer_t* VolumeTimer;
 const lv_img_dsc_t* VolumeImg;
 bool PlayingFadeDownAnimation_Flag;
 uint8_t Volume;
-
-LV_IMG_DECLARE(ui_img_audio_volume_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_audio_mute_volume_png);    // assets\dlna_cast_f.png
 
 static void CreateVolumePanel(lv_obj_t* parent);
 static void VolumeTimer_cb(lv_timer_t * timer);

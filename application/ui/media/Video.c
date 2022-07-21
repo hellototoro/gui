@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 15:25:05
- * @FilePath: /gui/application/ui/Video.c
+ * @LastEditTime: 2022-07-21 16:06:39
+ * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
  */
@@ -28,7 +28,7 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     lv_obj_center(VideoScreen);
     VideoHandler = VideoScreen;
     #elif defined(HCCHIP_GCC)
-    VideoHandler = media_open(MEDIA_VIDEO);
+    VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
     VideoScreen = lv_obj_create(NULL);
     lv_obj_set_style_bg_opa(VideoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     #endif
@@ -53,7 +53,7 @@ void close_video_window(void)
     lv_ffmpeg_player_set_cmd(VideoScreen, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(VideoHandler);
-    MediaMonitorDeinit(VideoHandler);
+    //MediaMonitorDeinit(VideoHandler);
     media_close(VideoHandler);
     VideoHandler = NULL;
     #endif
@@ -78,7 +78,6 @@ static void SetStyleForPlayBar(lv_obj_t* bar)
 {
     lv_obj_set_style_bg_color(bar, lv_color_hex(0x303030), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(bar, LV_OPA_90, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(bar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(lv_obj_get_child(bar, PlayedTime), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(lv_obj_get_child(bar, TotalTime), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);

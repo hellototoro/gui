@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-#define INVALID_ID  0xFFFFFFFF
+#define INVALID_ID	0xFFFFFFFF
 
 uint32_t api_message_create(int msg_count, int msg_length);
 int api_message_delete(uint32_t msg_id);

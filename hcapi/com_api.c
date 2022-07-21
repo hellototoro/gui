@@ -7,8 +7,8 @@
 #include <ffplayer.h>
 #include <fcntl.h>
 
-#include "../lvgl/lvgl.h"
-#include "../lv_drivers/display/fbdev.h"
+#include "hcapi/lvgl/lvgl.h"
+#include "hcapi/lv_drivers/display/fbdev.h"
 
 
 #include "com_api.h"

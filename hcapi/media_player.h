@@ -10,6 +10,7 @@ extern "C" {
 #endif
 
 #include <pthread.h>
+#include <ffplayer.h>
 //#include "com_api.h"	
 
 typedef enum{
@@ -45,7 +46,7 @@ typedef enum
 }PlayListLoopType;
 
 
-typedef struct{
+typedef struct media_handle_t{
 	media_type_t		type;
 	media_state_t 		state;	
 	uint8_t 			speed;	//only used for video
@@ -56,6 +57,7 @@ typedef struct{
 	char 				play_name[1024];
 	void 				*player;
 	int                 msg_id;
+	void                (*msg_proc_func)(struct media_handle_t *media_hld, HCPlayerMsg *msg);
 	uint8_t             exit;
 	pthread_mutex_t 	api_lock;
 
@@ -64,7 +66,7 @@ typedef struct{
 }media_handle_t;
 
 
-media_handle_t *media_open(media_type_t type);
+media_handle_t *media_open(media_type_t type, void* customer_msg_proc_func);
 void media_close(media_handle_t *media_hld);
 int media_play(media_handle_t *media_hld, const char *media_src);
 int media_stop(media_handle_t *media_hld);
@@ -80,6 +82,7 @@ uint32_t media_get_playtime(media_handle_t *media_hld);
 uint32_t media_get_totaltime(media_handle_t *media_hld);
 uint8_t media_get_speed(media_handle_t *media_hld);
 int media_set_vol(uint8_t volume);
+char *media_get_cur_play_file(media_handle_t *media_hld);
 
 #ifdef __cplusplus
 } /*extern "C"*/

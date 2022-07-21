@@ -3,9 +3,10 @@
 #
 CC ?= gcc
 LVGL_DIR_NAME ?= lvgl
-LVGL_DIR ?= ${shell pwd}
+ROOT_DIR ?= ${shell pwd}
+LVGL_DIR ?= ${shell pwd}/hcapi
 
-SYS_DIR = -I$(LVGL_DIR) \
+SYS_DIR = -I$(ROOT_DIR) \
 		-I$(STAGING_DIR)/usr/include \
 		-I$(STAGING_DIR)/usr/include/hcuapi \
 		-I$(STAGING_DIR)/usr/include/libgoahead
@@ -33,11 +34,11 @@ GUI_LIBS += -lwpa_client
 #Collect the files to compile
 MAINSRC = ./main.cpp
 
-include $(LVGL_DIR)/lvgl/lvgl.mk
-include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
-include $(LVGL_DIR)/application/gui_app.mk
-include $(LVGL_DIR)/lv_i18n/lv_i18n.mk
-include $(LVGL_DIR)/hcapi/hcapi.mk
+#include $(LVGL_DIR)/lvgl/lvgl.mk
+#include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
+include $(ROOT_DIR)/hcapi/hcapi.mk
+include $(ROOT_DIR)/application/gui_app.mk
+include $(ROOT_DIR)/lv_i18n/lv_i18n.mk
 
 OBJEXT ?= .o
 

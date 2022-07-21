@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <ffplayer.h>
 #include <hcuapi/dis.h>
 #include <hcuapi/avsync.h>
 #include <hcuapi/snd.h>
@@ -17,6 +16,8 @@
 #include "com_api.h"
 #include "media_player.h"
 #include "os_api.h"
+#include "key.h"
+
 
 static int m_ff_speed[] = {1, 2, 4, 8, 16, 24, 32};
 static int m_fb_speed[] = {1, -2, -4, -8, -16, -24, -32};
@@ -24,7 +25,228 @@ static float m_sf_speed[] = {1, 1/2, 1/4, 1/8, 1/16, 1/24};
 static float m_sb_speed[] = {1, -1/2, -1/4, -1/8, -1/16, -1/24};
 static bool m_closevp = true,  m_fillblack = false;
 
-media_handle_t *media_open(media_type_t type)
+static void *media_monitor_task(void *arg);
+static int media_monitor_deinit(media_handle_t *media_hld);
+static int media_monitor_init(media_handle_t *media_hld);
+static void media_msg_proc(media_handle_t *media_hld, HCPlayerMsg *msg);
+
+static void media_msg_proc(media_handle_t *media_hld, HCPlayerMsg *msg)
+{
+    if (!media_hld || !msg)
+        return;
+printf("%s(), msg->type:%d\n", __FUNCTION__, (int)(msg->type));
+    switch (msg->type)
+    {
+    case HCPLAYER_MSG_STATE_EOS:
+        printf (">> app get eos, normal play end!\n");
+        api_control_send_key(V_KEY_NEXT);
+        break;
+    case HCPLAYER_MSG_STATE_TRICK_EOS:
+        printf (">> app get trick eos, fast play to end\n");
+        api_control_send_key(V_KEY_NEXT);
+        break;
+    case HCPLAYER_MSG_STATE_TRICK_BOS:
+        printf (">> app get trick bos, fast back play to begining!\n");
+        api_control_send_key(V_KEY_PLAY);
+        break;
+    case HCPLAYER_MSG_OPEN_FILE_FAILED:
+        printf (">> open file fail\n");
+        break;
+    case HCPLAYER_MSG_ERR_UNDEFINED:
+        printf (">> error unknow\n");
+        break;
+    case HCPLAYER_MSG_UNSUPPORT_FORMAT:
+        printf (">> unsupport format\n");
+        break;
+    case HCPLAYER_MSG_BUFFERING:
+        printf(">> buffering %d\n", msg->val);
+        break;
+    case HCPLAYER_MSG_STATE_PLAYING:
+        printf(">> player playing\n");
+        break;
+    case HCPLAYER_MSG_STATE_PAUSED:
+        printf(">> player paused\n");
+        break;
+    case HCPLAYER_MSG_STATE_READY:
+        printf(">> player ready\n");
+        break;
+    case HCPLAYER_MSG_READ_TIMEOUT:
+        printf(">> player read timeout\n");
+        break;
+    case HCPLAYER_MSG_UNSUPPORT_ALL_AUDIO:
+        printf(">> no audio track/or no supported audio track\n");
+        break;
+    case HCPLAYER_MSG_UNSUPPORT_ALL_VIDEO:
+        printf(">> no video track/or no supported video track\n");
+        break;
+    case HCPLAYER_MSG_UNSUPPORT_VIDEO_TYPE:
+        {
+            HCPlayerVideoInfo video_info;
+            char *video_type = "unknow";
+            if (!hcplayer_get_nth_video_stream_info (media_hld->player, msg->val, &video_info)) {
+                /* only a simple sample, app developers use a static struct to mapping them. */
+                if (video_info.codec_id == HC_AVCODEC_ID_HEVC) {
+                    video_type = "h265";
+                } 
+            }
+            printf("unsupport video type %s\n", video_type);
+        }
+        break;
+    case HCPLAYER_MSG_UNSUPPORT_AUDIO_TYPE:
+        {
+            HCPlayerAudioInfo audio_info;
+            char *audio_type = "unknow";
+            if (!hcplayer_get_nth_audio_stream_info (media_hld->player, msg->val, &audio_info)) {
+                /* only a simple sample, app developers use a static struct to mapping them. */
+                if (audio_info.codec_id < 0x11000) {
+                    audio_type = "pcm";
+                } else if (audio_info.codec_id < 0x12000) {
+                    audio_type = "adpcm";
+                } else if (audio_info.codec_id == HC_AVCODEC_ID_DTS) {
+                    audio_type = "dts";
+                } else if (audio_info.codec_id == HC_AVCODEC_ID_EAC3) {
+                    audio_type = "eac3";
+                } else if (audio_info.codec_id == HC_AVCODEC_ID_APE) {
+                    audio_type = "ape";
+                } 
+            }
+            printf("unsupport audio type %s\n", audio_type);
+        }
+        break;
+    case HCPLAYER_MSG_AUDIO_DECODE_ERR:
+        {
+            printf("audio dec err, audio idx %d\n", msg->val);
+            /* check if it is the last audio track, if not, then change to next one. */
+            if (media_hld->player) {
+                int total_audio_num = -1;
+                total_audio_num = hcplayer_get_audio_streams_count(media_hld->player);
+                if (msg->val >= 0 && total_audio_num > (msg->val + 1)) {
+                    HCPlayerAudioInfo audio_info;
+                    if (!hcplayer_get_cur_audio_stream_info(media_hld->player, &audio_info)) {
+                        if (audio_info.index == msg->val) {
+                            int idx = audio_info.index + 1;
+                            while (hcplayer_change_audio_track(media_hld->player, idx)) {
+                                idx++;
+                                if (idx >= total_audio_num) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        break;
+    case HCPLAYER_MSG_VIDEO_DECODE_ERR:
+        {
+            printf("video dec err, video idx %d\n", msg->val);
+            /* check if it is the last video track, if not, then change to next one. */
+            if (media_hld->player) {
+                int total_video_num = -1;
+                total_video_num = hcplayer_get_video_streams_count(media_hld->player);
+                if (msg->val >= 0 && total_video_num > (msg->val + 1)) {
+                    HCPlayerVideoInfo video_info;
+                    if (!hcplayer_get_cur_video_stream_info(media_hld->player, &video_info)) {
+                        if (video_info.index == msg->val) {
+                            int idx = video_info.index + 1;
+                            while (hcplayer_change_video_track(media_hld->player, idx)) {
+                                idx++;
+                                if (idx >= total_video_num) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        break;
+    default:
+        break;
+    }
+}
+
+static void *media_monitor_task(void *arg)
+{
+    HCPlayerMsg msg;
+    int msg_length;
+    media_handle_t *media_hld = (media_handle_t *)arg;
+
+    msg_length = sizeof(HCPlayerMsg);
+
+    while(!media_hld->exit) {
+        do{
+            // if (0 != api_message_receive(media_hld->msg_id, &msg, msg_length))
+            // {
+            //     break;
+            // }
+
+        #ifdef __linux__
+            if (msgrcv(media_hld->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) == -1)
+        #else
+            if (xQueueReceive((QueueHandle_t)media_hld->msg_id, (void *)&msg, -1) != pdPASS)
+        #endif
+            {
+                break;
+            }
+
+            //media_hld = (media_handle_t*)(msg.user_data);
+            if (media_hld->msg_proc_func)  media_hld->msg_proc_func(media_hld, &msg);
+            else                           media_msg_proc(media_hld, &msg);
+
+        }while(0);
+        api_sleep_ms(10);
+    }
+
+    pthread_cond_signal(&media_hld->msg_task_cond);
+
+    printf("exit win_media_monitor_task()\n");
+    return NULL;
+}
+
+static int media_monitor_init(media_handle_t *media_hld)
+{
+    pthread_t thread_id = 0;
+    pthread_attr_t attr;
+
+    if (INVALID_ID != media_hld->msg_id)
+        return API_SUCCESS;
+
+    media_hld->msg_id = api_message_create(CTL_MSG_COUNT, sizeof(HCPlayerMsg));
+    pthread_mutex_init(&media_hld->msg_task_mutex, NULL);
+    pthread_cond_init(&media_hld->msg_task_cond, NULL);
+
+    //create the message task
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, 0x2000);
+    pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED); //release task resource itself
+    if(pthread_create(&thread_id, &attr, media_monitor_task, (void*)media_hld)) 
+        return API_FAILURE;
+
+    return API_SUCCESS;
+
+}
+
+static int media_monitor_deinit(media_handle_t *media_hld)
+{
+    if (INVALID_ID == media_hld->msg_id)
+        return API_SUCCESS;
+
+    api_message_delete(media_hld->msg_id);
+    media_hld->msg_id = INVALID_ID;
+
+    media_hld->exit = 1; 
+    pthread_cond_wait(&media_hld->msg_task_cond, &media_hld->msg_task_mutex);
+
+    pthread_mutex_destroy(&media_hld->msg_task_mutex);
+    pthread_cond_destroy(&media_hld->msg_task_cond);
+
+    return API_SUCCESS;
+}
+
+
+
+media_handle_t *media_open(media_type_t type, void* customer_msg_proc_func)
 {
 	media_handle_t *media_hld = (media_handle_t*)malloc(sizeof(media_handle_t));
 
@@ -32,11 +254,14 @@ media_handle_t *media_open(media_type_t type)
 	media_hld->type = type;
 	media_hld->state = MEDIA_STOP;
 	media_hld->msg_id = INVALID_ID;
+    media_hld->msg_proc_func = customer_msg_proc_func;
 
 	if (MEDIA_TYPE_PHOTO == type){
 		media_hld->time_gap = 2000; //2 seconds interval for next slide show
 	}
 	media_hld->loop_type = PLAY_LIST_NONE;
+
+	media_monitor_init(media_hld);
 	pthread_mutex_init(&media_hld->api_lock, NULL);
 
 	return media_hld;
@@ -45,9 +270,11 @@ media_handle_t *media_open(media_type_t type)
 void media_close(media_handle_t *media_hld)
 {
 	ASSERT_API(media_hld);
+
+	media_monitor_deinit(media_hld);
 	pthread_mutex_destroy(&media_hld->api_lock);
 	free((void*)media_hld);
- }
+}
 
 int media_play(media_handle_t *media_hld, const char *media_src)
 {
@@ -64,6 +291,12 @@ int media_play(media_handle_t *media_hld, const char *media_src)
 	player_args.msg_id = media_hld->msg_id;
 	player_args.user_data = media_hld;
 	player_args.sync_type = 2;
+
+	player_args.img_dis_mode = 0;
+	player_args.img_dis_hold_time = 3000;
+	player_args.gif_dis_interval = 50;
+	player_args.img_alpha_mode = 0;	
+
 	if (MEDIA_TYPE_MUSIC == media_hld->type){
 		player_args.play_attached_file = 1;
 	}
@@ -363,3 +596,11 @@ uint8_t media_get_speed(media_handle_t *media_hld)
 	ASSERT_API(media_hld);
 	return media_hld->speed;
 }
+
+char *media_get_cur_play_file(media_handle_t *media_hld)
+{
+	ASSERT_API(media_hld);
+	return media_hld->play_name;
+}
+
+
