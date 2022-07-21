@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 09:50:54
- * @FilePath: /gui/application/ui/Music.cpp
+ * @LastEditTime: 2022-07-15 14:00:31
+ * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
  */
@@ -11,7 +11,7 @@
 #include "Music.h"
 #include "MediaCom.h"
 #include "MediaFile.h"
-#include "ui_com.h"
+#include "application/ui/ui_com.h"
 #include "music_lyric.h"
 
 MediaHandle* MusicHandler;
@@ -23,18 +23,6 @@ lv_group_t* Lyric_Group;
 
 music_lyric* lyric;
 int lyric_index;
-
-//LV_FONT_DECLARE(ui_font_MyFont24);
-LV_FONT_DECLARE(ui_font_MyFont30);
-LV_FONT_DECLARE(ui_font_MyFont34);
-LV_FONT_DECLARE(ui_font_MyFont38);
-LV_IMG_DECLARE(ui_img_move_pause_png);    // assets\move_pause.png
-LV_IMG_DECLARE(ui_img_move_next_png);    // assets\move_next.png
-LV_IMG_DECLARE(ui_img_move_previous_png);    // assets\move_previous.png
-LV_IMG_DECLARE(ui_img_move_play_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_order_mode_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_list_png);    // assets\move_play.png
-LV_IMG_DECLARE(ui_img_music_cover_png);    // assets\move_play.png
 
 static void key_event_handler(lv_event_t* event);
 static lv_obj_t* CreateMusicScreen(lv_obj_t* parent);
@@ -77,7 +65,7 @@ void close_music_window(lv_obj_t* music_window)
     //lv_ffmpeg_player_set_cmd(MusicHandler, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(MusicHandler);
-    MediaMonitorDeinit(MusicHandler);
+    //MediaMonitorDeinit(MusicHandler);
     media_close(MusicHandler);
     MusicHandler = NULL;
     #endif
@@ -231,9 +219,7 @@ static void key_event_handler(lv_event_t* event)
 
 static void SetStyleForPlayBar(lv_obj_t* bar)
 {
-    lv_obj_set_style_bg_color(bar, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(bar, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
@@ -245,6 +231,7 @@ static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
     lv_obj_clear_flag(MusicScreen, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(MusicScreen, lv_color_hex(0x2D729C), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(MusicScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(MusicScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_add_event_cb(MusicScreen, key_event_handler, LV_EVENT_KEY, NULL);
 
     MusicName = lv_label_create(MusicScreen);
@@ -280,9 +267,7 @@ static void CreateLyricPanel(lv_obj_t* parent)
     lv_obj_set_align(LyricPanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(LyricPanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(LyricPanel, LV_DIR_VER);
-    lv_obj_set_style_bg_color(LyricPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(LyricPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(LyricPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(LyricPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_scroll_snap_y(LyricPanel, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_flex_flow(LyricPanel, LV_FLEX_FLOW_COLUMN);

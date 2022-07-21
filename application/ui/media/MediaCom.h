@@ -2,15 +2,15 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 15:04:29
- * @FilePath: /gui/application/ui/MediaCom.h
+ * @LastEditTime: 2022-07-14 12:50:40
+ * @FilePath: /gui/application/ui/media/MediaCom.h
  * @Description: None
  * @other: None
  */
 #ifndef __MEDIA_COM_H__
 #define __MEDIA_COM_H__
 
-#include "lvgl/lvgl.h"
+#include "application/ui/resource/ui.h"
 #include "media_list.h"
 #include "MediaFile.h"
 #ifdef HCCHIP_GCC
@@ -42,6 +42,11 @@ typedef enum
     PlayModeNumber
 } PlayListMode;
 
+typedef enum {
+    AutoPlay,
+    ManualPlay
+} GetNextMode;
+
 typedef DLNode MediaNode;
 typedef LinkDList MediaList;
 typedef char* file_name_t;
@@ -68,7 +73,7 @@ extern void SetMediaIndex(int index);
 extern int GetMediaIndex(void);
 extern char* GetCurrentMediaName(void);
 extern char* GetPreMediaName(MediaType media_type, PlayListMode mode);
-extern char* GetNextMediaName(MediaType media_type, PlayListMode mode);
+extern char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode);
 extern file_name_t* GetMediaArray(void);
 extern void DestroyMediaArray(void);
 extern void PlayMedia(MediaHandle* media_hal, char * file_name);
@@ -77,8 +82,8 @@ extern void PlayMedia(MediaHandle* media_hal, char * file_name);
 extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);
 
 #ifdef HCCHIP_GCC
-extern int MediaMonitorInit(media_handle_t *media_hld);
-extern int MediaMonitorDeinit(media_handle_t *media_hld);
+//extern int MediaMonitorInit(media_handle_t *media_hld);
+//extern int MediaMonitorDeinit(media_handle_t *media_hld);
 #endif
 
 #ifdef __cplusplus

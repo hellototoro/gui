@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 13:41:11
+ * @LastEditTime: 2022-07-15 19:18:06
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -23,16 +23,6 @@ enum CategoryList {
     ProjectorInfo,
     CategoryNumber
 };
-
-LV_IMG_DECLARE(ui_img_network_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_projector_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_pic_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_sound_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_system_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_update_setting_png);    // assets\dlna_cast_f.png
-LV_IMG_DECLARE(ui_img_projector_info_png);    // assets\dlna_cast_f.png
-
-LV_FONT_DECLARE(ui_font_MyFont34);
 
 static void event_handler(lv_event_t* event);
 
@@ -73,6 +63,7 @@ void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
     lv_obj_set_style_radius(ui_SettingScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(ui_SettingScreen, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_SettingScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(ui_SettingScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //HomeScreenGroup = lv_group_create();
     //set_group_activity(HomeScreenGroup);

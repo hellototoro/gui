@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 14:41:37
- * @FilePath: /gui/main.c
+ * @LastEditTime: 2022-07-18 23:30:01
+ * @FilePath: /SOURCE/gui/main.c
  * @Description: None
  * @other: None
  */
@@ -15,11 +15,16 @@
 #include <stdlib.h>
 #include <pthread.h>
 #include <semaphore.h>
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 #include "application/windows.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
-#include "hcapi/key/key.h"
+#include "hcapi/key.h"
+#include "hcapi/wifi_api.h"
 #endif
 #include "application/ui/ui_com.h"
 
@@ -30,11 +35,23 @@ extern int sdl_init_2(void);
 #define HOR_RES         1280
 #define VER_RES         720
 
+#ifdef HCCHIP_GCC
+static char m_wifi_module_name[32];
+#endif
+
 static void exit_console(int signo);
 
-int main(void)
+int main(int argc, char *argv[])
 {
     ActiveScreen DefaultScreen;
+
+    #ifdef HCCHIP_GCC
+    if (argc == 2){
+        strncpy(m_wifi_module_name, argv[1], sizeof(m_wifi_module_name)-1);
+        wifi_api_set_module(m_wifi_module_name);
+        printf("please modprobe %s!\n", m_wifi_module_name);
+    }
+    #endif
 
     signal(SIGTERM, exit_console); //kill signal
     signal(SIGINT, exit_console); //Ctrl+C signal
@@ -64,7 +81,7 @@ int main(void)
     while(1) {
         WindowsManager();
         lv_task_handler();
-        usleep(1000);
+        usleep(5000);
     }
     return 0;
 }

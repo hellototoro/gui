@@ -10,7 +10,11 @@
 #ifndef __APPLICATION_WINDOWS_H__
 #define __APPLICATION_WINDOWS_H__
 
+#ifdef HCCHIP_GCC
+#include "hcapi/lvgl/lvgl.h"
+#else
 #include "lvgl/lvgl.h"
+#endif
 
 typedef enum  {
     LanguageScreen,

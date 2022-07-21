@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-01 16:48:03
- * @FilePath: /gui/application/ui/MediaScreen.cpp
+ * @LastEditTime: 2022-07-18 12:34:55
+ * @FilePath: /SOURCE/gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
  */
@@ -17,11 +17,13 @@
 #include "MediaCom.h"
 #include "Video.h"
 #include "Music.h"
+#include "Photo.h"
+#include "Text.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
-#include "ui_com.h"
-#include "Volume.h"
+#include "application/ui/ui_com.h"
+#include "application/ui/Volume.h"
 #include "application/key_map.h"
 
 #define FileListPanelWidth 1010
@@ -195,10 +197,10 @@ static void file_list_handler(lv_event_t* event)
                     CurrentMediaWindow = creat_music_window(target);
                     break;
                 case FILE_PHOTO:
-
+                    CurrentMediaWindow = creat_photo_window(target);
                     break;
                 case FILE_TEXT:
-
+                    CurrentMediaWindow = creat_text_window(target);
                     break;
                 
                 default:
@@ -302,9 +304,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
     lv_obj_set_pos(ui_Category_Panel, -515, 0);
     lv_obj_set_align(ui_Category_Panel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ui_Category_Panel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(ui_Category_Panel, lv_color_hex(0x36589D), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_Category_Panel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     Category_Group = lv_group_create();
@@ -316,7 +316,6 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_align(ui_BTN, LV_ALIGN_CENTER);
         lv_obj_clear_flag(ui_BTN, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_style_radius(ui_BTN, 25, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_bg_color(ui_BTN, lv_color_hex(0xFF3700), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_shadow_color(ui_BTN, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_shadow_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -514,7 +513,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_label_set_text(ui_LAB_Path, "路径：");
     lv_obj_set_style_text_color(ui_LAB_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LAB_Path, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LAB_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // ui_LAB_Real_Path
     ui_LAB_Real_Path = lv_label_create(ui_MediaScreen);
@@ -525,7 +524,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_obj_set_style_text_color(ui_LAB_Real_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_Real_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(ui_LAB_Real_Path, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     CreateCategoryPanel(ui_MediaScreen);
     CreateFilePanel(ui_MediaScreen);
@@ -536,8 +535,8 @@ static void MediaInit(lv_obj_t* parent, void *param)
 
 static void LoadMedia(void)
 {
-    //lv_disp_load_scr(ui_MediaScreen);
-    lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    lv_disp_load_scr(ui_MediaScreen);
+    //lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 static void MediaClose(void)
@@ -548,7 +547,7 @@ static void MediaClose(void)
     }
     lv_group_del(Category_Group);
     lv_group_del(File_List_Group);
-    //lv_obj_del(ui_MediaScreen);
+    lv_obj_del(ui_MediaScreen);
 }
 
 window MediaWindow = {

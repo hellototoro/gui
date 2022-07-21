@@ -140,8 +140,8 @@ typedef enum{
 #define NETWORK_STATE_WIFI_AP_CONNECT    (1 << 2) //the devoce connect to wifi AP OK
 
 typedef struct{
-    msg_type_t	msg_type;
-    uint32_t	msg_code;
+	msg_type_t	msg_type;
+	uint32_t	msg_code;
 }control_msg_t;
 
 #define BACK_LOGO "/gui_files/HICHP_DLNA.m2v"
@@ -166,6 +166,8 @@ int api_dis_show_onoff(bool on_off);
 int api_logo_show(const char *file);
 extern int api_logo_off(void);
 
+int api_lvgl_init(int width, int height);
+
 bool api_is_ip_addr(char *ip_buff);
 int api_get_mac_addr(char *mac);
 
@@ -179,8 +181,6 @@ int webs_stop();
 
 void api_sleep_ms(uint32_t ms);
 int api_shell_exe_result(char *cmd);
-
-int api_lvgl_init(int width, int height);
 
 #define SYS_HALT()      \
 {                       \
@@ -197,11 +197,15 @@ int api_lvgl_init(int width, int height);
         }                               \
     }
 
+
 #ifndef MKTAG
   #define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))
 #endif
 
+
+
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
+
 #endif
