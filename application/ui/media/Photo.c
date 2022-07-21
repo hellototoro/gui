@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-15 14:38:17
+ * @LastEditTime: 2022-07-21 16:06:41
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -28,7 +28,7 @@ lv_obj_t* creat_photo_window(lv_obj_t* foucsed_obj)
     lv_obj_center(PhotoScreen);
     PhotoHandler = PhotoScreen;
     #elif defined(HCCHIP_GCC)
-    PhotoHandler = media_open(MEDIA_PHOTO);
+    PhotoHandler = media_open(MEDIA_TYPE_PHOTO, (void*)MediaMsgProc);
     PhotoScreen = lv_obj_create(NULL);
     lv_obj_set_style_bg_opa(PhotoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     #endif

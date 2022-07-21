@@ -9,7 +9,6 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <ffplayer.h>
 #include <hcuapi/dis.h>
 #include <hcuapi/avsync.h>
 #include <hcuapi/snd.h>
@@ -192,7 +191,8 @@ static void *media_monitor_task(void *arg)
             }
 
             //media_hld = (media_handle_t*)(msg.user_data);
-            media_msg_proc(media_hld, &msg);
+            if (media_hld->msg_proc_func)  media_hld->msg_proc_func(media_hld, &msg);
+            else                           media_msg_proc(media_hld, &msg);
 
         }while(0);
         api_sleep_ms(10);
@@ -246,7 +246,7 @@ static int media_monitor_deinit(media_handle_t *media_hld)
 
 
 
-media_handle_t *media_open(media_type_t type)
+media_handle_t *media_open(media_type_t type, void* customer_msg_proc_func)
 {
 	media_handle_t *media_hld = (media_handle_t*)malloc(sizeof(media_handle_t));
 
@@ -254,6 +254,7 @@ media_handle_t *media_open(media_type_t type)
 	media_hld->type = type;
 	media_hld->state = MEDIA_STOP;
 	media_hld->msg_id = INVALID_ID;
+    media_hld->msg_proc_func = customer_msg_proc_func;
 
 	if (MEDIA_TYPE_PHOTO == type){
 		media_hld->time_gap = 2000; //2 seconds interval for next slide show

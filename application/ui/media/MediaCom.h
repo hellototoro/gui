@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-14 12:50:40
+ * @LastEditTime: 2022-07-21 17:24:53
  * @FilePath: /gui/application/ui/media/MediaCom.h
  * @Description: None
  * @other: None
@@ -82,8 +82,7 @@ extern void PlayMedia(MediaHandle* media_hal, char * file_name);
 extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);
 
 #ifdef HCCHIP_GCC
-//extern int MediaMonitorInit(media_handle_t *media_hld);
-//extern int MediaMonitorDeinit(media_handle_t *media_hld);
+extern void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
 #endif
 
 #ifdef __cplusplus

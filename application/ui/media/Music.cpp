@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-15 14:00:31
+ * @LastEditTime: 2022-07-21 16:05:46
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -24,14 +24,15 @@ lv_group_t* Lyric_Group;
 music_lyric* lyric;
 int lyric_index;
 
+extern "C" {
 static void key_event_handler(lv_event_t* event);
 static lv_obj_t* CreateMusicScreen(lv_obj_t* parent);
 static void SetStyleForPlayBar(lv_obj_t* bar);
 static void CreateLyricPanel(lv_obj_t* parent);
+}
 
 lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj)
 {
-    lyric = new music_lyric;
     CreateMusicScreen(lv_scr_act());
     #ifdef HOST_GCC
     lv_obj_t* Player = lv_ffmpeg_player_create(MusicScreen);
@@ -43,7 +44,7 @@ lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj)
     //lv_obj_center(Player);
     MusicHandler = Player;
     #elif defined(HCCHIP_GCC)
-    MusicHandler = media_open((media_type_t)MEDIA_MUSIC);
+    MusicHandler = media_open(MEDIA_TYPE_MUSIC, (void*)MediaMsgProc);
     #endif
 
     lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
@@ -259,6 +260,7 @@ static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
 
 static void CreateLyricPanel(lv_obj_t* parent)
 {
+    lyric = new music_lyric;
     LyricPanel = lv_obj_create(parent);
     lv_obj_set_width(LyricPanel, 500);
     lv_obj_set_height(LyricPanel, 456);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-19 17:22:32
+ * @LastEditTime: 2022-07-21 16:06:39
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -28,7 +28,7 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     lv_obj_center(VideoScreen);
     VideoHandler = VideoScreen;
     #elif defined(HCCHIP_GCC)
-    VideoHandler = media_open(MEDIA_VIDEO);
+    VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
     VideoScreen = lv_obj_create(NULL);
     lv_obj_set_style_bg_opa(VideoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     #endif

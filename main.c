@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-18 23:30:01
- * @FilePath: /SOURCE/gui/main.c
+ * @LastEditTime: 2022-07-21 14:12:25
+ * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
  */
@@ -35,6 +35,8 @@ extern int sdl_init_2(void);
 #define HOR_RES         1280
 #define VER_RES         720
 
+pthread_mutex_t lvgl_task_mutex;
+
 #ifdef HCCHIP_GCC
 static char m_wifi_module_name[32];
 #endif
@@ -52,6 +54,11 @@ int main(int argc, char *argv[])
         printf("please modprobe %s!\n", m_wifi_module_name);
     }
     #endif
+
+    if (pthread_mutex_init(&lvgl_task_mutex, NULL) != 0) {
+        perror("Mutex init failed");
+        exit(EXIT_FAILURE);
+    }
 
     signal(SIGTERM, exit_console); //kill signal
     signal(SIGINT, exit_console); //Ctrl+C signal
@@ -80,8 +87,10 @@ int main(int argc, char *argv[])
     CurrentScreen = DefaultScreen;
     while(1) {
         WindowsManager();
+        pthread_mutex_lock(&lvgl_task_mutex);
         lv_task_handler();
         usleep(5000);
+        pthread_mutex_unlock(&lvgl_task_mutex);
     }
     return 0;
 }
