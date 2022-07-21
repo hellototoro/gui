@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 17:25:31
+ * @LastEditTime: 2022-07-21 17:56:11
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -23,7 +23,6 @@
 #include "hcapi/com_api.h"
 #include "hcapi/os_api.h"
 #endif
-#include "id3v2lib/include/id3v2lib.h"
 #include "application/ui/ui_com.h"
 #include "application/ui/Volume.h"
 #include "application/key_map.h"
