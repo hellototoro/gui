@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:14:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-14 12:55:34
+ * @LastEditTime: 2022-07-21 13:07:22
  * @FilePath: /gui/application/ui/media/Text.cpp
  * @Description: None
  * @other: None
@@ -24,7 +24,7 @@ lv_obj_t* TextName;
 lv_group_t* Text_Group;
 static constexpr lv_coord_t letter_space = 4;
 static constexpr lv_coord_t line_space = 10;
-static constexpr lv_coord_t TextLabWidth = 1280;
+static constexpr lv_coord_t TextLabWidth = 1240;
 std::vector<std::string> *TextBuff;
 std::string buff;
 
@@ -75,9 +75,10 @@ void LoadText(char* file_name)
     while ( std::getline (*text_file, line) ) {
         if (line.size() > 0 && line[line.size()-1] == '\r') line.erase(line.size()-1);
         lv_coord_t pixel_width = lv_txt_get_width(line.c_str(), line.size(), &ui_font_MyFont30, letter_space, LV_TEXT_FLAG_NONE);
-        if(pixel_width == 0) ++line_number;
-        line_number += static_cast<int>(ceil(pixel_width/(TextLabWidth*1.f)));
-        if (line_number % 14 == 0) {
+        if(pixel_width != 0) line_number += static_cast<int>(ceil(pixel_width/((TextLabWidth)*1.f)));
+        else                 ++line_number;
+        if (line_number > 13) {
+            line_number = 0;
             ++page_number;
             TextBuff->resize(page_number + 1, "");
         }
@@ -150,25 +151,32 @@ static void CreateTextPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_color(TextPanel, lv_color_hex(0x2D729C), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(TextPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(TextPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_scroll_snap_x(TextPanel, LV_SCROLL_SNAP_START);
-    lv_obj_set_flex_flow(TextPanel, LV_FLEX_FLOW_ROW);
+    lv_obj_set_scroll_snap_x(TextPanel, LV_SCROLL_SNAP_CENTER);
 
     int page = TextBuff->size();
     for(int i = 0; i < page; ++i) {
-        lv_obj_t* ui_Label = lv_label_create(TextPanel);
+        lv_obj_t* obj = lv_obj_create(TextPanel);
+        lv_obj_set_width(obj, 1280);
+        lv_obj_set_height(obj, 720);
+        lv_obj_set_x(obj, i * 1280);
+        lv_obj_set_y(obj, 0);
+        lv_obj_set_align(obj, LV_ALIGN_CENTER);
+        lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_border_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_group_add_obj(Text_Group, obj);
+        lv_obj_add_event_cb(obj, key_event_handler, LV_EVENT_KEY, NULL);
+
+        lv_obj_t* ui_Label = lv_label_create(obj);
         lv_obj_set_width(ui_Label, TextLabWidth);
-        lv_obj_set_height(ui_Label, LV_SIZE_CONTENT);
-        //lv_obj_set_x(ui_Label, i * 1280 + 12);
-        //lv_obj_set_y(ui_Label, 0);
+        lv_obj_set_height(ui_Label, 680);
         lv_obj_set_align(ui_Label, LV_ALIGN_TOP_MID);
-        lv_obj_add_flag(ui_Label, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_label_set_text(ui_Label, TextBuff->at(i).c_str());
         lv_obj_set_style_text_color(ui_Label, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(ui_Label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_letter_space(ui_Label, letter_space, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(ui_Label, line_space, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(ui_Label, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_group_add_obj(Text_Group, ui_Label);
-        lv_obj_add_event_cb(ui_Label, key_event_handler, LV_EVENT_KEY, NULL);
     }
 }

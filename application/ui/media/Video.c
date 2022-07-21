@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-06 15:16:17
+ * @LastEditTime: 2022-07-19 17:22:32
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -53,7 +53,7 @@ void close_video_window(void)
     lv_ffmpeg_player_set_cmd(VideoScreen, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(VideoHandler);
-    MediaMonitorDeinit(VideoHandler);
+    //MediaMonitorDeinit(VideoHandler);
     media_close(VideoHandler);
     VideoHandler = NULL;
     #endif

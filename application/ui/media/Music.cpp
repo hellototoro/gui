@@ -65,7 +65,7 @@ void close_music_window(lv_obj_t* music_window)
     //lv_ffmpeg_player_set_cmd(MusicHandler, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(MusicHandler);
-    MediaMonitorDeinit(MusicHandler);
+    //MediaMonitorDeinit(MusicHandler);
     media_close(MusicHandler);
     MusicHandler = NULL;
     #endif

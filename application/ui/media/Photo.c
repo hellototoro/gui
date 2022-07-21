@@ -53,7 +53,7 @@ void close_photo_window(void)
     lv_ffmpeg_player_set_cmd(PhotoScreen, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(PhotoHandler);
-    MediaMonitorDeinit(PhotoHandler);
+    //MediaMonitorDeinit(PhotoHandler);
     media_close(PhotoHandler);
     PhotoHandler = NULL;
     #endif

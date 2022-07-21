@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-15 14:30:43
+ * @LastEditTime: 2022-07-19 17:37:25
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -86,7 +86,7 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_
     current_media_hdl = media_hdl;
     CurrentPlayMode = RandPlay;
     #ifdef HCCHIP_GCC
-    MediaMonitorInit(current_media_hdl);
+    //MediaMonitorInit(current_media_hdl);
     #endif
     srand(time(0));
     PlayingAnimation_Flag = false;
@@ -624,23 +624,6 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_label_set_text(lv_obj, "00:00:00");
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     for (int i = 0; i < PlayBarNumber - PlayMode; i++) {
-        // ctrl_bar
-        /*lv_obj_t* ctrl_bar = lv_img_create(PlayBar);
-        lv_img_set_src(ctrl_bar, image_src[i]);
-        lv_obj_set_width(ctrl_bar, LV_SIZE_CONTENT);
-        lv_obj_set_height(ctrl_bar, LV_SIZE_CONTENT);
-        lv_obj_set_x(ctrl_bar, img_area[i][0]);
-        lv_obj_set_y(ctrl_bar, img_area[i][1]);
-        lv_obj_set_align(ctrl_bar, LV_ALIGN_CENTER);
-        lv_obj_add_flag(ctrl_bar, LV_OBJ_FLAG_ADV_HITTEST);
-        lv_obj_clear_flag(ctrl_bar, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_style_radius(ctrl_bar, 30, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_bg_color(ctrl_bar, lv_color_hex(0x08AED2), LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_bg_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_img_recolor(ctrl_bar, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_img_recolor_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_img_recolor(ctrl_bar, lv_color_hex(0xBE3906), LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_img_recolor_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_FOCUSED);*/
         lv_obj_t* ctrl_bar = lv_btn_create(PlayBar);
         lv_obj_set_size(ctrl_bar, 75, 75);
         lv_obj_set_pos(ctrl_bar, img_area[i][0], img_area[i][1]);
@@ -852,200 +835,4 @@ static void ShowDownAnimation(lv_obj_t * TargetObject, int delay)
     lv_anim_start(&PropertyAnimation);
 }
 
-#ifdef HCCHIP_GCC
-static void* MediaMonitorTask(void* arg);
-int MediaMonitorInit(media_handle_t *media_hld)
-{
-    int res;
-    pthread_t thread_id = 0;
-    pthread_attr_t attr;
-    //current_media_hdl = media_hld;
-    media_hld->msg_id = api_message_create(CTL_MSG_COUNT, sizeof(HCPlayerMsg));
-    pthread_mutex_init(&media_hld->msg_task_mutex, NULL);
-    pthread_cond_init(&media_hld->msg_task_cond, NULL);
-
-    res = pthread_attr_init(&attr);
-    if (res != 0) {
-        perror("Attribute creation failed");
-        exit(EXIT_FAILURE);
-    }
-    res = pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
-    if (res != 0) {
-        perror("Setting detached attribute failed");
-        exit(EXIT_FAILURE);
-    }
-    res = pthread_create(&thread_id, &attr, MediaMonitorTask, NULL);
-    if (res != 0) {
-        perror("Thread creation failed");
-        exit(EXIT_FAILURE);
-    }
-    (void)pthread_attr_destroy(&attr);
-
-    return API_SUCCESS;
-}
-
-int MediaMonitorDeinit(media_handle_t *media_hld)
-{
-    if (INVALID_ID == media_hld->msg_id)
-        return API_SUCCESS;
-    api_message_delete(media_hld->msg_id);
-    media_hld->msg_id = INVALID_ID;
-    media_hld->exit = 1;
-    media_hld->msg_id = INVALID_ID;
-    pthread_cond_wait(&media_hld->msg_task_cond, &media_hld->msg_task_mutex);
-    pthread_mutex_destroy(&media_hld->msg_task_mutex);
-    pthread_cond_destroy(&media_hld->msg_task_cond);
-    current_media_hdl = NULL;
-    return API_SUCCESS;
-}
-
-void* MediaMonitorTask(void* arg)
-{
-    (void)arg;
-    HCPlayerMsg msg;
-    while (!current_media_hdl->exit) {
-        if (msgrcv(current_media_hdl->msg_id, (void *)&msg, sizeof(HCPlayerMsg) - sizeof(msg.type), 0, 0) != -1)
-        {
-            MediaMsgProc(current_media_hdl, &msg);
-        }
-        api_sleep_ms(10);
-    }
-    pthread_cond_signal(&current_media_hdl->msg_task_cond);
-    pthread_exit(NULL);
-}
-
-static void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
-{
-    if (!media_hld || !msg) return;
-    switch (msg->type)
-    {
-    case HCPLAYER_MSG_STATE_EOS:
-        printf (">> app get eos, normal play end!\n");
-        //api_control_send_key(V_KEY_NEXT);
-        break;
-    case HCPLAYER_MSG_STATE_TRICK_EOS:
-        printf (">> app get trick eos, fast play to end\n");
-        //api_control_send_key(V_KEY_NEXT);
-        break;
-    case HCPLAYER_MSG_STATE_TRICK_BOS:
-        printf (">> app get trick bos, fast back play to begining!\n");
-        //api_control_send_key(V_KEY_PLAY);
-        break;
-    case HCPLAYER_MSG_OPEN_FILE_FAILED:
-        printf (">> open file fail\n");
-        break;
-    case HCPLAYER_MSG_ERR_UNDEFINED:
-        printf (">> error unknow\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_FORMAT:
-        printf (">> unsupport format\n");
-        break;
-    case HCPLAYER_MSG_BUFFERING:
-        printf(">> buffering %d\n", msg->val);
-        break;
-    case HCPLAYER_MSG_STATE_PLAYING:
-        printf(">> player playing\n");
-        break;
-    case HCPLAYER_MSG_STATE_PAUSED:
-        printf(">> player paused\n");
-        break;
-    case HCPLAYER_MSG_STATE_READY:
-        printf(">> player ready\n");
-        SetTotalTimeAndProgress(media_get_totaltime(media_hld));
-        break;
-    case HCPLAYER_MSG_READ_TIMEOUT:
-        printf(">> player read timeout\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_ALL_AUDIO:
-        printf(">> no audio track/or no supported audio track\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_ALL_VIDEO:
-        printf(">> no video track/or no supported video track\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_VIDEO_TYPE:
-        {
-            HCPlayerVideoInfo video_info;
-            char *video_type = "unknow";
-            if (!hcplayer_get_nth_video_stream_info (media_hld->player, msg->val, &video_info)) {
-                /* only a simple sample, app developers use a static struct to mapping them. */
-                if (video_info.codec_id == HC_AVCODEC_ID_HEVC) {
-                    video_type = "h265";
-                } 
-            }
-            printf("unsupport video type %s\n", video_type);
-        }
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_AUDIO_TYPE:
-        {
-            HCPlayerAudioInfo audio_info;
-            char *audio_type = "unknow";
-            if (!hcplayer_get_nth_audio_stream_info (media_hld->player, msg->val, &audio_info)) {
-                /* only a simple sample, app developers use a static struct to mapping them. */
-                if (audio_info.codec_id < 0x11000) {
-                    audio_type = "pcm";
-                } else if (audio_info.codec_id < 0x12000) {
-                    audio_type = "adpcm";
-                } else if (audio_info.codec_id == HC_AVCODEC_ID_DTS) {
-                    audio_type = "dts";
-                } else if (audio_info.codec_id == HC_AVCODEC_ID_EAC3) {
-                    audio_type = "eac3";
-                } else if (audio_info.codec_id == HC_AVCODEC_ID_APE) {
-                    audio_type = "ape";
-                } 
-            }
-            printf("unsupport audio type %s\n", audio_type);
-        }
-        break;
-    case HCPLAYER_MSG_AUDIO_DECODE_ERR:
-        {
-            printf("audio dec err, audio idx %d\n", msg->val);
-            /* check if it is the last audio track, if not, then change to next one. */
-            if (media_hld->player) {
-                int total_audio_num = -1;
-                total_audio_num = hcplayer_get_audio_streams_count(media_hld->player);
-                if (msg->val >= 0 && total_audio_num > (msg->val + 1)) {
-                    HCPlayerAudioInfo audio_info;
-                    if (!hcplayer_get_cur_audio_stream_info(media_hld->player, &audio_info)) {
-                        if (audio_info.index == msg->val) {
-                            int idx = audio_info.index + 1;
-                            while (hcplayer_change_audio_track(media_hld->player, idx)) {
-                                idx++;
-                                if (idx >= total_audio_num) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    case HCPLAYER_MSG_VIDEO_DECODE_ERR:
-        {
-            printf("video dec err, video idx %d\n", msg->val);
-            /* check if it is the last video track, if not, then change to next one. */
-            if (media_hld->player) {
-                int total_video_num = -1;
-                total_video_num = hcplayer_get_video_streams_count(media_hld->player);
-                if (msg->val >= 0 && total_video_num > (msg->val + 1)) {
-                    HCPlayerVideoInfo video_info;
-                    if (!hcplayer_get_cur_video_stream_info(media_hld->player, &video_info)) {
-                        if (video_info.index == msg->val) {
-                            int idx = video_info.index + 1;
-                            while (hcplayer_change_video_track(media_hld->player, idx)) {
-                                idx++;
-                                if (idx >= total_video_num) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
-}
-#endif
+//SetTotalTimeAndProgress(media_get_totaltime(media_hld));

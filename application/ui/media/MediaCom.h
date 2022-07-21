@@ -82,8 +82,8 @@ extern void PlayMedia(MediaHandle* media_hal, char * file_name);
 extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);
 
 #ifdef HCCHIP_GCC
-extern int MediaMonitorInit(media_handle_t *media_hld);
-extern int MediaMonitorDeinit(media_handle_t *media_hld);
+//extern int MediaMonitorInit(media_handle_t *media_hld);
+//extern int MediaMonitorDeinit(media_handle_t *media_hld);
 #endif
 
 #ifdef __cplusplus
