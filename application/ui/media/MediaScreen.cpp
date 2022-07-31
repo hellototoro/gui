@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-18 12:34:55
- * @FilePath: /SOURCE/gui/application/ui/media/MediaScreen.cpp
+ * @LastEditTime: 2022-07-22 14:47:24
+ * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
  */
@@ -245,11 +245,11 @@ static void FilterFile(CategoryList filter_type)
 {
     static const lv_img_dsc_t* image_src[] = {
         NULL,
-        &ui_img_filetype_mp4_png,
-        &ui_img_filetype_mp3_png,
-        &ui_img_filetype_jpg_png,
-        &ui_img_filetype_text_png,
-        &ui_img_filetype_other_png };
+        &ui_img_movie_png,
+        &ui_img_music_png,
+        &ui_img_image_png,
+        &ui_img_text_png,
+        &ui_img_other_png };
     static CategoryList last_filter_type = All;
     
     if (last_filter_type != filter_type) {
@@ -402,22 +402,22 @@ static void ShowFileList(FileList *file_list)
             break;
         case FILE_VIDEO:
             AddToMediaList(MEDIA_VIDEO, file->name);
-            image = (lv_img_dsc_t* )&ui_img_filetype_mp4_png;
+            image = (lv_img_dsc_t* )&ui_img_movie_png;
             break;
         case FILE_MUSIC:
             AddToMediaList(MEDIA_MUSIC, file->name);
-            image = (lv_img_dsc_t* )&ui_img_filetype_mp3_png;
+            image = (lv_img_dsc_t* )&ui_img_music_png;
             break;
         case FILE_PHOTO:
             AddToMediaList(MEDIA_PHOTO, file->name);
-            image = (lv_img_dsc_t* )&ui_img_filetype_jpg_png;
+            image = (lv_img_dsc_t* )&ui_img_image_png;
             break;
         case FILE_TEXT:
             AddToMediaList(MEDIA_TEXT, file->name);
-            image = (lv_img_dsc_t* )&ui_img_filetype_text_png;
+            image = (lv_img_dsc_t* )&ui_img_text_png;
             break;
         default:
-            image = (lv_img_dsc_t* )&ui_img_filetype_other_png;
+            image = (lv_img_dsc_t* )&ui_img_other_png;
             break;
         }
         if (FileFilter != All) {//必须放在 AddToMediaList 函数后面，因为就算过滤掉此类型，也要将其加入媒体文件列表里面
@@ -470,7 +470,7 @@ static void CreateFilePanel(lv_obj_t* parent)
 {
     ui_File_List_Panel = lv_obj_create(parent);
     lv_obj_set_size(ui_File_List_Panel, 1010, 600);
-    lv_obj_set_pos(ui_File_List_Panel, 110, 40);
+    lv_obj_set_pos(ui_File_List_Panel, 110, 25);
     lv_obj_set_align(ui_File_List_Panel, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(ui_File_List_Panel, LV_FLEX_FLOW_ROW_WRAP);
     lv_obj_set_style_bg_color(ui_File_List_Panel, lv_color_hex(0x0D6D96), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -508,7 +508,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     // ui_LAB_Path
     lv_obj_t* ui_LAB_Path = lv_label_create(ui_MediaScreen);
     lv_obj_set_size(ui_LAB_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(ui_LAB_Path, -336, -289);
+    lv_obj_set_pos(ui_LAB_Path, -336, -300);
     lv_obj_set_align(ui_LAB_Path, LV_ALIGN_CENTER);
     lv_label_set_text(ui_LAB_Path, "路径：");
     lv_obj_set_style_text_color(ui_LAB_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -518,7 +518,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     // ui_LAB_Real_Path
     ui_LAB_Real_Path = lv_label_create(ui_MediaScreen);
     lv_obj_set_size(ui_LAB_Real_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(ui_LAB_Real_Path, 360, -289);
+    lv_obj_set_pos(ui_LAB_Real_Path, 360, -300);
     lv_obj_set_align(ui_LAB_Real_Path, LV_ALIGN_LEFT_MID);
     lv_label_set_text(ui_LAB_Real_Path, "");
     lv_obj_set_style_text_color(ui_LAB_Real_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
