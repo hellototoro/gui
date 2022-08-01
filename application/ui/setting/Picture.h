@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-28 20:28:05
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-31 20:11:43
+ * @LastEditTime: 2022-08-01 11:55:11
  * @FilePath: /gui/application/ui/setting/Picture.h
  * @Description: None
  * @other: None
@@ -28,7 +28,8 @@ public:
         Setting_PicturePowerBank,
         Setting_PicturegDataItemNum
     };
-    class PictureMode {
+    
+    class PictureMode : public Base {
         public:
         enum PictureModeType {
             PictureMode_Standard,
@@ -40,16 +41,40 @@ public:
         uint8_t type;//标准；柔和；用户；动态
         class ModeType {
             public:
+            constexpr static uint8_t ItemNum = 4;
+            enum ContentType {
+                Content_Contrast = 1,
+                Content_Brightness,
+                Content_Colour,
+                Content_Sharpness,
+                Content_Num
+            };
             uint8_t contrast;
+            char ContrastName[4];
             uint8_t brightness;
+            char BrightnessName[4];
             uint8_t colour;
+            char ColourName[4];
             uint8_t sharpness;
+            char SharpnessName[4];
         } standard, soft, user, dynamic;
         constexpr static const char* name[4] = { 
         "标准", "柔和", "用户", "动态" };
+
+        PictureMode() {}
+        ~PictureMode() {}
+
+        virtual int GetItemNum(void) { return user.ItemNum; }
+        virtual int GetOnlyTextItemNum(void) { return 0; }
+        virtual const char** GetStrArray(void);
+        virtual int GetValue(int index);
+        virtual void IncreaseValue(int index);
+        virtual void DecreaseValue(int index);
+        virtual const char* GetStr(int index);
+        virtual void* GetDerivedAddress(int index) { return this; }
     } mode;
 
-    class PictureColorTemperature {
+    class PictureColorTemperature : public Base {
         public:
         enum PictureColorTemperatureType {
             PictureColorTemperature_Standard,
@@ -61,12 +86,34 @@ public:
         uint8_t type;//标准；暖色；用户；冷色
         class ColorTemperatureType {
             public:
+            constexpr static uint8_t ItemNum = 3;
+            enum ContentType {
+                Content_Red = 1,
+                Content_Green,
+                Content_Blue,
+                Content_Num
+            };
             uint8_t red;
+            char RedName[4];
             uint8_t green;
+            char GreenName[4];
             uint8_t blue;
+            char BlueName[4];
         } standard, warm, user, cool;
         constexpr static const char* name[4] = { 
         "标准", "暖色", "用户", "冷色" };
+
+        PictureColorTemperature() {}
+        ~PictureColorTemperature() {}
+
+        virtual int GetItemNum(void) { return user.ItemNum; }
+        virtual int GetOnlyTextItemNum(void) { return 0; }
+        virtual const char** GetStrArray(void);
+        virtual int GetValue(int index);
+        virtual void IncreaseValue(int index);
+        virtual void DecreaseValue(int index);
+        virtual const char* GetStr(int index);
+        virtual void* GetDerivedAddress(int index) { return this; }
     } ColorTemperature;
 
     uint8_t scale;
@@ -74,11 +121,7 @@ public:
     "16:9", "4:3", "自动" };
 
     uint8_t ratio;
-    //const char* RatioName;
-    constexpr static const char* RatioName[] = { 
-    "75%", "76%", "77%", "78%", "79%", 
-    "80%", "81%", "82%", "83%", "84%", "85%", "86%", "87%", "88%", "89%", 
-    "90%", "91%", "92%", "93%", "94%", "95%", "96%", "97%", "98%", "99%", "100%" };
+    char RatioName[5];
 
     uint8_t PowerBankMode;
     constexpr static const char* PowerBankModeName[3] = { 
@@ -88,16 +131,14 @@ public:
     Picture(/* args */);
     ~Picture();
 
-    void IncreaseDataComm(uint8_t& data, int MinRange, int MaxRange);
-    void DecreaseDataComm(uint8_t& data, int MinRange, int MaxRange);
-
     virtual int GetItemNum(void) { return ItemNum; }
     virtual int GetOnlyTextItemNum(void) { return OnlyTextItemNum; }
     virtual const char** GetStrArray(void);
-    virtual void SelectData(int index);
-    virtual void IncreaseData(int index);
-    virtual void DecreaseData(int index);
+    virtual int GetValue(int index);
+    virtual void IncreaseValue(int index);
+    virtual void DecreaseValue(int index);
     virtual const char* GetStr(int index);
+    virtual void* GetDerivedAddress(int index);
 
 };
 

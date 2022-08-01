@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-31 20:11:17
+ * @LastEditTime: 2022-08-01 12:15:30
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -13,8 +13,10 @@
 
 lv_obj_t* ui_SettingScreen;
 lv_obj_t* SettingPanel;
+lv_obj_t* SubSettingPanel;
 lv_group_t* SettingGroup;
 lv_obj_t* LastFocused;
+lv_obj_t* SubLastFocused;
 
 enum CategoryList {
     NetWork,
@@ -25,25 +27,6 @@ enum CategoryList {
     Update,
     Info,
     CategoryNumber
-};
-
-
-typedef struct LvObjUserData {
-    void* SettingData;
-    void (*SelectData) (void);
-    void (*IncreaseData) (void);
-    void (*DecreaseData) (void);
-    char* (*GetStr) (void);
-} LvObjUserData_t;
-
-
-const char* PictureItemName[] = {
-    "图像设置",
-    "图像模式", "标准", 
-    "缩放设置", "4:3", 
-    "色温", "暖色", 
-    "投影缩放", "100%", 
-    "充电宝亮度模式", "中"
 };
 
 const char* SoundItemName[] = {
@@ -64,6 +47,7 @@ const char* SystemItemName[] = {
 
 static void event_handler(lv_event_t* event);
 void CreateSettingPanel(void* user_data, bool BgTransp);
+void CreateSubSettingPanel(void* user_data, bool BgTransp);
 
 void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
 {
@@ -232,21 +216,28 @@ static void setting_item_key_event_handler(lv_event_t* event)
     switch (value)
     {
     case LV_KEY_ENTER:
-        Setting->SelectData(index);
+        if(!lv_obj_is_valid(SubSettingPanel))
+            CreateSubSettingPanel(Setting->GetDerivedAddress(index), false);
         break;
     case LV_KEY_LEFT:
-        if (lv_obj_get_child_cnt(target) == 1) {
+        if (lv_obj_get_child_cnt(target) == 1) {//只能响应enter键的控件
             break;
         }
-        Setting->DecreaseData(index);
+        Setting->DecreaseValue(index);
         lv_label_set_text(target->spec_attr->children[1], Setting->GetStr(index));
+        if(lv_obj_is_valid(SubSettingPanel)) {
+            lv_slider_set_value(target->spec_attr->children[2], Setting->GetValue(index), LV_ANIM_OFF);
+        }
         break;
     case LV_KEY_RIGHT:
         if (lv_obj_get_child_cnt(target) == 1) {
             break;
         }
-        Setting->IncreaseData(index);
+        Setting->IncreaseValue(index);
         lv_label_set_text(target->spec_attr->children[1], Setting->GetStr(index));
+        if(lv_obj_is_valid(SubSettingPanel)) {
+            lv_slider_set_value(target->spec_attr->children[2], Setting->GetValue(index), LV_ANIM_OFF);
+        }
         break;
     case LV_KEY_UP:
         lv_group_focus_prev(group);
@@ -256,8 +247,14 @@ static void setting_item_key_event_handler(lv_event_t* event)
         break;
     case LV_KEY_ESC:
         SettingGroup = delete_group(SettingGroup);
-        lv_obj_del_async(SettingPanel);
-        delete Setting;
+        if(lv_obj_is_valid(SubSettingPanel)) {
+            LastFocused = SubLastFocused;
+            lv_obj_del_async(SubSettingPanel);
+        }
+        else {
+            lv_obj_del_async(SettingPanel);
+            delete Setting;
+        }
         break;
     default:
         break;
@@ -272,7 +269,7 @@ static void focused_handler(lv_group_t* group)
             lv_obj_t* child = LastFocused->spec_attr->children[i];
             if(lv_obj_check_type(child, &lv_label_class))
                 lv_obj_set_style_text_color(child, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
-            else
+            else if(lv_obj_check_type(child, &lv_img_class))
                 lv_obj_set_style_img_recolor(child, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         }
     }
@@ -282,7 +279,7 @@ static void focused_handler(lv_group_t* group)
         lv_obj_t* child = obj->spec_attr->children[i];
         if(lv_obj_check_type(child, &lv_label_class))
             lv_obj_set_style_text_color(child, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        else
+        else if(lv_obj_check_type(child, &lv_img_class))
             lv_obj_set_style_img_recolor(child, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     }
     LastFocused = obj;
@@ -291,7 +288,7 @@ static void focused_handler(lv_group_t* group)
 void CreateSettingPanel(void* user_data, bool BgTransp)
 {
     Setting::Base* Setting = static_cast<Setting::Base*>(user_data);
-    uint8_t item_num = Setting->GetItemNum();
+    uint8_t ItemNum = Setting->GetItemNum();
     uint8_t only_text_item_num = Setting->GetOnlyTextItemNum();
     const char** text = Setting->GetStrArray();
 
@@ -309,7 +306,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
     // SettingPanelLayout
     lv_obj_t* SettingPanelLayout = lv_obj_create(SettingPanel);
     lv_obj_set_width(SettingPanelLayout, 800);
-    lv_obj_set_height(SettingPanelLayout, 90 * (item_num + 1));
+    lv_obj_set_height(SettingPanelLayout, 90 * (ItemNum + 1));
     lv_obj_set_x(SettingPanelLayout, 0);
     lv_obj_set_y(SettingPanelLayout, 0);
     lv_obj_set_align(SettingPanelLayout, LV_ALIGN_CENTER);
@@ -320,7 +317,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_width(title, 800);
     lv_obj_set_height(title, 90);
     lv_obj_set_x(title, 0);
-    lv_obj_set_y(title, -(90 / 2) * item_num);
+    lv_obj_set_y(title, -(90 / 2) * ItemNum);
     lv_obj_set_align(title, LV_ALIGN_CENTER);
     lv_obj_clear_flag(title, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_border_color(title, lv_color_hex(0xBBBBBB), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -341,13 +338,13 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
 
     SettingGroup = create_new_group(SettingGroup);
     set_group_activity(SettingGroup);
-    for(int i = 0; i < item_num; ++i) {
+    for(int i = 0; i < ItemNum; ++i) {
         // item_panel
         lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
         lv_obj_set_width(item_panel, 800);
         lv_obj_set_height(item_panel, 90);
         lv_obj_set_x(item_panel, 0);
-        lv_obj_set_y(item_panel, -(90 / 2) * item_num + (i + 1) * 90);
+        lv_obj_set_y(item_panel, -(90 / 2) * ItemNum + (i + 1) * 90);
         lv_obj_set_align(item_panel, LV_ALIGN_CENTER);
         lv_obj_clear_flag(item_panel, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_style_border_color(item_panel, lv_color_hex(0xBBBBBB), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -369,13 +366,13 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_text_color(item_text1, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(item_text1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(item_text1, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-        if (i < item_num - only_text_item_num) {
+        if (i < ItemNum - only_text_item_num) {
             lv_obj_set_x(item_text1, -200);
             lv_label_set_text(item_text1, text[2*i+1]);
         }
         else {
             lv_obj_set_x(item_text1, 0);
-            lv_label_set_text(item_text1, text[item_num - only_text_item_num + 1 + i]);
+            lv_label_set_text(item_text1, text[ItemNum - only_text_item_num + 1 + i]);
             continue;
         }
 
@@ -418,6 +415,117 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_img_recolor(item_image2, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_img_recolor_opa(item_image2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
+    LastFocused = NULL;
+    lv_group_focus_obj(lv_obj_get_child(SettingPanelLayout, 1));
+}
+
+void CreateSubSettingPanel(void* user_data, bool BgTransp)
+{
+    Setting::Base* Setting = static_cast<Setting::Base*>(user_data);
+    uint8_t ItemNum = Setting->GetItemNum();
+    const char** text = Setting->GetStrArray();
+
+    SubSettingPanel = lv_obj_create(SettingPanel);
+    lv_obj_set_size(SubSettingPanel, 1280, 720);
+    lv_obj_clear_flag(SubSettingPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(SubSettingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(SubSettingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    if (BgTransp)
+        lv_obj_set_style_bg_opa(SubSettingPanel, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    else
+        lv_obj_set_style_bg_opa(SubSettingPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(SubSettingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // SettingPanelLayout
+    lv_obj_t* SettingPanelLayout = lv_obj_create(SubSettingPanel);
+    lv_obj_set_width(SettingPanelLayout, 600);
+    lv_obj_set_height(SettingPanelLayout, 70 * (ItemNum + 1));
+    lv_obj_set_x(SettingPanelLayout, 0);
+    lv_obj_set_y(SettingPanelLayout, 0);
+    lv_obj_set_align(SettingPanelLayout, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(SettingPanelLayout, LV_OBJ_FLAG_SCROLLABLE);
+    SettingPanelLayout->user_data = user_data;
+
+    lv_obj_t* title = lv_obj_create(SettingPanelLayout);
+    lv_obj_set_width(title, 600);
+    lv_obj_set_height(title, 70);
+    lv_obj_set_x(title, 0);
+    lv_obj_set_y(title, -(70 / 2) * ItemNum);
+    lv_obj_set_align(title, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(title, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_border_color(title, lv_color_hex(0xBBBBBB), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(title, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(title, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_side(title, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_t* title_text = lv_label_create(title);
+    lv_obj_set_width(title_text, LV_SIZE_CONTENT);
+    lv_obj_set_height(title_text, LV_SIZE_CONTENT);
+    lv_obj_set_x(title_text, 0);
+    lv_obj_set_y(title_text, 0);
+    lv_obj_set_align(title_text, LV_ALIGN_CENTER);
+    lv_label_set_text(title_text, text[0]);
+    lv_obj_set_style_text_color(title_text, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    SettingGroup = create_new_group(SettingGroup);
+    set_group_activity(SettingGroup);
+    for(int i = 0; i < ItemNum; ++i) {
+        // item_panel
+        lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
+        lv_obj_set_width(item_panel, 600);
+        lv_obj_set_height(item_panel, 70);
+        lv_obj_set_x(item_panel, 0);
+        lv_obj_set_y(item_panel, -(70 / 2) * ItemNum + (i + 1) * 70);
+        lv_obj_set_align(item_panel, LV_ALIGN_CENTER);
+        lv_obj_clear_flag(item_panel, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_border_color(item_panel, lv_color_hex(0xBBBBBB), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_border_opa(item_panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_border_width(item_panel, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_border_side(item_panel, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_color(item_panel, lv_color_hex(0xEF16E9), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_opa(item_panel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_group_add_obj(SettingGroup, item_panel);
+        lv_obj_add_event_cb(item_panel, setting_item_key_event_handler, LV_EVENT_KEY, NULL);
+        lv_group_set_focus_cb(SettingGroup, focused_handler);
+
+        // item_text1
+        lv_obj_t* item_text1 = lv_label_create(item_panel);
+        lv_obj_set_width(item_text1, LV_SIZE_CONTENT);
+        lv_obj_set_height(item_text1, LV_SIZE_CONTENT);
+        lv_obj_set_x(item_text1, -200);
+        lv_obj_set_y(item_text1, 0);
+        lv_label_set_text(item_text1, text[i+1]);
+        lv_obj_set_align(item_text1, LV_ALIGN_CENTER);
+        lv_obj_set_style_text_color(item_text1, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(item_text1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(item_text1, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+        // item_text2
+        lv_obj_t* item_text2 = lv_label_create(item_panel);
+        lv_obj_set_width(item_text2, LV_SIZE_CONTENT);
+        lv_obj_set_height(item_text2, LV_SIZE_CONTENT);
+        lv_obj_set_x(item_text2, 230);
+        lv_obj_set_y(item_text2, 0);
+        lv_obj_set_align(item_text2, LV_ALIGN_CENTER);
+        lv_label_set_text(item_text2, Setting->GetStr(i+1));
+        lv_obj_set_style_text_color(item_text2, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(item_text2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(item_text2, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+        lv_obj_t* slider = lv_slider_create(item_panel);
+        lv_slider_set_range(slider, 0, 100);
+        lv_slider_set_value(slider, Setting->GetValue(i+1), LV_ANIM_OFF);
+        if(lv_slider_get_mode(slider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(slider, 0, LV_ANIM_OFF);
+        lv_obj_set_width(slider, 200);
+        lv_obj_set_height(slider, 7);
+        lv_obj_set_x(slider, 80);
+        lv_obj_set_y(slider, 0);
+        lv_obj_set_align(slider, LV_ALIGN_CENTER);
+        lv_obj_clear_state(slider, LV_STATE_FOCUS_KEY);
+    }
+    SubLastFocused = LastFocused;
     LastFocused = NULL;
     lv_group_focus_obj(lv_obj_get_child(SettingPanelLayout, 1));
 }
