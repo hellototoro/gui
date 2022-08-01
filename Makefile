@@ -20,6 +20,8 @@ CPPFLAGS ?= -O0 -g0 $(SYS_DIR)/ -Wall -Wshadow -Wundef -Wall -Wextra -Wno-unused
 
 CFLAGS += -DHCCHIP_GCC
 CPPFLAGS += -DHCCHIP_GCC
+#CPPFLAGS += -std=c++17
+CPPFLAGS += "-I$(ROOT_DIR)/boost_1_79_0"
 
 LDFLAGS ?= -lm
 BIN = gui_app

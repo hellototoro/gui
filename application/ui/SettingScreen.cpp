@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 12:15:30
+ * @LastEditTime: 2022-08-01 14:28:43
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -27,13 +27,6 @@ enum CategoryList {
     Update,
     Info,
     CategoryNumber
-};
-
-const char* SoundItemName[] = {
-    "声音设置",
-    "声音模式", "音乐", 
-    "环绕声", "SRS环绕", 
-    "自动音量", "开"
 };
 
 const char* SystemItemName[] = {
@@ -178,11 +171,11 @@ static void event_handler(lv_event_t* event)
             break;
 
         case Sound:
-            //CreateSettingPanel(3, 0, SoundItemName, NULL, false);
+            CreateSettingPanel(Setting::CreateSoundSettingObj(), false);
             break;
 
         case System:
-            //CreateSettingPanel(5, 2, SystemItemName, NULL, false);
+            CreateSettingPanel(Setting::CreateSystemSettingObj(), false);
             break;
 
         case Update:
@@ -421,6 +414,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
 
 void CreateSubSettingPanel(void* user_data, bool BgTransp)
 {
+    if (user_data == nullptr) return;
     Setting::Base* Setting = static_cast<Setting::Base*>(user_data);
     uint8_t ItemNum = Setting->GetItemNum();
     const char** text = Setting->GetStrArray();

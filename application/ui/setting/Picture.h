@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-28 20:28:05
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 11:55:11
+ * @LastEditTime: 2022-08-01 21:34:03
  * @FilePath: /gui/application/ui/setting/Picture.h
  * @Description: None
  * @other: None
@@ -41,6 +41,10 @@ public:
         uint8_t type;//标准；柔和；用户；动态
         class ModeType {
             public:
+            ModeType() = default;
+            ModeType(uint8_t _contrast, uint8_t _brightness, uint8_t _colour, uint8_t _sharpness) : 
+                contrast { _contrast }, brightness { _brightness }, colour { _colour }, sharpness { _sharpness } { }
+
             constexpr static uint8_t ItemNum = 4;
             enum ContentType {
                 Content_Contrast = 1,
@@ -57,8 +61,13 @@ public:
             char ColourName[4];
             uint8_t sharpness;
             char SharpnessName[4];
-        } standard, soft, user, dynamic;
-        constexpr static const char* name[4] = { 
+        };
+        ModeType standard{50, 50, 50, 50};
+        ModeType soft{50, 50, 50, 50};
+        ModeType user{50, 50, 50, 50};
+        ModeType dynamic{50, 50, 50, 50};
+        //constexpr static const char* name[4] = { 
+        const char* name[4] = { 
         "标准", "柔和", "用户", "动态" };
 
         PictureMode() {}
@@ -86,6 +95,10 @@ public:
         uint8_t type;//标准；暖色；用户；冷色
         class ColorTemperatureType {
             public:
+            ColorTemperatureType() = default;
+            ColorTemperatureType(uint8_t _red, uint8_t _green, uint8_t _blue) : 
+                red { _red }, green { _green }, blue { _blue } { }
+
             constexpr static uint8_t ItemNum = 3;
             enum ContentType {
                 Content_Red = 1,
@@ -99,12 +112,17 @@ public:
             char GreenName[4];
             uint8_t blue;
             char BlueName[4];
-        } standard, warm, user, cool;
-        constexpr static const char* name[4] = { 
+        };
+        ColorTemperatureType standard{50, 50, 50};
+        ColorTemperatureType warm{50, 50, 50};
+        ColorTemperatureType user{50, 50, 50};
+        ColorTemperatureType cool{50, 50, 50};
+        //constexpr static const char* name[4] = { 
+        const char* name[4] = { 
         "标准", "暖色", "用户", "冷色" };
 
-        PictureColorTemperature() {}
-        ~PictureColorTemperature() {}
+        PictureColorTemperature() { }
+        ~PictureColorTemperature() { }
 
         virtual int GetItemNum(void) { return user.ItemNum; }
         virtual int GetOnlyTextItemNum(void) { return 0; }
@@ -117,14 +135,16 @@ public:
     } ColorTemperature;
 
     uint8_t scale;
-    constexpr static const char* ScaleName[3] = { 
+    //constexpr static const char* ScaleName[3] = { 
+    const char* ScaleName[3] = { 
     "16:9", "4:3", "自动" };
 
     uint8_t ratio;
     char RatioName[5];
 
     uint8_t PowerBankMode;
-    constexpr static const char* PowerBankModeName[3] = { 
+    //constexpr static const char* PowerBankModeName[3] = { 
+    const char* PowerBankModeName[3] = { 
     "低", "中", "高" };
 
 public:
@@ -141,9 +161,6 @@ public:
     virtual void* GetDerivedAddress(int index);
 
 };
-
-extern Picture* CreatePictureSettingObj(void);
-extern void DeletePictureSettingObj(Picture* PictureData);
 
 }
 #endif

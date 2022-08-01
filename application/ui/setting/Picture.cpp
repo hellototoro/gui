@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-28 20:27:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 12:18:16
+ * @LastEditTime: 2022-08-01 20:44:35
  * @FilePath: /gui/application/ui/setting/Picture.cpp
  * @Description: None
  * @other: None
@@ -22,7 +22,7 @@ Picture::~Picture()
 
 const char** Picture::GetStrArray(void)
 {
-    static const char* name[] = {
+    static const char* name[11] = {
         "图像设置",
         "图像模式", "标准", 
         "缩放设置", "16:9", 
@@ -143,43 +143,10 @@ void* Picture::GetDerivedAddress(int index)
     }
 }
 
-void PictureSettingInit(Picture* setting)
-{
-    setting->mode.type = static_cast<uint8_t>(setting->mode.PictureMode_User);
-    setting->mode.user.contrast = 50;
-    setting->mode.user.brightness = 60;
-    setting->mode.user.colour = 70;
-    setting->mode.user.sharpness = 80;
-
-    setting->scale = 0;
-    
-    setting->ColorTemperature.type = static_cast<uint8_t>(setting->ColorTemperature.PictureColorTemperature_User);
-    setting->ColorTemperature.user.red = 50;
-    setting->ColorTemperature.user.green = 60;
-    setting->ColorTemperature.user.blue = 70;
-
-    
-    setting->ratio = 100;
-
-    setting->PowerBankMode = 0;
-}
-
-Picture* CreatePictureSettingObj(void)
-{
-    Picture* PictureData = new Picture;
-    PictureSettingInit(PictureData);
-    return PictureData;
-}
-
-void DeletePictureSettingObj(Picture* PictureData)
-{
-    delete PictureData;
-}
-
 const char** Picture::PictureMode::GetStrArray(void)
 {
     //const char** name = nullptr;
-    static const char* name[] = { "图像设置", "对比度", "亮度", "色彩",  "锐度" };
+    static const char* name[5] = { "图像模式", "对比度", "亮度", "色彩",  "锐度" };
     return name;
 }
 
@@ -288,7 +255,7 @@ const char* Picture::PictureMode::GetStr(int index)
 
 const char** Picture::PictureColorTemperature::GetStrArray(void)
 {
-    static const char* name[] = { "色温", "红", "绿", "蓝", };
+    static const char* name[4] = { "色温", "红", "绿", "蓝", };
     return name;
 }
 
