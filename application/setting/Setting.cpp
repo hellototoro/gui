@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:25:46
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 21:45:11
+ * @LastEditTime: 2022-08-02 08:12:54
  * @FilePath: /gui/application/ui/setting/Setting.cpp
  * @Description: None
  * @other: None
@@ -44,12 +44,6 @@ Picture* CreatePictureSettingObj(void)
     return PictureData;
 }
 
-void DeletePictureSettingObj(Picture* PictureData)
-{
-    delete PictureData;
-}
-
-
 void SoundSettingInit(Sound* setting)
 {
     boost::property_tree::ptree pt, commonCfg;
@@ -74,11 +68,6 @@ Sound* CreateSoundSettingObj(void)
     return SoundData;
 }
 
-void DeleteSoundSettingObj(Sound* SoundData)
-{
-    delete SoundData;
-}
-
 void SystemSettingInit(System* setting)
 {
     boost::property_tree::ptree pt, commonCfg;
@@ -100,9 +89,10 @@ System* CreateSystemSettingObj(void)
     return SystemData;
 }
 
-void DeleteSystemSettingObj(System* SystemData)
+template <typename T>
+void DeleteSettingObj(T* SettingData)
 {
-    delete SystemData;
+    delete SettingData;
 }
 
 }

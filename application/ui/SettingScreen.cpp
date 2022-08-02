@@ -2,13 +2,13 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 14:28:43
+ * @LastEditTime: 2022-08-02 08:18:29
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
  */
 #include "SettingScreen.h"
-#include "setting/Setting.h"
+#include "application/setting/Setting.h"
 #include "ui_com.h"
 
 lv_obj_t* ui_SettingScreen;
