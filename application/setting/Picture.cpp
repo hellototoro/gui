@@ -2,13 +2,14 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-28 20:27:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 20:44:35
- * @FilePath: /gui/application/ui/setting/Picture.cpp
+ * @LastEditTime: 2022-08-08 18:43:43
+ * @FilePath: /gui/application/setting/Picture.cpp
  * @Description: None
  * @other: None
  */
 #include <stdio.h>
 #include "Picture.h"
+
 
 namespace Setting {
 
@@ -23,22 +24,22 @@ Picture::~Picture()
 const char** Picture::GetStrArray(void)
 {
     static const char* name[11] = {
-        "图像设置",
-        "图像模式", "标准", 
-        "缩放设置", "16:9", 
-        "色温", "标准", 
-        "投影缩放", "100%", 
-        "充电宝亮度模式", "低"
+        _("setting_p_picture_setting"), 
+        _("setting_p_picture_mode"), _("setting_p_picture_mode_type_standard"), 
+        _("setting_p_picture_scale"), "16:9", 
+        _("setting_p_picture_color_temp"), _("setting_p_picture_color_temp_type_standard"), 
+        _("setting_p_picture_rate"), _("setting_p_picture_rate_100"), 
+        _("setting_p_picture_power_bank_mode"), _("setting_p_picture_power_bank_mode_low")
     };
     return name;
 }
 
-int Picture::GetValue(int index)
+int Picture::GetUserValue(int index)
 {
     return 0;
 }
 
-void Picture::IncreaseValue(int index)
+void Picture::IncreaseUserValue(int index)
 {
     switch (index)
     {
@@ -67,7 +68,7 @@ void Picture::IncreaseValue(int index)
     }
 }
 
-void Picture::DecreaseValue(int index)
+void Picture::DecreaseUserValue(int index)
 {
     switch (index)
     {
@@ -146,11 +147,16 @@ void* Picture::GetDerivedAddress(int index)
 const char** Picture::PictureMode::GetStrArray(void)
 {
     //const char** name = nullptr;
-    static const char* name[5] = { "图像模式", "对比度", "亮度", "色彩",  "锐度" };
+    static const char* name[5] = { 
+    _("setting_p_picture_mode"), 
+    _("setting_p_picture_mode_contrast"), 
+    _("setting_p_picture_mode_brightness"), 
+    _("setting_p_picture_mode_colour"), 
+    _("setting_p_picture_mode_sharpness") };
     return name;
 }
 
-int Picture::PictureMode::GetValue(int index)
+int Picture::PictureMode::GetUserValue(int index)
 {
     switch (index)
     {
@@ -172,7 +178,7 @@ int Picture::PictureMode::GetValue(int index)
     return 0;
 }
 
-void Picture::PictureMode::IncreaseValue(int index)
+void Picture::PictureMode::IncreaseUserValue(int index)
 {
     switch (index)
     {
@@ -197,7 +203,7 @@ void Picture::PictureMode::IncreaseValue(int index)
     }
 }
 
-void Picture::PictureMode::DecreaseValue(int index)
+void Picture::PictureMode::DecreaseUserValue(int index)
 {
     switch (index)
     {
@@ -255,11 +261,15 @@ const char* Picture::PictureMode::GetStr(int index)
 
 const char** Picture::PictureColorTemperature::GetStrArray(void)
 {
-    static const char* name[4] = { "色温", "红", "绿", "蓝", };
+    static const char* name[4] = { 
+    _("setting_p_picture_color_temp"), 
+    _("setting_p_picture_color_temp_red"), 
+    _("setting_p_picture_color_temp_green"), 
+    _("setting_p_picture_color_temp_blue") };
     return name;
 }
 
-int Picture::PictureColorTemperature::GetValue(int index)
+int Picture::PictureColorTemperature::GetUserValue(int index)
 {
     switch (index)
     {
@@ -278,7 +288,7 @@ int Picture::PictureColorTemperature::GetValue(int index)
     return 0;
 }
 
-void Picture::PictureColorTemperature::IncreaseValue(int index)
+void Picture::PictureColorTemperature::IncreaseUserValue(int index)
 {
     switch (index)
     {
@@ -299,7 +309,7 @@ void Picture::PictureColorTemperature::IncreaseValue(int index)
     }
 }
 
-void Picture::PictureColorTemperature::DecreaseValue(int index)
+void Picture::PictureColorTemperature::DecreaseUserValue(int index)
 {
     switch (index)
     {

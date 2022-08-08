@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-18 12:34:21
- * @FilePath: /SOURCE/gui/application/ui/HomeScreen.c
+ * @LastEditTime: 2022-08-08 18:16:39
+ * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
  */
@@ -15,7 +15,7 @@
 #include "Volume.h"
 #include "application/key_map.h"
 #include "SettingScreen.h"
-//#include "lv_i18n/src/lv_i18n.h"
+#include "lv_i18n/src/lv_i18n.h"
 
 lv_obj_t* ui_HomeScreen;
 lv_obj_t* ui_Main_Panel;
@@ -46,11 +46,6 @@ static const lv_img_dsc_t* source_img_src[] = {
     &ui_img_hdmi_big_png
 };
 
-static const char* source_lab_txt[] = {
-    "U Disk",
-    "HDMI"
-};
-
 static void event_handler(lv_event_t* event);
 static void ExitHome(ActiveScreen screen);
 static void source_event_handler(lv_event_t* event);
@@ -73,7 +68,13 @@ static void CreateMainPanel(lv_obj_t* parent)
         {    0,  -38},
         {   -8,  -38}
     };
-    static const char* str[] =  { "U Disk", "Setting", "Source", "IOS", "Android", "DLNA"};
+    const char* str[6];
+    str[0] = _("main_p_u_disk");//盘设置信号源苹果安卓无线投屏西班牙德英意大利法语简体中文
+    str[1] = _("main_setting");
+    str[2] = _("main_source");
+    str[3] = _("main_ios");
+    str[4] = _("main_android");
+    str[5] = _("main_dlna");
     static const lv_img_dsc_t* image_src[] = {
         & ui_img_udisk_n_png,
         & ui_img_setting_n_png,
@@ -179,7 +180,7 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_size(ui_LAB_SourceType, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(ui_LAB_SourceType, 0, 84);
     lv_obj_set_align(ui_LAB_SourceType, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LAB_SourceType, "U Disk");
+    lv_label_set_text(ui_LAB_SourceType, _("source_p_u_disk"));
     lv_obj_set_style_text_color(ui_LAB_SourceType, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_SourceType, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LAB_SourceType, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -279,7 +280,10 @@ static void source_event_handler(lv_event_t* event)
     //lv_img_set_src(ui_IMG_SourceType, source_img_src[lv_obj_get_index(target)]);
     int index = lv_obj_get_index(lv_group_get_focused(group));
     lv_img_set_src(ui_IMG_SourceType, source_img_src[index]);
-    lv_label_set_text(ui_LAB_SourceType, source_lab_txt[index]);
+    if(index == 0)
+        lv_label_set_text(ui_LAB_SourceType, _("source_p_u_disk"));
+    else if(index == 1)
+        lv_label_set_text(ui_LAB_SourceType, _("source_p_hdim"));
 }
 
 static void ExitHome(ActiveScreen screen)

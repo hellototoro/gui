@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:09:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 21:42:43
- * @FilePath: /gui/application/ui/setting/System.h
+ * @LastEditTime: 2022-08-08 20:54:11
+ * @FilePath: /gui/application/setting/System.h
  * @Description: None
  * @other: None
  */
@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include "Base.h"
+#include "lv_i18n/src/lv_i18n.h"
 
 namespace Setting {
 
@@ -30,18 +31,30 @@ public:
     uint8_t language;
     //constexpr static const char* LanguageName[] = { 
     const char* LanguageName[6] = { 
-    "西班牙语", "德语", "英语", "意大利语", "法语", "简体中文" };
+    _("setting_p_system_espaol"),
+    _("setting_p_system_deutsch"),
+    _("setting_p_system_english"),
+    _("setting_p_system_italiano"),
+    _("setting_p_system_france"),
+    _("setting_p_system_chinese")
+ };
 
 
     uint8_t OsdTime;
     //constexpr static const char* OsdTimeName[] = { 
     const char* OsdTimeName[7] = { 
-    "关", "5秒", "10秒", "15秒", "20秒", "25秒", "30秒" };
+    _("setting_p_system_osd_time_off"), 
+    _("setting_p_system_osd_time_5"), 
+    _("setting_p_system_osd_time_10"), 
+    _("setting_p_system_osd_time_15"), 
+    _("setting_p_system_osd_time_20"), 
+    _("setting_p_system_osd_time_25"), 
+    _("setting_p_system_osd_time_30") };
 
     uint8_t RestoreFactory;
     //constexpr static const char* RestoreFactoryName[] = { 
     const char* RestoreFactoryName[1] = { 
-    "恢复出厂设置" };
+    _("setting_p_system_restore_factory_mode") };
 
 public:
     System(/* args */);
@@ -50,9 +63,11 @@ public:
     virtual int GetItemNum(void) { return ItemNum; }
     virtual int GetOnlyTextItemNum(void) { return OnlyTextItemNum; }
     virtual const char** GetStrArray(void);
-    virtual int GetValue(int index);
-    virtual void IncreaseValue(int index);
-    virtual void DecreaseValue(int index);
+    virtual int GetUserValue(int index);
+    virtual void SetUserValue(int index, int value) { }
+    virtual void SelectedValue(int index);
+    virtual void IncreaseUserValue(int index);
+    virtual void DecreaseUserValue(int index);
     virtual const char* GetStr(int index);
     virtual void* GetDerivedAddress(int index);
 

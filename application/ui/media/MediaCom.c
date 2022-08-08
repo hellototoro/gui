@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 17:56:11
+ * @LastEditTime: 2022-08-08 21:51:51
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -26,6 +26,7 @@
 #include "application/ui/ui_com.h"
 #include "application/ui/Volume.h"
 #include "application/key_map.h"
+#include "lv_i18n/src/lv_i18n.h"
 
 char current_path[100];
 int current_path_size = sizeof(current_path);
@@ -672,8 +673,14 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_x(PlayListMode_LAB, 79);
     lv_obj_set_y(PlayListMode_LAB, 0);
     lv_obj_set_align(PlayListMode_LAB, LV_ALIGN_LEFT_MID);
-    //lv_label_set_text(PlayListMode_LAB, "顺序播放（276首）");
-    lv_label_set_text_fmt(PlayListMode_LAB, "顺序播放（%d首）", file_number);
+
+    //CurrentPlayMode
+
+    char buf[64];
+    sprintf(buf, _p("songs", file_number), file_number);
+    //sprintf(buf, _p("user_logged_in", 7)), 7);
+    lv_label_set_text(PlayListMode_LAB, buf);
+    //lv_label_set_text_fmt(PlayListMode_LAB, "顺序播放（%d首）", file_number);
     lv_obj_set_style_text_font(PlayListMode_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     // FileListPanel

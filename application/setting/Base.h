@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:22:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 12:17:28
- * @FilePath: /gui/application/ui/setting/Base.h
+ * @LastEditTime: 2022-08-08 20:47:16
+ * @FilePath: /gui/application/setting/Base.h
  * @Description: None
  * @other: None
  */
@@ -11,6 +11,8 @@
 #define __SETTING_BASE_H__
 
 namespace Setting {
+    
+#define _2INT(x)  static_cast<int>(x)
 
 class Base {
 private:
@@ -31,9 +33,11 @@ public:
     virtual int GetItemNum(void) = 0;
     virtual int GetOnlyTextItemNum(void) = 0;
     virtual const char** GetStrArray(void) = 0;
-    virtual int GetValue(int index) = 0;
-    virtual void IncreaseValue(int index) = 0;
-    virtual void DecreaseValue(int index) = 0;
+    virtual int GetUserValue(int index) = 0;
+    virtual void SetUserValue(int index, int value) = 0;
+    virtual void SelectedValue(int index) = 0;
+    virtual void IncreaseUserValue(int index) = 0;
+    virtual void DecreaseUserValue(int index) = 0;
     virtual const char* GetStr(int index) = 0;
     virtual void* GetDerivedAddress(int index) = 0;
 };

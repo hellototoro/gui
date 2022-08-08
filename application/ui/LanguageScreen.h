@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:29
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-14 12:46:06
+ * @LastEditTime: 2022-08-08 16:50:57
  * @FilePath: /gui/application/ui/LanguageScreen.h
  * @Description: None
  * @other: None
@@ -16,6 +16,17 @@
 extern "C" {
 #endif
 
+enum LanguageType {
+    Espaol,     //西班牙语
+    Deutsch,    //德语
+    English,    //英语
+    Italiano,   //意大利语
+    France,     //法语
+    Chinese,     //中文
+    LanguageNumber
+};
+
+extern const char* DefaultLanguage;
 
 #ifdef __cplusplus
 } /*extern "C"*/

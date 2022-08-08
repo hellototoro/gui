@@ -2,67 +2,159 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:25:46
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-02 09:40:41
+ * @LastEditTime: 2022-08-08 13:27:26
  * @FilePath: /gui/application/setting/Setting.cpp
  * @Description: None
  * @other: None
  */
 #include <string>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
 #include "Setting.h"
+#include "application/ConfigParam.h"
+#include "application/windows.h"
 
 namespace Setting {
 
-boost::property_tree::ptree* ReadConfigFile(void)
+
+void ReadPictureSettingParam(Picture& setting)
 {
-    boost::property_tree::ptree* pt = new boost::property_tree::ptree;
-    #ifdef HCCHIP_GCC
-    boost::property_tree::ini_parser::read_ini("/tmp/data/gui_setting.ini", *pt);
-    #else
-    boost::property_tree::ini_parser::read_ini("/home/totoro/workspace/HiChip/hclinux/SOURCE/gui/application/setting/gui_setting.ini", *pt);
-    #endif
-    return pt;
+    //boost::property_tree::ptree* pt = ReadConfigFile();
+    boost::property_tree::ptree config;// = pt->get_child("picture_setting");
+    ReadConfigFile(config, "picture_setting");
+    setting.mode.type = config.get<int>("mode_type", 0);
+    setting.mode.user.contrast = config.get<int>("mode_user_contrast", 50);
+    setting.mode.user.brightness = config.get<int>("mode_user_brightness", 50);
+    setting.mode.user.colour = config.get<int>("mode_user_colour", 50);
+    setting.mode.user.sharpness = config.get<int>("mode_user_sharpness", 50);
+    setting.scale = config.get<int>("scale", 0);
+    setting.ColorTemperature.type = config.get<int>("ColorTemperature_type", 0);
+    setting.ColorTemperature.user.red = config.get<int>("ColorTemperature_user_red", 50);
+    setting.ColorTemperature.user.green = config.get<int>("ColorTemperature_user_green", 50);
+    setting.ColorTemperature.user.blue = config.get<int>("ColorTemperature_user_blue", 50);
+    setting.ratio = config.get<int>("ratio", 0);
+    setting.PowerBankMode = config.get<int>("PowerBankMode", 0);
+    //delete pt;
 }
 
-void PictureSettingInit(Picture* setting)
+void ReadSoundSettingParam(Sound& setting)
 {
-    boost::property_tree::ptree* pt = ReadConfigFile();
-    boost::property_tree::ptree config = pt->get_child("picture_setting");
-    setting->mode.type = config.get<int>("mode_type", 0);
-    setting->mode.user.contrast = config.get<int>("mode_user_contrast", 50);
-    setting->mode.user.brightness = config.get<int>("mode_user_brightness", 50);
-    setting->mode.user.colour = config.get<int>("mode_user_colour", 50);
-    setting->mode.user.sharpness = config.get<int>("mode_user_sharpness", 50);
-    setting->scale = config.get<int>("scale", 0);
-    setting->ColorTemperature.type = config.get<int>("ColorTemperature_type", 0);
-    setting->ColorTemperature.user.red = config.get<int>("ColorTemperature_user_red", 50);
-    setting->ColorTemperature.user.green = config.get<int>("ColorTemperature_user_green", 50);
-    setting->ColorTemperature.user.blue = config.get<int>("ColorTemperature_user_blue", 50);
-    setting->ratio = config.get<int>("ratio", 0);
-    setting->PowerBankMode = config.get<int>("PowerBankMode", 0);
-    delete pt;
+    //boost::property_tree::ptree* pt = ReadConfigFile();
+    //boost::property_tree::ptree config = pt->get_child("sound_setting");
+    boost::property_tree::ptree config;// = pt->get_child("picture_setting");
+    ReadConfigFile(config, "sound_setting");
+    setting.mode.type = config.get<int>("mode_type", 0);
+    setting.mode.user.treble = config.get<int>("mode_user_treble", 50);
+    setting.mode.user.bass = config.get<int>("mode_user_bass", 50);
+    setting.surround = config.get<int>("surround", 0);
+    setting.AutoVolume = config.get<int>("AutoVolume", 0);
+    //delete pt;
 }
 
-void SoundSettingInit(Sound* setting)
+void ReadSystemSettingParam(System& setting)
 {
-    boost::property_tree::ptree* pt = ReadConfigFile();
-    boost::property_tree::ptree config = pt->get_child("sound_setting");
-    setting->mode.type = config.get<int>("mode_type", 0);
-    setting->mode.user.treble = config.get<int>("mode_user_treble", 50);
-    setting->mode.user.bass = config.get<int>("mode_user_bass", 50);
-    setting->surround = config.get<int>("surround", 0);
-    setting->AutoVolume = config.get<int>("AutoVolume", 0);
-    delete pt;
+    //boost::property_tree::ptree* pt = ReadConfigFile();
+    //boost::property_tree::ptree config = pt->get_child("system_setting");
+    boost::property_tree::ptree config;// = pt->get_child("picture_setting");
+    ReadConfigFile(config, "system_setting");
+    setting.language = config.get<int>("language", 0);
+    setting.OsdTime = config.get<int>("OsdTime", 0);
+    //delete pt;
 }
 
-void SystemSettingInit(System* setting)
+template <typename T>
+T* CreateSettingObj( void (*SettingInit)(T&) )
 {
-    boost::property_tree::ptree* pt = ReadConfigFile();
-    boost::property_tree::ptree config = pt->get_child("system_setting");
-    setting->language = config.get<int>("language", 0);
-    setting->OsdTime = config.get<int>("OsdTime", 0);
-    delete pt;
+    T* SettingData = new T;
+    SettingInit(*SettingData);
+    return SettingData;
+}
+//显式声明模板函数
+template Picture* CreateSettingObj<Picture>(void (*SettingInit)(Picture&));
+template Sound* CreateSettingObj<Sound>(void (*SettingInit)(Sound&));
+template System* CreateSettingObj<System>(void (*SettingInit)(System&));
+
+template <typename T>
+void DeleteSettingObj(T& SettingData)
+{
+    delete SettingData;
+}
+//显式声明模板函数
+//template void DeleteSettingObj<Picture>(Picture*);
+//template void DeleteSettingObj<Sound>(Sound*);
+//template void DeleteSettingObj<System>(System*);
+
+void LoadSettingParameter(void)
+{
+
+    /*************************picture*****************************/
+    Picture picture;
+    ReadPictureSettingParam(picture);
+    switch (picture.mode.type)
+    {
+    case static_cast<int>(Picture::PictureMode::PictureMode_Standard):
+        //SetContrast(picture.mode.standard.contrast);
+        //SetBrightness(picture.mode.standard.brightness);
+        //SetColour(picture.mode.standard.colour);
+        //SetSharpness(picture.mode.standard.sharpness);
+        break;
+    case static_cast<int>(Picture::PictureMode::PictureMode_Soft):
+        //SetContrast(picture.mode.soft.contrast);
+        //SetBrightness(picture.mode.soft.brightness);
+        //SetColour(picture.mode.soft.colour);
+        //SetSharpness(picture.mode.soft.sharpness);
+        break;
+    case static_cast<int>(Picture::PictureMode::PictureMode_User):
+        //SetContrast(picture.mode.user.contrast);
+        //SetBrightness(picture.mode.user.brightness);
+        //SetColour(picture.mode.user.colour);
+        //SetSharpness(picture.mode.user.sharpness);
+        break;
+    case static_cast<int>(Picture::PictureMode::PictureMode_Dynamic):
+        //SetContrast(picture.mode.dynamic.contrast);
+        //SetBrightness(picture.mode.dynamic.brightness);
+        //SetColour(picture.mode.dynamic.colour);
+        //SetSharpness(picture.mode.dynamic.sharpness);
+        break;
+    default:
+        break;
+    }
+
+    switch (picture.ColorTemperature.type)
+    {
+    case static_cast<int>(Picture::PictureColorTemperature::PictureColorTemperature_Standard):
+        //SetColorTemperatureRed(picture.ColorTemperature.standard.red);
+        //SetColorTemperatureGreen(picture.ColorTemperature.standard.green);
+        //SetColorTemperatureBlue(picture.ColorTemperature.standard.blue);
+        break;
+    case static_cast<int>(Picture::PictureColorTemperature::PictureColorTemperature_Warm):
+        //SetColorTemperatureRed(picture.ColorTemperature.warm.red);
+        //SetColorTemperatureGreen(picture.ColorTemperature.warm.green);
+        //SetColorTemperatureBlue(picture.ColorTemperature.warm.blue);
+        break;
+    case static_cast<int>(Picture::PictureColorTemperature::PictureColorTemperature_User):
+        //SetColorTemperatureRed(picture.ColorTemperature.standard.red);
+        //SetColorTemperatureGreen(picture.ColorTemperature.standard.green);
+        //SetColorTemperatureBlue(picture.ColorTemperature.standard.blue);
+        break;
+    case static_cast<int>(Picture::PictureColorTemperature::PictureColorTemperature_Cool):
+        //SetColorTemperatureRed(picture.ColorTemperature.cool.red);
+        //SetColorTemperatureGreen(picture.ColorTemperature.cool.green);
+        //SetColorTemperatureBlue(picture.ColorTemperature.cool.blue);
+        break;
+    default:
+        break;
+    }
+    //SetScale(picture.scale);
+    //SetRatio(picture.ratio);
+    //SetPowerBankMode(picture.PowerBankMode);
+
+    /*************************sound*****************************/
+    Sound sound;
+    ReadSoundSettingParam(sound);
+    
+    /*************************system*****************************/
+    System system;
+    ReadSystemSettingParam(system);
+    
 }
 
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-22 14:01:34
+ * @LastEditTime: 2022-08-08 18:22:45
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -242,7 +242,7 @@ static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
     lv_obj_set_y(MusicName, -300);
     lv_obj_set_align(MusicName, LV_ALIGN_CENTER);
     lv_label_set_text(MusicName, "");
-    lv_obj_set_style_text_font(MusicName, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(MusicName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     MusicCover = lv_img_create(MusicScreen);
     //lv_img_set_src(MusicCover, &ui_img_music_cover2_png);

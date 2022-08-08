@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:25:49
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-02 09:40:07
+ * @LastEditTime: 2022-08-04 19:17:00
  * @FilePath: /gui/application/setting/Setting.h
  * @Description: None
  * @other: None
@@ -16,23 +16,12 @@
 
 namespace Setting {
 
-extern void PictureSettingInit(Picture* setting);
-extern void SoundSettingInit(Sound* setting);
-extern void SystemSettingInit(System* setting);
-
-template <typename T>
-T* CreateSettingObj( void (*SettingInit)(T*) )
-{
-    T* SettingData = new T;
-    SettingInit(SettingData);
-    return SettingData;
-}
-
-template <typename T>
-void DeleteSettingObj(T* SettingData)
-{
-    delete SettingData;
-}
+extern void ReadPictureSettingParam(Picture& setting);
+extern void ReadSoundSettingParam(Sound& setting);
+extern void ReadSystemSettingParam(System& setting);
+template <typename T> extern T* CreateSettingObj( void (*SettingInit)(T&) );
+template <typename T> extern void DeleteSettingObj(T& SettingData);
 
 }
+
 #endif

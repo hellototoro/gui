@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-02 09:39:19
+ * @LastEditTime: 2022-08-08 22:18:09
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -29,15 +29,6 @@ enum CategoryList {
     CategoryNumber
 };
 
-const char* SystemItemName[] = {
-    "系统设置",
-    "语言", "简体中文", // i = 0
-    "菜单显示时间", "关",  // i = 1
-    "自动开机", "关",  // i = 2
-    "软件升级",  // i = 3
-    "恢复出厂设置" // i = 4
-};
-
 static void event_handler(lv_event_t* event);
 void CreateSettingPanel(void* user_data, bool BgTransp);
 void CreateSubSettingPanel(void* user_data, bool BgTransp);
@@ -62,7 +53,14 @@ void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
         { 0, 45},
         { 0, 45}
     };
-    static const char* str[CategoryNumber] =  { "网络设置", "投影设置", "图像设置", "声音设置", "系统设置", "系统升级", "关于投影"};
+    static const char* str[CategoryNumber] =  { 
+    _("setting_p_net_work"), 
+    _("setting_p_projector"), 
+    _("setting_p_picture"), 
+    _("setting_p_sound"), 
+    _("setting_p_system"), 
+    _("setting_p_upgrade"), 
+    _("setting_p_projector_info") };
     static const lv_img_dsc_t* image_src[CategoryNumber] = {
         & ui_img_network_setting_png,
         & ui_img_projector_setting_png,
@@ -167,15 +165,15 @@ static void event_handler(lv_event_t* event)
             break;
 
         case Picture:
-            CreateSettingPanel(Setting::CreateSettingObj<Setting::Picture>(Setting::PictureSettingInit), false);
+            CreateSettingPanel(Setting::CreateSettingObj<Setting::Picture>(Setting::ReadPictureSettingParam), false);
             break;
 
         case Sound:
-            CreateSettingPanel(Setting::CreateSettingObj<Setting::Sound>(Setting::SoundSettingInit), false);
+            CreateSettingPanel(Setting::CreateSettingObj<Setting::Sound>(Setting::ReadSoundSettingParam), false);
             break;
 
         case System:
-            CreateSettingPanel(Setting::CreateSettingObj<Setting::System>(Setting::SystemSettingInit), false);
+            CreateSettingPanel(Setting::CreateSettingObj<Setting::System>(Setting::ReadSystemSettingParam), false);
             break;
 
         case Update:
@@ -209,27 +207,31 @@ static void setting_item_key_event_handler(lv_event_t* event)
     switch (value)
     {
     case LV_KEY_ENTER:
-        if(!lv_obj_is_valid(SubSettingPanel))
+        if(Setting->GetDerivedAddress(index) != nullptr)
             CreateSubSettingPanel(Setting->GetDerivedAddress(index), false);
+        //if(!lv_obj_is_valid(SubSettingPanel))
+            //CreateSubSettingPanel(Setting->GetDerivedAddress(index), false);
+        else
+            Setting->SelectedValue(index);
         break;
     case LV_KEY_LEFT:
         if (lv_obj_get_child_cnt(target) == 1) {//只能响应enter键的控件
             break;
         }
-        Setting->DecreaseValue(index);
+        Setting->DecreaseUserValue(index);
         lv_label_set_text(target->spec_attr->children[1], Setting->GetStr(index));
         if(lv_obj_is_valid(SubSettingPanel)) {
-            lv_slider_set_value(target->spec_attr->children[2], Setting->GetValue(index), LV_ANIM_OFF);
+            lv_slider_set_value(target->spec_attr->children[2], Setting->GetUserValue(index), LV_ANIM_OFF);
         }
         break;
     case LV_KEY_RIGHT:
         if (lv_obj_get_child_cnt(target) == 1) {
             break;
         }
-        Setting->IncreaseValue(index);
+        Setting->IncreaseUserValue(index);
         lv_label_set_text(target->spec_attr->children[1], Setting->GetStr(index));
         if(lv_obj_is_valid(SubSettingPanel)) {
-            lv_slider_set_value(target->spec_attr->children[2], Setting->GetValue(index), LV_ANIM_OFF);
+            lv_slider_set_value(target->spec_attr->children[2], Setting->GetUserValue(index), LV_ANIM_OFF);
         }
         break;
     case LV_KEY_UP:
@@ -373,7 +375,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_t* item_text2 = lv_label_create(item_panel);
         lv_obj_set_width(item_text2, LV_SIZE_CONTENT);
         lv_obj_set_height(item_text2, LV_SIZE_CONTENT);
-        static constexpr uint8_t mid = (120+300)/2;
+        static constexpr uint8_t mid = (100+320)/2;
         lv_obj_set_x(item_text2, mid);
         lv_obj_set_y(item_text2, 0);
         lv_obj_set_align(item_text2, LV_ALIGN_CENTER);
@@ -387,7 +389,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_img_set_src(item_image1, &ui_img_menu_arrow_right32_png);
         lv_obj_set_width(item_image1, LV_SIZE_CONTENT);
         lv_obj_set_height(item_image1, LV_SIZE_CONTENT);
-        lv_obj_set_x(item_image1, 300);
+        lv_obj_set_x(item_image1, 320);
         lv_obj_set_y(item_image1, 0);
         lv_obj_set_align(item_image1, LV_ALIGN_CENTER);
         lv_obj_add_flag(item_image1, LV_OBJ_FLAG_ADV_HITTEST);
@@ -400,7 +402,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_img_set_src(item_image2, &ui_img_menu_arrow_left32_png);
         lv_obj_set_width(item_image2, LV_SIZE_CONTENT);
         lv_obj_set_height(item_image2, LV_SIZE_CONTENT);
-        lv_obj_set_x(item_image2, 120);
+        lv_obj_set_x(item_image2, 100);
         lv_obj_set_y(item_image2, 0);
         lv_obj_set_align(item_image2, LV_ALIGN_CENTER);
         lv_obj_add_flag(item_image2, LV_OBJ_FLAG_ADV_HITTEST);
@@ -510,7 +512,7 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
 
         lv_obj_t* slider = lv_slider_create(item_panel);
         lv_slider_set_range(slider, 0, 100);
-        lv_slider_set_value(slider, Setting->GetValue(i+1), LV_ANIM_OFF);
+        lv_slider_set_value(slider, Setting->GetUserValue(i+1), LV_ANIM_OFF);
         if(lv_slider_get_mode(slider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(slider, 0, LV_ANIM_OFF);
         lv_obj_set_width(slider, 200);
         lv_obj_set_height(slider, 7);

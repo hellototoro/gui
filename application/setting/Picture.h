@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-28 20:28:05
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 21:34:03
- * @FilePath: /gui/application/ui/setting/Picture.h
+ * @LastEditTime: 2022-08-08 20:51:30
+ * @FilePath: /gui/application/setting/Picture.h
  * @Description: None
  * @other: None
  */
@@ -12,14 +12,16 @@
 
 #include <stdint.h>
 #include "Base.h"
+#include "lv_i18n/src/lv_i18n.h"
 
 namespace Setting {
 
 class Picture : public Base {
-public:
+private:
     constexpr static uint8_t ItemNum = 5;
     constexpr static uint8_t OnlyTextItemNum = 0;
 
+public:
     enum PicturegSettingItemList {
         Setting_PictureMode = 1,
         Setting_PictureScale,
@@ -30,6 +32,8 @@ public:
     };
     
     class PictureMode : public Base {
+        private:
+        
         public:
         enum PictureModeType {
             PictureMode_Standard,
@@ -66,9 +70,12 @@ public:
         ModeType soft{50, 50, 50, 50};
         ModeType user{50, 50, 50, 50};
         ModeType dynamic{50, 50, 50, 50};
-        //constexpr static const char* name[4] = { 
+        //constexpr static const char* name[4] = { setting_p_picture_mode_type_standard_
         const char* name[4] = { 
-        "标准", "柔和", "用户", "动态" };
+        _("setting_p_picture_mode_type_standard"), 
+        _("setting_p_picture_mode_type_standard_soft"), 
+        _("setting_p_picture_mode_type_standard_user"), 
+        _("setting_p_picture_mode_type_standard_dynamic") };
 
         PictureMode() {}
         ~PictureMode() {}
@@ -76,9 +83,11 @@ public:
         virtual int GetItemNum(void) { return user.ItemNum; }
         virtual int GetOnlyTextItemNum(void) { return 0; }
         virtual const char** GetStrArray(void);
-        virtual int GetValue(int index);
-        virtual void IncreaseValue(int index);
-        virtual void DecreaseValue(int index);
+        virtual int GetUserValue(int index);
+        virtual void SetUserValue(int index, int value) { }
+        virtual void SelectedValue(int index) { }
+        virtual void IncreaseUserValue(int index);
+        virtual void DecreaseUserValue(int index);
         virtual const char* GetStr(int index);
         virtual void* GetDerivedAddress(int index) { return this; }
     } mode;
@@ -117,9 +126,12 @@ public:
         ColorTemperatureType warm{50, 50, 50};
         ColorTemperatureType user{50, 50, 50};
         ColorTemperatureType cool{50, 50, 50};
-        //constexpr static const char* name[4] = { 
+        //constexpr static const char* name[4] = { setting_p_picture_color_temp_type_
         const char* name[4] = { 
-        "标准", "暖色", "用户", "冷色" };
+        _("setting_p_picture_color_temp_type_standard"), 
+        _("setting_p_picture_color_temp_type_warm"), 
+        _("setting_p_picture_color_temp_type_user"), 
+        _("setting_p_picture_color_temp_type_cool") };
 
         PictureColorTemperature() { }
         ~PictureColorTemperature() { }
@@ -127,9 +139,11 @@ public:
         virtual int GetItemNum(void) { return user.ItemNum; }
         virtual int GetOnlyTextItemNum(void) { return 0; }
         virtual const char** GetStrArray(void);
-        virtual int GetValue(int index);
-        virtual void IncreaseValue(int index);
-        virtual void DecreaseValue(int index);
+        virtual int GetUserValue(int index);
+        virtual void SetUserValue(int index, int value) { }
+        virtual void SelectedValue(int index) { }
+        virtual void IncreaseUserValue(int index);
+        virtual void DecreaseUserValue(int index);
         virtual const char* GetStr(int index);
         virtual void* GetDerivedAddress(int index) { return this; }
     } ColorTemperature;
@@ -137,7 +151,9 @@ public:
     uint8_t scale;
     //constexpr static const char* ScaleName[3] = { 
     const char* ScaleName[3] = { 
-    "16:9", "4:3", "自动" };
+    "16:9", 
+    "4:3", 
+    _("setting_p_picture_scale_auto") };
 
     uint8_t ratio;
     char RatioName[5];
@@ -145,7 +161,9 @@ public:
     uint8_t PowerBankMode;
     //constexpr static const char* PowerBankModeName[3] = { 
     const char* PowerBankModeName[3] = { 
-    "低", "中", "高" };
+    _("setting_p_picture_power_bank_mode_low"), 
+    _("setting_p_picture_power_bank_mode_middle"), 
+    _("setting_p_picture_power_bank_mode_high") };
 
 public:
     Picture(/* args */);
@@ -154,9 +172,11 @@ public:
     virtual int GetItemNum(void) { return ItemNum; }
     virtual int GetOnlyTextItemNum(void) { return OnlyTextItemNum; }
     virtual const char** GetStrArray(void);
-    virtual int GetValue(int index);
-    virtual void IncreaseValue(int index);
-    virtual void DecreaseValue(int index);
+    virtual int GetUserValue(int index);
+    virtual void SetUserValue(int index, int value) { }
+    virtual void SelectedValue(int index) { }
+    virtual void IncreaseUserValue(int index);
+    virtual void DecreaseUserValue(int index);
     virtual const char* GetStr(int index);
     virtual void* GetDerivedAddress(int index);
 

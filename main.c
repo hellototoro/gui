@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 14:12:25
+ * @LastEditTime: 2022-08-08 20:34:39
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -27,6 +27,7 @@
 #include "hcapi/wifi_api.h"
 #endif
 #include "application/ui/ui_com.h"
+#include "application/SystemInit.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
@@ -45,8 +46,6 @@ static void exit_console(int signo);
 
 int main(int argc, char *argv[])
 {
-    ActiveScreen DefaultScreen;
-
     #ifdef HCCHIP_GCC
     if (argc == 2){
         strncpy(m_wifi_module_name, argv[1], sizeof(m_wifi_module_name)-1);
@@ -83,7 +82,7 @@ int main(int argc, char *argv[])
     #endif
     get_keypad_indev();
 
-    DefaultScreen = HomeScreen;
+    SystemInit();
     CurrentScreen = DefaultScreen;
     while(1) {
         WindowsManager();

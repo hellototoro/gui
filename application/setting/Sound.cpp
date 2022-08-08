@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 13:38:33
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 21:38:20
- * @FilePath: /gui/application/ui/setting/Sound.cpp
+ * @LastEditTime: 2022-08-08 14:36:00
+ * @FilePath: /gui/application/setting/Sound.cpp
  * @Description: None
  * @other: None
  */
@@ -23,20 +23,19 @@ Sound::~Sound()
 const char** Sound::GetStrArray(void)
 {
     static const char* name[7] = {
-    "声音设置",
-    "声音模式", "标准", 
-    "环绕声", "关", 
-    "自动音量", "关"
-    };
+    _("setting_p_sound_setting"),
+    _("setting_p_sound_mode"), _("setting_p_sound_mode_type_standard"), 
+    _("setting_p_sound_surround"), _("setting_p_sound_surround_off"), 
+    _("setting_p_sound_auto_volume"), _("setting_p_sound_auto_volume_off") };
     return name;
 }
 
-int Sound::GetValue(int index)
+int Sound::GetUserValue(int index)
 {
     return 0;
 }
 
-void Sound::IncreaseValue(int index)
+void Sound::IncreaseUserValue(int index)
 {
     switch (index)
     {
@@ -57,7 +56,7 @@ void Sound::IncreaseValue(int index)
     }
 }
 
-void Sound::DecreaseValue(int index)
+void Sound::DecreaseUserValue(int index)
 {
     switch (index)
     {
@@ -116,11 +115,14 @@ void* Sound::GetDerivedAddress(int index)
 const char** Sound::SoundMode::GetStrArray(void)
 {
     //const char** name = nullptr;
-    static const char* name[3] = { "声音模式", "低音", "高音" };
+    static const char* name[3] = { 
+    _("setting_p_sound_mode"), 
+    _("setting_p_sound_mode_treble"), 
+    _("setting_p_sound_mode_bass") };
     return name;
 }
 
-int Sound::SoundMode::GetValue(int index)
+int Sound::SoundMode::GetUserValue(int index)
 {
     switch (index)
     {
@@ -136,7 +138,7 @@ int Sound::SoundMode::GetValue(int index)
     return 0;
 }
 
-void Sound::SoundMode::IncreaseValue(int index)
+void Sound::SoundMode::IncreaseUserValue(int index)
 {
     switch (index)
     {
@@ -153,7 +155,7 @@ void Sound::SoundMode::IncreaseValue(int index)
     }
 }
 
-void Sound::SoundMode::DecreaseValue(int index)
+void Sound::SoundMode::DecreaseUserValue(int index)
 {
     switch (index)
     {

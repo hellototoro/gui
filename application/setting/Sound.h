@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 13:36:19
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-01 21:42:57
- * @FilePath: /gui/application/ui/setting/Sound.h
+ * @LastEditTime: 2022-08-08 21:53:48
+ * @FilePath: /gui/application/setting/Sound.h
  * @Description: None
  * @other: None
  */
@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include "Base.h"
+#include "lv_i18n/src/lv_i18n.h"
 
 namespace Setting {
 
@@ -62,7 +63,11 @@ public:
         ModeType user{50, 50};
         //constexpr static const char* name[] = { 
         const char* name[5] = { 
-        "标准", "音乐", "电影", "运动", "用户" };
+        _("setting_p_sound_mode_type_standard"), 
+        _("setting_p_sound_mode_type_music"), 
+        _("setting_p_sound_mode_type_movie"), 
+        _("setting_p_sound_mode_type_sport"), 
+        _("setting_p_sound_mode_type_user") };
 
         SoundMode() {}
         ~SoundMode() {}
@@ -70,9 +75,11 @@ public:
         virtual int GetItemNum(void) { return user.ItemNum; }
         virtual int GetOnlyTextItemNum(void) { return 0; }
         virtual const char** GetStrArray(void);
-        virtual int GetValue(int index);
-        virtual void IncreaseValue(int index);
-        virtual void DecreaseValue(int index);
+        virtual int GetUserValue(int index);
+        virtual void SetUserValue(int index, int value) { }
+        virtual void SelectedValue(int index) { }
+        virtual void IncreaseUserValue(int index);
+        virtual void DecreaseUserValue(int index);
         virtual const char* GetStr(int index);
         virtual void* GetDerivedAddress(int index) { return this; }
     } mode;
@@ -80,12 +87,12 @@ public:
     uint8_t surround;
     //constexpr static const char* SurroundName[] = { 
     const char* SurroundName[2] = { 
-    "关", "SRS 环绕" };
+    _("setting_p_sound_surround_off"), _("setting_p_sound_surround_srs") };
 
     uint8_t AutoVolume;
     //constexpr static const char* AutoVolumeName[] = { 
     const char* AutoVolumeName[2] = { 
-    "关", "开" };
+    _("setting_p_sound_auto_volume_off"), _("setting_p_sound_auto_volume_on") };
 
 public:
     Sound(/* args */);
@@ -94,9 +101,11 @@ public:
     virtual int GetItemNum(void) { return ItemNum; }
     virtual int GetOnlyTextItemNum(void) { return OnlyTextItemNum; }
     virtual const char** GetStrArray(void);
-    virtual int GetValue(int index);
-    virtual void IncreaseValue(int index);
-    virtual void DecreaseValue(int index);
+    virtual int GetUserValue(int index);
+    virtual void SetUserValue(int index, int value) { }
+    virtual void SelectedValue(int index) { }
+    virtual void IncreaseUserValue(int index);
+    virtual void DecreaseUserValue(int index);
     virtual const char* GetStr(int index);
     virtual void* GetDerivedAddress(int index);
 

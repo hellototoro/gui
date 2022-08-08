@@ -7,4 +7,4 @@ file(GLOB_RECURSE SOURCES ./ui/*.c
                           ./setting/*.c
                           ./setting/*.cpp)
 
-add_library(application STATIC ${SOURCES} windows.c)
+add_library(application STATIC ${SOURCES} windows.c SystemInit.cpp ConfigParam.cpp)
