@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 17:24:53
+ * @LastEditTime: 2022-08-09 08:06:26
  * @FilePath: /gui/application/ui/media/MediaCom.h
  * @Description: None
  * @other: None
@@ -77,6 +77,8 @@ extern char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMo
 extern file_name_t* GetMediaArray(void);
 extern void DestroyMediaArray(void);
 extern void PlayMedia(MediaHandle* media_hal, char * file_name);
+extern void LoadingMediaFileScreen(lv_obj_t* parent);
+extern void CloseLoadingMediaFileScreen(void);
 
 //公共ui部分
 extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);

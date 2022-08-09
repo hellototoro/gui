@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 21:51:51
+ * @LastEditTime: 2022-08-09 08:06:11
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -33,6 +33,7 @@ int current_path_size = sizeof(current_path);
 lv_obj_t* PlayBar;
 lv_obj_t* PlayListPanel;
 lv_obj_t* CurrentMediaScreen;
+lv_obj_t* LoadingPanel;
 MediaType CurrentPlayingType;
 PlayListMode CurrentPlayMode;
 MediaHandle* current_media_hdl;
@@ -347,6 +348,37 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
             LoadLyric(file_name);
         }
     }
+}
+
+void LoadingMediaFileScreen(lv_obj_t* parent)
+{
+    // LoadingPanel
+    LoadingPanel = lv_obj_create(parent);//lv_scr_act()
+    lv_obj_set_width(LoadingPanel, 1280);
+    lv_obj_set_height(LoadingPanel, 720);
+    lv_obj_set_x(LoadingPanel, 0);
+    lv_obj_set_y(LoadingPanel, 0);
+    lv_obj_set_align(LoadingPanel, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(LoadingPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(LoadingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(LoadingPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(LoadingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    // Spinner
+    lv_obj_t* Spinner = lv_spinner_create(LoadingPanel, 1000, 90);
+    lv_obj_set_width(Spinner, 80);
+    lv_obj_set_height(Spinner, 80);
+    lv_obj_set_x(Spinner, 0);
+    lv_obj_set_y(Spinner, 0);
+    lv_obj_set_align(Spinner, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(Spinner, LV_OBJ_FLAG_CLICKABLE);
+}
+
+void CloseLoadingMediaFileScreen(void)
+{
+    lv_obj_del(LoadingPanel);
 }
 
 //公共ui部分
@@ -847,6 +879,7 @@ void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
         printf(">> player ready\n");
         pthread_mutex_lock(&lvgl_task_mutex);
         SetTotalTimeAndProgress(media_get_totaltime(media_hld));
+        CloseLoadingMediaFileScreen();
         pthread_mutex_unlock(&lvgl_task_mutex);
         break;
     case HCPLAYER_MSG_READ_TIMEOUT:

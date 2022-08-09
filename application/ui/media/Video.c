@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 16:06:39
+ * @LastEditTime: 2022-08-09 08:07:05
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -43,6 +43,9 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
 
     SetStyleForPlayBar(CreatePlayBar(VideoScreen));
     lv_disp_load_scr(VideoScreen);
+    #ifdef HCCHIP_GCC
+    LoadingMediaFileScreen(VideoScreen);
+    #endif
     return VideoScreen;
 }
 

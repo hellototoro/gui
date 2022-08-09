@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 16:06:41
+ * @LastEditTime: 2022-08-09 13:20:25
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -43,6 +43,9 @@ lv_obj_t* creat_photo_window(lv_obj_t* foucsed_obj)
 
     SetStyleForPlayBar(CreatePlayBar(PhotoScreen));
     lv_disp_load_scr(PhotoScreen);
+    #ifdef HCCHIP_GCC
+    LoadingMediaFileScreen(PhotoScreen);
+    #endif
     return PhotoScreen;
 }
 
