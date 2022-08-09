@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-18 12:34:21
- * @FilePath: /SOURCE/gui/application/ui/HomeScreen.c
+ * @LastEditTime: 2022-07-21 20:46:09
+ * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
  */
@@ -15,6 +15,7 @@
 #include "Volume.h"
 #include "application/key_map.h"
 #include "SettingScreen.h"
+#include "HdmiRx.h"
 //#include "lv_i18n/src/lv_i18n.h"
 
 lv_obj_t* ui_HomeScreen;
@@ -37,7 +38,7 @@ enum CategoryList {
 
 enum SourceList {
     SourceUDisk,
-    HDMI,
+    SourceHDMI,
     SourceListNumber
 };
 
@@ -263,6 +264,20 @@ static void source_event_handler(lv_event_t* event)
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     switch (value)
     {
+    case LV_KEY_ENTER:
+        switch (lv_obj_get_index(target))
+        {
+        case SourceUDisk:
+            ExitHome(MediaScreen);
+            break;
+         case SourceHDMI:
+            CreateHdmiRxScreen();
+            break;
+       
+        default:
+            break;
+        }
+        return;
     case LV_KEY_LEFT:
         lv_group_focus_prev(group);
         break;
