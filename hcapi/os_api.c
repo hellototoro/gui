@@ -122,7 +122,7 @@ uint32_t api_message_create(int msg_count, int msg_length)
     msgid = xQueueCreate(( UBaseType_t )msg_count, msg_length);
     if (!msgid) {
         printf ("create msg queue failed\n");
-        return NULL;
+        return 0;
     }
     return (uint32_t)msgid;
 }

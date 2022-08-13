@@ -12,4 +12,5 @@ CFLAGS += "-I$(ROOT_DIR)/hcapi"
 
 include $(LVGL_DIR)/lvgl/lvgl.mk
 include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
-include $(LVGL_DIR)/wpa_funs/wpa_funs.mk
+include $(ROOT_DIR)/hcapi/wpa_funs/wpa_funs.mk
+include $(ROOT_DIR)/hcapi/hc_src/hc_src.mk

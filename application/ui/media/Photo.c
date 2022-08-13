@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-09 13:20:25
+ * @LastEditTime: 2022-08-11 09:03:20
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -36,16 +36,13 @@ lv_obj_t* creat_photo_window(lv_obj_t* foucsed_obj)
     lv_obj_clear_flag(PhotoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
-    MediaComInit(MEDIA_PHOTO, PhotoHandler, old_group);
+    MediaComInit(PhotoScreen, MEDIA_PHOTO, PhotoHandler, old_group);
     CreateMediaArray(MEDIA_PHOTO);
     LocateMediaIndex(MEDIA_PHOTO, ((FileStr *)(foucsed_obj->user_data))->name);
     PlayMedia(PhotoHandler, GetCurrentMediaName());
 
     SetStyleForPlayBar(CreatePlayBar(PhotoScreen));
     lv_disp_load_scr(PhotoScreen);
-    #ifdef HCCHIP_GCC
-    LoadingMediaFileScreen(PhotoScreen);
-    #endif
     return PhotoScreen;
 }
 

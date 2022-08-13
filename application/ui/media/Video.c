@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-09 08:07:05
+ * @LastEditTime: 2022-08-11 09:01:56
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -36,16 +36,13 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
-    MediaComInit(MEDIA_VIDEO, VideoHandler, old_group);
+    MediaComInit(VideoScreen, MEDIA_VIDEO, VideoHandler, old_group);
     CreateMediaArray(MEDIA_VIDEO);
     LocateMediaIndex(MEDIA_VIDEO, ((FileStr *)(foucsed_obj->user_data))->name);
     PlayMedia(VideoHandler, GetCurrentMediaName());
 
     SetStyleForPlayBar(CreatePlayBar(VideoScreen));
     lv_disp_load_scr(VideoScreen);
-    #ifdef HCCHIP_GCC
-    LoadingMediaFileScreen(VideoScreen);
-    #endif
     return VideoScreen;
 }
 

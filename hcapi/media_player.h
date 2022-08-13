@@ -81,8 +81,10 @@ int media_slowbackward(media_handle_t *media_hld);
 uint32_t media_get_playtime(media_handle_t *media_hld);
 uint32_t media_get_totaltime(media_handle_t *media_hld);
 uint8_t media_get_speed(media_handle_t *media_hld);
-int media_set_vol(uint8_t volume);
 char *media_get_cur_play_file(media_handle_t *media_hld);
+int media_mute(bool mute);
+int media_set_vol(uint8_t volume);
+int media_vol_up(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

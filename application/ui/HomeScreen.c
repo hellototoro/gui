@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 18:16:39
+ * @LastEditTime: 2022-08-13 21:21:14
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -272,7 +272,7 @@ static void source_event_handler(lv_event_t* event)
             ExitHome(MediaScreen);
             break;
          case SourceHDMI:
-            CreateHdmiRxScreen();
+            //CreateHdmiRxScreen();
             break;
        
         default:

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-09 08:06:11
+ * @LastEditTime: 2022-08-11 09:05:53
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -81,11 +81,12 @@ static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_nu
 static void ShowOffPlayList(void);
 static void SetTotalTimeAndProgress(uint32_t total_time);
 
-void MediaComInit(MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group)
+void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group)
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
     CurrentPlayMode = RandPlay;
+    CurrentMediaScreen = MediaScreen;
     #ifdef HCCHIP_GCC
     //MediaMonitorInit(current_media_hdl);
     #endif
@@ -108,6 +109,8 @@ void MediaComDeinit(void)
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO)
         lv_timer_del(PlayBar_Timer);
     lv_timer_del(PlayState_Timer);
+
+    CloseLoadingMediaFileScreen();
 }
 
 MediaList* CreateMediaList(MediaType media_type)
@@ -343,7 +346,12 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
             media_stop(media_hal);
         media_play(media_hal, file_path);
         #endif
-        if(CurrentPlayingType == MEDIA_MUSIC) {
+        if(CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO ) {
+            #ifdef HCCHIP_GCC
+            LoadingMediaFileScreen(CurrentMediaScreen);
+            #endif
+        }
+        else if(CurrentPlayingType == MEDIA_MUSIC) {
             SetCurrentMusicTitle(file_name);
             LoadLyric(file_name);
         }
@@ -352,6 +360,8 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
 
 void LoadingMediaFileScreen(lv_obj_t* parent)
 {
+    if (lv_obj_is_valid(LoadingPanel))
+        return;
     // LoadingPanel
     LoadingPanel = lv_obj_create(parent);//lv_scr_act()
     lv_obj_set_width(LoadingPanel, 1280);
@@ -378,7 +388,8 @@ void LoadingMediaFileScreen(lv_obj_t* parent)
 
 void CloseLoadingMediaFileScreen(void)
 {
-    lv_obj_del(LoadingPanel);
+    if (lv_obj_is_valid(LoadingPanel))
+        lv_obj_del(LoadingPanel);
 }
 
 //公共ui部分
@@ -646,7 +657,6 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
     lv_timer_set_repeat_count(PlayState_Timer, -1);
     lv_timer_pause(PlayState_Timer);
-    CurrentMediaScreen = parent;
     #ifdef HOST_GCC
     SetTotalTimeAndProgress(20);
     #endif

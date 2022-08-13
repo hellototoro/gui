@@ -73,7 +73,6 @@ int wifi_connected_ap_save(void *wifi_handle, wifi_ap_info_t *wifi_info);
 wifi_ap_info_t *wifi_get_current_ap(void *wifi_handle);
 int wifi_driver_module_init();
 void *wifi_wpa_get_handle(char *ifname);
-int wifi_api_set_module(char *wifi_module);
 
 #ifdef __cplusplus
 } /*extern "C"*/

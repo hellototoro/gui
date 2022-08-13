@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 20:34:39
+ * @LastEditTime: 2022-08-12 08:21:20
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -28,15 +28,17 @@
 #endif
 #include "application/ui/ui_com.h"
 #include "application/SystemInit.h"
+#include "application/ui/HdmiRx.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
 #endif
 
-#define HOR_RES         1280
-#define VER_RES         720
-
 pthread_mutex_t lvgl_task_mutex;
+
+#ifdef HCCHIP_GCC
+extern int wifi_api_set_module(char *wifi_module);
+#endif
 
 #ifdef HCCHIP_GCC
 static char m_wifi_module_name[32];
@@ -46,6 +48,16 @@ static void exit_console(int signo);
 
 int main(int argc, char *argv[])
 {
+    #ifdef HCCHIP_GCC
+    hdmi_init();
+    hdmi_hotplug_enable();
+    hdmi_rx_start();
+    while (1)
+    {
+        /* code */
+    }
+    
+    #endif
     #ifdef HCCHIP_GCC
     if (argc == 2){
         strncpy(m_wifi_module_name, argv[1], sizeof(m_wifi_module_name)-1);
@@ -72,7 +84,7 @@ int main(int argc, char *argv[])
     app_ffplay_init();
 
     //lvgl_init();
-    api_lvgl_init(HOR_RES, VER_RES);
+    api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();
     //key_regist(NULL);
     #endif
@@ -98,23 +110,4 @@ void exit_console(int signo)
 {
     printf("%s(), signo: %d, error: %s\n", __FUNCTION__, signo, strerror(errno));
     exit(0);
-}
-
-/*Set in lv_conf.h as `LV_TICK_CUSTOM_SYS_TIME_EXPR`*/
-uint32_t custom_tick_get(void)
-{
-    static uint64_t start_ms = 0;
-    if(start_ms == 0) {
-        struct timeval tv_start;
-        gettimeofday(&tv_start, NULL);
-        start_ms = (tv_start.tv_sec * 1000000 + tv_start.tv_usec) / 1000;
-    }
-
-    struct timeval tv_now;
-    gettimeofday(&tv_now, NULL);
-    uint64_t now_ms;
-    now_ms = (tv_now.tv_sec * 1000000 + tv_now.tv_usec) / 1000;
-
-    uint32_t time_ms = now_ms - start_ms;
-    return time_ms;
 }

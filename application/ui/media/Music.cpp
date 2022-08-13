@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 18:22:45
+ * @LastEditTime: 2022-08-11 08:59:55
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -48,7 +48,7 @@ lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj)
     #endif
 
     lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
-    MediaComInit(MEDIA_MUSIC, MusicHandler, old_group);
+    MediaComInit(MusicScreen, MEDIA_MUSIC, MusicHandler, old_group);
     CreateMediaArray(MEDIA_MUSIC);
     LocateMediaIndex(MEDIA_MUSIC, ((FileStr *)(foucsed_obj->user_data))->name);
     PlayMedia(MusicHandler, GetCurrentMediaName());

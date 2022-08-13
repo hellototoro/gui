@@ -172,7 +172,7 @@ uint32_t custom_tick_get(void);
 
 /*Maximum buffer size to allocate for rotation.
  *Only used if software rotation is enabled in the display driver.*/
-#define LV_DISP_ROT_MAX_BUF (10*1024)
+#define LV_DISP_ROT_MAX_BUF (32*1024)
 
 /*-------------
  * GPU
@@ -411,6 +411,9 @@ uint32_t custom_tick_get(void);
     #define LV_FONT_SUBPX_BGR 0  /*0: RGB; 1:BGR order*/
 #endif
 
+/*Enable drawing placeholders when glyph dsc is not found*/
+#define LV_USE_FONT_PLACEHOLDER 1
+
 /*=================
  *  TEXT SETTINGS
  *=================*/
@@ -465,6 +468,8 @@ uint32_t custom_tick_get(void);
 
 #define LV_USE_ARC        1
 
+#define LV_USE_ANIMIMG    1
+
 #define LV_USE_BAR        1
 
 #define LV_USE_BTN        1
@@ -510,8 +515,6 @@ uint32_t custom_tick_get(void);
 /*-----------
  * Widgets
  *----------*/
-#define LV_USE_ANIMIMG    1
-
 #define LV_USE_CALENDAR   0
 #if LV_USE_CALENDAR
     #define LV_CALENDAR_WEEK_STARTS_MONDAY 0
@@ -544,12 +547,6 @@ uint32_t custom_tick_get(void);
 
 #define LV_USE_MSGBOX     1
 
-#define LV_USE_SPAN       1
-#if LV_USE_SPAN
-    /*A line text can contain maximum num of span descriptor */
-    #define LV_SPAN_SNIPPET_STACK_SIZE 64
-#endif
-
 #define LV_USE_SPINBOX    1
 
 #define LV_USE_SPINNER    1
@@ -559,6 +556,12 @@ uint32_t custom_tick_get(void);
 #define LV_USE_TILEVIEW   1
 
 #define LV_USE_WIN        1
+
+#define LV_USE_SPAN       1
+#if LV_USE_SPAN
+    /*A line text can contain maximum num of span descriptor */
+    #define LV_SPAN_SNIPPET_STACK_SIZE 64
+#endif
 
 /*-----------
  * Themes
@@ -672,7 +675,7 @@ uint32_t custom_tick_get(void);
 #define LV_USE_FFMPEG 0
 #if LV_USE_FFMPEG
     /*Dump input information to stderr*/
-    #define LV_FFMPEG_DUMP_FORMAT 0
+    #define LV_FFMPEG_AV_DUMP_FORMAT 0
 #endif
 
 /*-----------
@@ -707,6 +710,12 @@ uint32_t custom_tick_get(void);
     /*Set the maximum number of candidate panels that can be displayed*/
     /*This needs to be adjusted according to the size of the screen*/
     #define LV_IME_PINYIN_CAND_TEXT_NUM 6
+
+    /*Use 9 key input(k9)*/
+    #define LV_IME_PINYIN_USE_K9_MODE      1
+    #if LV_IME_PINYIN_USE_K9_MODE == 1
+        #define LV_IME_PINYIN_K9_CAND_TEXT_NUM 3
+    #endif // LV_IME_PINYIN_USE_K9_MODE
 #endif
 
 /*==================
@@ -723,7 +732,7 @@ uint32_t custom_tick_get(void);
 /*Show some widget. It might be required to increase `LV_MEM_SIZE` */
 #define LV_USE_DEMO_WIDGETS 0
 #if LV_USE_DEMO_WIDGETS
-#define LV_DEMO_WIDGETS_SLIDESHOW 0
+#define LV_DEMO_WIDGETS_SLIDESHOW  0
 #endif
 
 /*Demonstrate the usage of encoder and keyboard*/
@@ -751,11 +760,8 @@ uint32_t custom_tick_get(void);
 
 /*--END OF LV_CONF_H--*/
 
-/* hichip ge */
-#define LV_USE_GPU_HICHIP 1
 
-//enable dual framebuffer
-#define LV_USE_DUAL_FRAMEBUFFER 1
+#include "lv_hichip_conf.h"
 
 #endif /*LV_CONF_H*/
 

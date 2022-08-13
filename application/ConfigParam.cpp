@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-04 19:18:32
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 20:27:13
+ * @LastEditTime: 2022-08-10 18:39:48
  * @FilePath: /gui/application/ConfigParam.cpp
  * @Description: None
  * @other: None
@@ -10,7 +10,7 @@
 #include "ConfigParam.h"
 
 #ifdef HCCHIP_GCC
-static constexpr char ConfigFileName[] = {"/tmp/data/gui_setting.ini"};
+static constexpr char ConfigFileName[] = {"/mnt/data/gui_setting.ini"};
 #else
 static constexpr char ConfigFileName[] = {"/home/totoro/workspace/HiChip/hclinux/SOURCE/gui/application/setting/gui_setting.ini"};
 #endif

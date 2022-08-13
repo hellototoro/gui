@@ -104,12 +104,13 @@ typedef enum{
     MSG_TYPE_NETWORK_DHCP_ON,
     MSG_TYPE_NETWORK_DHCP_OFF,
     MSG_TYPE_USB_PLUGIN,
+    MSG_TYPE_NETWORK_DEV_NAME_SET,
 
     MSG_TYPE_CAST_DLNA_START,
     MSG_TYPE_CAST_DLNA_STOP,
-    MSG_TYPE_CAST_AIRPLAY_START,
-    MSG_TYPE_CAST_AIRPLAY_AUDIO_START,
-    MSG_TYPE_CAST_AIRPLAY_STOP,
+    MSG_TYPE_CAST_AIRCAST_START,
+    MSG_TYPE_CAST_AIRCAST_AUDIO_START,
+    MSG_TYPE_CAST_AIRCAST_STOP,
     MSG_TYPE_CAST_MIRACAST_START,
     MSG_TYPE_CAST_MIRACAST_STOP,
 
@@ -119,7 +120,7 @@ typedef enum{
 
 typedef enum{
     CAST_STATE_IDLE = 0,
-    CAST_STATE_AIRPLAY_PLAY,
+    CAST_STATE_AIRCAST_PLAY,
     CAST_STATE_ARIPLAY_PAUSE,
     CAST_STATE_DLNA_PLAY,
     CAST_STATE_DLNA_PAUSE,
@@ -149,11 +150,11 @@ typedef struct{
 #define WLAN0_NAME      "wlan0"
 #define WLAN1_NAME      "wlan1"
 
-void hc_control_init();
+void hc_control_init(void);
 
-extern int api_system_init(void);
-extern int api_video_init(void);
-extern int api_audio_init(void);
+int api_system_init(void);
+int api_video_init(void);
+int api_audio_init(void);
 
 cast_play_state_t api_cast_play_state_get(void);
 void api_cast_play_state_set(cast_play_state_t state);
@@ -164,20 +165,15 @@ int api_control_send_key(uint32_t key);
 
 int api_dis_show_onoff(bool on_off);
 int api_logo_show(const char *file);
-extern int api_logo_off(void);
+int api_logo_off(void);
 
 int api_lvgl_init(int width, int height);
 
 bool api_is_ip_addr(char *ip_buff);
 int api_get_mac_addr(char *mac);
 
-extern void app_ffplay_init(void);
-extern void app_ffplay_deinit(void);
-extern void app_exit(void);
-
-
-int webs_start();
-int webs_stop();
+int webs_start(void);
+int webs_stop(void);
 
 void api_sleep_ms(uint32_t ms);
 int api_shell_exe_result(char *cmd);
@@ -202,6 +198,9 @@ int api_shell_exe_result(char *cmd);
   #define MKTAG(a,b,c,d) ((a) | ((b) << 8) | ((c) << 16) | ((unsigned)(d) << 24))
 #endif
 
+void app_ffplay_init(void);
+void app_ffplay_deinit(void);
+void app_exit(void);
 
 
 #ifdef __cplusplus

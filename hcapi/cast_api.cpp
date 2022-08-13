@@ -8,14 +8,17 @@
  * @copyright Copyright (c) 2022
  * 
  */
+
 #include <ffplayer.h>
 #include "com_api.h"
+#include "com_api.h"
+
 #include "cast_api.h"
 
 
-#ifdef CAST_AIRPLAY_ENABLE
-#include <libairplay/airplay_service.h>
-static AIRPLAY_SERVICE_CALLBACK_t m_airplay_cls;
+#ifdef CAST_AIRCAST_ENABLE
+#include <libaircast/aircast_service.h>
+static AIRCAST_SERVICE_CALLBACK_t m_aircast_cls;
 #endif
 
 #if CAST_DLNA_ENABLE
@@ -25,7 +28,7 @@ static AIRPLAY_SERVICE_CALLBACK_t m_airplay_cls;
 #endif
 
 #define CAST_SERVICE_NAME               "HCcast"
-#define CAST_AIRPLAY_SERVICE_NAME       "HCcast"
+#define CAST_AIRCAST_SERVICE_NAME       "HCcast"
 #define CAST_DLNA_FIRENDLY_NAME         "HCcast"
 #define CAST_MIRACAST_NAME              "HCcast"
 
@@ -39,8 +42,8 @@ int cast_get_service_name(cast_type_t cast_type, char *service_name, int length)
     if (0 != api_get_mac_addr(mac_addr))
         memset(mac_addr, 0xff, sizeof(mac_addr));
 
-    if (CAST_TYPE_AIRPLAY == cast_type)
-        snprintf(service_prefix, sizeof(service_prefix)-1, "%s", CAST_AIRPLAY_SERVICE_NAME);
+    if (CAST_TYPE_AIRCAST == cast_type)
+        snprintf(service_prefix, sizeof(service_prefix)-1, "%s", CAST_AIRCAST_SERVICE_NAME);
     else if (CAST_TYPE_DLNA == cast_type)
         snprintf(service_prefix, sizeof(service_prefix)-1, "%s", CAST_DLNA_FIRENDLY_NAME);
     else if (CAST_TYPE_MIRACAST == cast_type)
@@ -52,8 +55,8 @@ int cast_get_service_name(cast_type_t cast_type, char *service_name, int length)
     return 0;
 }
 
-#ifdef CAST_AIRPLAY_ENABLE
-static void airplay_start_callback(AIRPLAY_SERVICE_CALLBACK_t *cls, AIRPLAY_SERVICE_STATUS_t status)
+#ifdef CAST_AIRCAST_ENABLE
+static void aircast_start_callback(AIRCAST_SERVICE_CALLBACK_t *cls, AIRCAST_SERVICE_STATUS_t status)
 {
     control_msg_t msg;
 
@@ -66,41 +69,41 @@ static void airplay_start_callback(AIRPLAY_SERVICE_CALLBACK_t *cls, AIRPLAY_SERV
         //stop miracast play
     }
 
-    api_cast_play_state_set(CAST_STATE_AIRPLAY_PLAY);
+    api_cast_play_state_set(CAST_STATE_AIRCAST_PLAY);
 
     //
-    if (AIRPLAY_SERVICE_AUDIO == status) 
-        msg.msg_type = MSG_TYPE_CAST_AIRPLAY_AUDIO_START;
+    if (AIRCAST_SERVICE_AUDIO == status) 
+        msg.msg_type = MSG_TYPE_CAST_AIRCAST_AUDIO_START;
     else
-        msg.msg_type = MSG_TYPE_CAST_AIRPLAY_START;
+        msg.msg_type = MSG_TYPE_CAST_AIRCAST_START;
 
     api_control_send_msg(&msg);
-	printf("Airplay start\n");
+	printf("aircast start\n");
 }
 
-static void airplay_stop_callback(AIRPLAY_SERVICE_CALLBACK_t *cls)
+static void aircast_stop_callback(AIRCAST_SERVICE_CALLBACK_t *cls)
 {
     control_msg_t msg;
-    msg.msg_type = MSG_TYPE_CAST_AIRPLAY_STOP;
+    msg.msg_type = MSG_TYPE_CAST_AIRCAST_STOP;
 
     api_cast_play_state_set(CAST_STATE_IDLE);
     api_control_send_msg(&msg);
-	printf("Airplay stop\n");
+	printf("aircast stop\n");
 }
 
-static void airplay_update_status_cb(AIRPLAY_SERVICE_CALLBACK_t *cls, AIRPLAY_SERVICE_STATUS_t status)
+static void aircast_update_status_cb(AIRCAST_SERVICE_CALLBACK_t *cls, AIRCAST_SERVICE_STATUS_t status)
 {
 	printf("%s:%d, status: %d\n",__func__, __LINE__, status);
 
     switch (status)
     {
-    case AIRPLAY_SERVICE_STOP:
-        airplay_stop_callback(cls);
+    case AIRCAST_SERVICE_STOP:
+        aircast_stop_callback(cls);
         break;
-    case AIRPLAY_SERVICE_PLAYING:
-    case AIRPLAY_SERVICE_MIRRORING:
-    case AIRPLAY_SERVICE_AUDIO:
-        airplay_start_callback(cls, status);
+    case AIRCAST_SERVICE_PLAYING:
+    case AIRCAST_SERVICE_MIRRORING:
+    case AIRCAST_SERVICE_AUDIO:
+        aircast_start_callback(cls, status);
         break;
     default:
         break;
@@ -113,29 +116,20 @@ void cast_airpaly_open()
     char service_name[64] = {0};
     cast_get_service_name(CAST_TYPE_NONE, service_name, sizeof(service_name));
 
-    /*
-	AIRPLAY_SERVICE_CALLBACK_t cls = {
-		.airplay_start_cb = airplay_start,
-		.airplay_stop_cb = airplay_stop,
-		.airplay_device_name = "hc_airplay_demo",
-	};
-    */
-    memset(&m_airplay_cls, 0, sizeof(AIRPLAY_SERVICE_CALLBACK_t));
-    // cls.airplay_start_cb = airplay_start_callback;
-    // cls.airplay_stop_cb = airplay_stop_callback;
-    m_airplay_cls.airplay_update_status_cb = airplay_update_status_cb;
-    strcpy(m_airplay_cls.airplay_device_name, service_name);
+    memset(&m_aircast_cls, 0, sizeof(AIRCAST_SERVICE_CALLBACK_t));
+    m_aircast_cls.aircast_update_status_cb = aircast_update_status_cb;
+    strcpy(m_aircast_cls.aircast_device_name, service_name);
     
-	airplay_service_start(&m_airplay_cls, false, false);
+	aircast_service_start(&m_aircast_cls, false, false);
 }
 
 /**
- * @brief stop the service of airplay
+ * @brief stop the service of aircast
  * 
  */
 void cast_airpaly_close()
 {
-	airplay_service_stop();
+	aircast_service_stop();
 }
 #endif    
 
@@ -146,9 +140,9 @@ static void dlna_play_callback()
     control_msg_t msg;
     memset(&msg, 0, sizeof(control_msg_t));
 
-    if (CAST_STATE_AIRPLAY_PLAY == api_cast_play_state_get() ||
-        CAST_STATE_AIRPLAY_PLAY == api_cast_play_state_get()){
-        //stop airplay
+    if (CAST_STATE_AIRCAST_PLAY == api_cast_play_state_get() ||
+        CAST_STATE_AIRCAST_PLAY == api_cast_play_state_get()){
+        //stop aircast
     }
     else if (CAST_STATE_MIRACAST_PLAY == api_cast_play_state_get() ||
         CAST_STATE_MIRACAST_PAUSE == api_cast_play_state_get()){

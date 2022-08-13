@@ -12,9 +12,9 @@
 #include <hcuapi/dis.h>
 #include <hcuapi/avsync.h>
 #include <hcuapi/snd.h>
-#include <sys/ioctl.h>
 #include "com_api.h"
 #include "media_player.h"
+#include <sys/ioctl.h>
 #include "os_api.h"
 #include "key.h"
 
@@ -169,11 +169,7 @@ printf("%s(), msg->type:%d\n", __FUNCTION__, (int)(msg->type));
 static void *media_monitor_task(void *arg)
 {
     HCPlayerMsg msg;
-    int msg_length;
     media_handle_t *media_hld = (media_handle_t *)arg;
-
-    msg_length = sizeof(HCPlayerMsg);
-
     while(!media_hld->exit) {
         do{
             // if (0 != api_message_receive(media_hld->msg_id, &msg, msg_length))
@@ -232,11 +228,21 @@ static int media_monitor_deinit(media_handle_t *media_hld)
     if (INVALID_ID == media_hld->msg_id)
         return API_SUCCESS;
 
-    api_message_delete(media_hld->msg_id);
-    media_hld->msg_id = INVALID_ID;
 
+#ifndef __linux__
+    HCPlayerMsg msg;
+    msg.type = HCPLAYER_MSG_ERR_UNDEFINED;
+    xQueueSend((QueueHandle_t)media_hld->msg_id, ( void * ) &msg, ( TickType_t ) 0 );
+#else
+    HCPlayerMsg msg;
+    msg.type = HCPLAYER_MSG_ERR_UNDEFINED;
+    msgsnd(media_hld->msg_id, &msg, sizeof(msg), 0);
+#endif
     media_hld->exit = 1; 
     pthread_cond_wait(&media_hld->msg_task_cond, &media_hld->msg_task_mutex);
+    api_message_delete(media_hld->msg_id);
+    media_hld->msg_id = INVALID_ID;
+	media_hld->msg_proc_func = NULL;
 
     pthread_mutex_destroy(&media_hld->msg_task_mutex);
     pthread_cond_destroy(&media_hld->msg_task_cond);
@@ -368,7 +374,7 @@ int media_set_vol(uint8_t volume)
 	return API_SUCCESS;
 }
 
-int media_vol_up()
+int media_vol_up(void)
 {
 	/*
 	uint8_t volume;
@@ -518,7 +524,7 @@ int media_slowforward(media_handle_t *media_hld)
 		speed += 1;
 		speed = speed % speed_cnt;
 	}
-	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, m_sf_speed[speed]);
+	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, (double)m_sf_speed[speed]);
 	hcplayer_set_speed_rate(media_hld->player, m_sf_speed[speed]);
 	media_hld->speed = speed;
 	if (0 == speed) //normal play
@@ -549,7 +555,7 @@ int media_slowbackward(media_handle_t *media_hld)
 		speed += 1;
 		speed = speed % speed_cnt;
 	}
-	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, m_sb_speed[speed]);
+	printf("%s(), line:%d. speed: %f\n", __FUNCTION__, __LINE__, (double)m_sb_speed[speed]);
 	hcplayer_set_speed_rate(media_hld->player, m_sb_speed[speed]);
 	media_hld->speed = speed;
 	if (0 == speed) //normal play
@@ -570,7 +576,7 @@ uint32_t media_get_playtime(media_handle_t *media_hld)
 	pthread_mutex_lock(&media_hld->api_lock);
 	play_time = (uint32_t)(hcplayer_get_position(media_hld->player)/1000);
 	media_hld->play_time = play_time;
-	printf("play time %d\n", play_time);
+	printf("play time %ld\n", play_time);
 	pthread_mutex_unlock(&media_hld->api_lock);
 	return play_time;
 }
