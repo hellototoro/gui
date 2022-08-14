@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 13:18:10
+ * @LastEditTime: 2022-08-15 00:34:38
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -54,13 +54,13 @@ void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
         { 0, 45}
     };
     static const char* str[CategoryNumber] =  { 
-    _("setting_p_net_work"), 
-    _("setting_p_projector"), 
-    _("setting_p_picture"), 
-    _("setting_p_sound"), 
-    _("setting_p_system"), 
-    _("setting_p_upgrade"), 
-    _("setting_p_projector_info") };
+    "setting_p_net_work", 
+    "setting_p_projector", 
+    "setting_p_picture", 
+    "setting_p_sound", 
+    "setting_p_system", 
+    "setting_p_upgrade", 
+    "setting_p_projector_info" };
     static const lv_img_dsc_t* image_src[CategoryNumber] = {
         & ui_img_network_setting_png,
         & ui_img_projector_setting_png,
@@ -106,7 +106,8 @@ void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
         lv_obj_set_x(ui_Label, lab_area[i][0]);
         lv_obj_set_y(ui_Label, lab_area[i][1]);
         lv_obj_set_align(ui_Label, LV_ALIGN_CENTER);
-        lv_label_set_text(ui_Label, str[i]);
+        ui_Label->user_data = const_cast<char*>(str[i]);
+        lv_label_set_text(ui_Label, _(str[i]));
         lv_obj_set_style_text_color(ui_Label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(ui_Label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(ui_Label, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -217,7 +218,8 @@ static void setting_item_key_event_handler(lv_event_t* event)
             break;
         }
         Setting->DecreaseUserValue(index);
-        lv_label_set_text(target->spec_attr->children[1], Setting->GetStr(index));
+        target->spec_attr->children[1]->user_data = const_cast<char*>(Setting->GetStr(index));
+        lv_label_set_text(target->spec_attr->children[1], _(Setting->GetStr(index)));
         if(lv_obj_is_valid(SubSettingPanel)) {
             lv_slider_set_value(target->spec_attr->children[2], Setting->GetUserValue(index), LV_ANIM_OFF);
         }
@@ -227,7 +229,8 @@ static void setting_item_key_event_handler(lv_event_t* event)
             break;
         }
         Setting->IncreaseUserValue(index);
-        lv_label_set_text(target->spec_attr->children[1], Setting->GetStr(index));
+        target->spec_attr->children[1]->user_data = const_cast<char*>(Setting->GetStr(index));
+        lv_label_set_text(target->spec_attr->children[1], _(Setting->GetStr(index)));
         if(lv_obj_is_valid(SubSettingPanel)) {
             lv_slider_set_value(target->spec_attr->children[2], Setting->GetUserValue(index), LV_ANIM_OFF);
         }
@@ -324,7 +327,8 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_x(title_text, 0);
     lv_obj_set_y(title_text, 0);
     lv_obj_set_align(title_text, LV_ALIGN_CENTER);
-    lv_label_set_text(title_text, text[0]);
+    title_text->user_data = const_cast<char*>(text[0]);
+    lv_label_set_text(title_text, _(text[0]));
     lv_obj_set_style_text_color(title_text, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -361,11 +365,13 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_text_font(item_text1, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
         if (i < ItemNum - only_text_item_num) {
             lv_obj_set_x(item_text1, -200);
-            lv_label_set_text(item_text1, text[2*i+1]);
+            item_text1->user_data = const_cast<char*>(text[2*i+1]);
+            lv_label_set_text(item_text1, _(text[2*i+1]));
         }
         else {
             lv_obj_set_x(item_text1, 0);
-            lv_label_set_text(item_text1, text[ItemNum - only_text_item_num + 1 + i]);
+            item_text1->user_data = const_cast<char*>(text[ItemNum - only_text_item_num + 1 + i]);
+            lv_label_set_text(item_text1, _(text[ItemNum - only_text_item_num + 1 + i]));
             continue;
         }
 
@@ -377,7 +383,8 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_x(item_text2, mid);
         lv_obj_set_y(item_text2, 0);
         lv_obj_set_align(item_text2, LV_ALIGN_CENTER);
-        lv_label_set_text(item_text2, text[2*i+2]);
+        item_text2->user_data = const_cast<char*>(text[2*i+2]);
+        lv_label_set_text(item_text2, _(text[2*i+2]));
         lv_obj_set_style_text_color(item_text2, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(item_text2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(item_text2, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -458,7 +465,8 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_x(title_text, 0);
     lv_obj_set_y(title_text, 0);
     lv_obj_set_align(title_text, LV_ALIGN_CENTER);
-    lv_label_set_text(title_text, text[0]);
+    title_text->user_data = const_cast<char*>(text[0]);
+    lv_label_set_text(title_text, _(text[0]));
     lv_obj_set_style_text_color(title_text, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -490,7 +498,8 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_height(item_text1, LV_SIZE_CONTENT);
         lv_obj_set_x(item_text1, -200);
         lv_obj_set_y(item_text1, 0);
-        lv_label_set_text(item_text1, text[i+1]);
+        item_text1->user_data = const_cast<char*>(text[i+1]);
+        lv_label_set_text(item_text1, _(text[i+1]));
         lv_obj_set_align(item_text1, LV_ALIGN_CENTER);
         lv_obj_set_style_text_color(item_text1, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(item_text1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -503,7 +512,8 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_x(item_text2, 230);
         lv_obj_set_y(item_text2, 0);
         lv_obj_set_align(item_text2, LV_ALIGN_CENTER);
-        lv_label_set_text(item_text2, Setting->GetStr(i+1));
+        item_text2->user_data = const_cast<char*>(Setting->GetStr(i+1));
+        lv_label_set_text(item_text2, _(Setting->GetStr(i+1)));
         lv_obj_set_style_text_color(item_text2, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(item_text2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(item_text2, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);

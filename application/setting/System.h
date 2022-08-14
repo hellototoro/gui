@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:09:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 20:54:11
+ * @LastEditTime: 2022-08-15 00:32:54
  * @FilePath: /gui/application/setting/System.h
  * @Description: None
  * @other: None
@@ -31,30 +31,30 @@ public:
     uint8_t language;
     //constexpr static const char* LanguageName[] = { 
     const char* LanguageName[6] = { 
-    _("setting_p_system_espaol"),
-    _("setting_p_system_deutsch"),
-    _("setting_p_system_english"),
-    _("setting_p_system_italiano"),
-    _("setting_p_system_france"),
-    _("setting_p_system_chinese")
+    "setting_p_system_espaol",
+    "setting_p_system_deutsch",
+    "setting_p_system_english",
+    "setting_p_system_italiano",
+    "setting_p_system_france",
+    "setting_p_system_chinese"
  };
 
 
     uint8_t OsdTime;
     //constexpr static const char* OsdTimeName[] = { 
     const char* OsdTimeName[7] = { 
-    _("setting_p_system_osd_time_off"), 
-    _("setting_p_system_osd_time_5"), 
-    _("setting_p_system_osd_time_10"), 
-    _("setting_p_system_osd_time_15"), 
-    _("setting_p_system_osd_time_20"), 
-    _("setting_p_system_osd_time_25"), 
-    _("setting_p_system_osd_time_30") };
+    "setting_p_system_osd_time_off", 
+    "setting_p_system_osd_time_5", 
+    "setting_p_system_osd_time_10", 
+    "setting_p_system_osd_time_15", 
+    "setting_p_system_osd_time_20", 
+    "setting_p_system_osd_time_25", 
+    "setting_p_system_osd_time_30" };
 
     uint8_t RestoreFactory;
     //constexpr static const char* RestoreFactoryName[] = { 
     const char* RestoreFactoryName[1] = { 
-    _("setting_p_system_restore_factory_mode") };
+    "setting_p_system_restore_factory_mode" };
 
 public:
     System(/* args */);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:25:46
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 13:27:26
+ * @LastEditTime: 2022-08-14 23:04:35
  * @FilePath: /gui/application/setting/Setting.cpp
  * @Description: None
  * @other: None
@@ -11,6 +11,7 @@
 #include "Setting.h"
 #include "application/ConfigParam.h"
 #include "application/windows.h"
+#include "application/ui/LanguageScreen.h"
 
 namespace Setting {
 
@@ -55,7 +56,7 @@ void ReadSystemSettingParam(System& setting)
     //boost::property_tree::ptree config = pt->get_child("system_setting");
     boost::property_tree::ptree config;// = pt->get_child("picture_setting");
     ReadConfigFile(config, "system_setting");
-    setting.language = config.get<int>("language", 0);
+    setting.language = DefaultLanguageIndex;
     setting.OsdTime = config.get<int>("OsdTime", 0);
     //delete pt;
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-29 18:58:42
+ * @LastEditTime: 2022-08-15 00:44:56
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -10,6 +10,7 @@
 #include <stack>
 #include <list>
 #include "ui_com.h"
+#include "lv_i18n/src/lv_i18n.h"
 
 /************全局变量*****************/
 std::stack<lv_group_t*, std::list<lv_group_t*>> group_stack;
@@ -63,4 +64,17 @@ lv_group_t* delete_group(lv_group_t* group)
     }
     lv_group_del(group);
     return last_group;
+}
+
+lv_obj_tree_walk_res_t obj_tree_walk_cb(lv_obj_t* obj, void * user_data)
+{
+    if (lv_obj_check_type(obj, &lv_label_class) && obj->user_data != nullptr) {
+        lv_label_set_text(obj, _(static_cast<const char*>(obj->user_data)));
+    }
+    return LV_OBJ_TREE_WALK_NEXT;
+}
+
+void refresh_all_lable_text(lv_obj_t* parent)
+{
+    lv_obj_tree_walk(parent, obj_tree_walk_cb, nullptr);
 }

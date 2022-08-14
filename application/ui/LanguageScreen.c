@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 21:20:37
+ * @LastEditTime: 2022-08-15 01:43:36
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -18,10 +18,7 @@ lv_obj_t* ui_LanguagePanel;
 static lv_obj_t* ui_LangImage;
 lv_group_t* LanguageScreenGroup;
 
-extern void WriteConfigFile_I(const char* ConfigName, int value);
-extern void WriteConfigFile_S(const char* ConfigName, const char* value);
-
-static const char* Language[] = {
+const char* Language[] = {
 "es",
 "de",
 "en-GB",
@@ -29,10 +26,15 @@ static const char* Language[] = {
 "fr",
 "zh-CN"
 };
-const char* DefaultLanguage = "en-GB";
+
+const char* DefaultLanguage = "zh-CN";
+int DefaultLanguageIndex = 5;
 
 static void event_handler(lv_event_t* event);
 static void ExitHome(ActiveScreen screen);
+
+extern void WriteConfigFile_I(const char* ConfigName, int value);
+extern void WriteConfigFile_S(const char* ConfigName, const char* value);
 
 void event_handler(lv_event_t* event)
 {
@@ -52,10 +54,8 @@ void event_handler(lv_event_t* event)
             break;
         case LV_KEY_ENTER:
             if (index == English || index == Chinese) {
-                DefaultLanguage = Language[index];
                 WriteConfigFile_I("guide_flag.flag", 0);
-                WriteConfigFile_S("default_language.language", DefaultLanguage);
-                lv_i18n_set_locale(DefaultLanguage);
+                SaveCurrentLanguageType(index);
                 ExitHome(HomeScreen);
             }
             break;
@@ -70,6 +70,15 @@ void event_handler(lv_event_t* event)
     }
 }
 
+void SaveCurrentLanguageType(int index)
+{
+    DefaultLanguageIndex = index;
+    DefaultLanguage = Language[DefaultLanguageIndex];
+    WriteConfigFile_S("default_language.language", DefaultLanguage);
+    WriteConfigFile_I("default_language.index", DefaultLanguageIndex);
+    lv_i18n_set_locale(DefaultLanguage);
+}
+
 static void CreateLanguagePanel(lv_obj_t* parent)
 {
     static const lv_img_dsc_t* image_src[] = {
@@ -80,15 +89,11 @@ static void CreateLanguagePanel(lv_obj_t* parent)
         &ui_img_install_bg_fra_png,
         &ui_img_install_bg_chn_png
     };
-    const char* language_list[6];
+    static const char* language_list[6] = {
+    "language_espaol", "language_deutsch", "language_english", 
+    "language_italiano", "language_france", "language_chinese" };
     lv_i18n_init(lv_i18n_language_pack);
     lv_i18n_set_locale(DefaultLanguage);
-    language_list[0] = _("language_espaol");
-    language_list[1] = _("language_deutsch");
-    language_list[2] = _("language_english");
-    language_list[3] = _("language_italiano");
-    language_list[4] = _("language_france");
-    language_list[5] = _("language_chinese");
 
     // ui_LanguagePanel
     ui_LanguagePanel = lv_obj_create(ui_LanguageScreen);
@@ -130,7 +135,8 @@ static void CreateLanguagePanel(lv_obj_t* parent)
         lv_obj_set_x(text, 0);
         lv_obj_set_y(text, 0);
         lv_obj_set_align(text, LV_ALIGN_CENTER);
-        lv_label_set_text(text, language_list[i]);
+        text->user_data = (void*)language_list[i];
+        lv_label_set_text(text, _(language_list[i]));
         lv_obj_set_style_text_color(text, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_letter_space(text, 3, LV_PART_MAIN | LV_STATE_DEFAULT);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 13:36:19
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 21:53:48
+ * @LastEditTime: 2022-08-15 01:17:49
  * @FilePath: /gui/application/setting/Sound.h
  * @Description: None
  * @other: None
@@ -63,11 +63,11 @@ public:
         ModeType user{50, 50};
         //constexpr static const char* name[] = { 
         const char* name[5] = { 
-        _("setting_p_sound_mode_type_standard"), 
-        _("setting_p_sound_mode_type_music"), 
-        _("setting_p_sound_mode_type_movie"), 
-        _("setting_p_sound_mode_type_sport"), 
-        _("setting_p_sound_mode_type_user") };
+        "setting_p_sound_mode_type_standard", 
+        "setting_p_sound_mode_type_music", 
+        "setting_p_sound_mode_type_movie", 
+        "setting_p_sound_mode_type_sport", 
+        "setting_p_sound_mode_type_user" };
 
         SoundMode() {}
         ~SoundMode() {}
@@ -87,12 +87,12 @@ public:
     uint8_t surround;
     //constexpr static const char* SurroundName[] = { 
     const char* SurroundName[2] = { 
-    _("setting_p_sound_surround_off"), _("setting_p_sound_surround_srs") };
+    "setting_p_sound_surround_off", "setting_p_sound_surround_srs" };
 
     uint8_t AutoVolume;
     //constexpr static const char* AutoVolumeName[] = { 
     const char* AutoVolumeName[2] = { 
-    _("setting_p_sound_auto_volume_off"), _("setting_p_sound_auto_volume_on") };
+    "setting_p_sound_auto_volume_off", "setting_p_sound_auto_volume_on" };
 
 public:
     Sound(/* args */);

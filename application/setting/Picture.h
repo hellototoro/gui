@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-28 20:28:05
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 20:51:30
+ * @LastEditTime: 2022-08-15 01:08:41
  * @FilePath: /gui/application/setting/Picture.h
  * @Description: None
  * @other: None
@@ -72,10 +72,10 @@ public:
         ModeType dynamic{50, 50, 50, 50};
         //constexpr static const char* name[4] = { setting_p_picture_mode_type_standard_
         const char* name[4] = { 
-        _("setting_p_picture_mode_type_standard"), 
-        _("setting_p_picture_mode_type_standard_soft"), 
-        _("setting_p_picture_mode_type_standard_user"), 
-        _("setting_p_picture_mode_type_standard_dynamic") };
+        "setting_p_picture_mode_type_standard", 
+        "setting_p_picture_mode_type_standard_soft", 
+        "setting_p_picture_mode_type_standard_user", 
+        "setting_p_picture_mode_type_standard_dynamic" };
 
         PictureMode() {}
         ~PictureMode() {}
@@ -128,10 +128,10 @@ public:
         ColorTemperatureType cool{50, 50, 50};
         //constexpr static const char* name[4] = { setting_p_picture_color_temp_type_
         const char* name[4] = { 
-        _("setting_p_picture_color_temp_type_standard"), 
-        _("setting_p_picture_color_temp_type_warm"), 
-        _("setting_p_picture_color_temp_type_user"), 
-        _("setting_p_picture_color_temp_type_cool") };
+        "setting_p_picture_color_temp_type_standard", 
+        "setting_p_picture_color_temp_type_warm", 
+        "setting_p_picture_color_temp_type_user", 
+        "setting_p_picture_color_temp_type_cool" };
 
         PictureColorTemperature() { }
         ~PictureColorTemperature() { }
@@ -153,7 +153,7 @@ public:
     const char* ScaleName[3] = { 
     "16:9", 
     "4:3", 
-    _("setting_p_picture_scale_auto") };
+    "setting_p_picture_scale_auto" };
 
     uint8_t ratio;
     char RatioName[5];
@@ -161,9 +161,9 @@ public:
     uint8_t PowerBankMode;
     //constexpr static const char* PowerBankModeName[3] = { 
     const char* PowerBankModeName[3] = { 
-    _("setting_p_picture_power_bank_mode_low"), 
-    _("setting_p_picture_power_bank_mode_middle"), 
-    _("setting_p_picture_power_bank_mode_high") };
+    "setting_p_picture_power_bank_mode_low", 
+    "setting_p_picture_power_bank_mode_middle", 
+    "setting_p_picture_power_bank_mode_high" };
 
 public:
     Picture(/* args */);

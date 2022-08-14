@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 22:30:57
+ * @LastEditTime: 2022-08-15 01:36:50
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -294,11 +294,11 @@ static void FilterFile(CategoryList filter_type)
 static void CreateCategoryPanel(lv_obj_t* parent)
 {
     static const char* lab_text[] = {
-        _("media_category_p_all"),
-        _("media_category_p_video"),
-        _("media_category_p_music"),
-        _("media_category_p_photo"),
-        _("media_category_p_text") 
+        "media_category_p_all",
+        "media_category_p_video",
+        "media_category_p_music",
+        "media_category_p_photo",
+        "media_category_p_text" 
     };
     ui_Category_Panel = lv_obj_create(parent);
     lv_obj_set_size(ui_Category_Panel, 252, 420);
@@ -332,7 +332,8 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_size(ui_LAB, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         lv_obj_set_pos(ui_LAB, 10, 0);
         lv_obj_set_align(ui_LAB, LV_ALIGN_CENTER);
-        lv_label_set_text(ui_LAB, lab_text[i]);
+        ui_LAB->user_data = const_cast<char*>(lab_text[i]);
+        lv_label_set_text(ui_LAB, _(lab_text[i]));
         lv_obj_set_style_text_color(ui_LAB, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_opa(ui_LAB, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(ui_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -384,6 +385,7 @@ static void ShowFileList(FileList *file_list)
 {
     lv_obj_t* ui_back = lv_btn_create(ui_File_List_Panel);
     ui_back->user_data = NULL;
+    ui_back->user_data = const_cast<char*>("media_file_p_return");
     DrawCell(ui_back, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
     lv_group_add_obj(File_List_Group, ui_back);
     lv_obj_add_event_cb(ui_back, return_handler, LV_EVENT_ALL, NULL);
@@ -511,6 +513,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_obj_set_size(ui_LAB_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(ui_LAB_Path, -336, -300);
     lv_obj_set_align(ui_LAB_Path, LV_ALIGN_CENTER);
+    ui_LAB_Path->user_data = const_cast<char*>("media_file_p_path");
     lv_label_set_text(ui_LAB_Path, _("media_file_p_path"));
     lv_obj_set_style_text_color(ui_LAB_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);

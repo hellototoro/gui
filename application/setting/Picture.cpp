@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-28 20:27:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 18:43:43
+ * @LastEditTime: 2022-08-15 01:14:50
  * @FilePath: /gui/application/setting/Picture.cpp
  * @Description: None
  * @other: None
@@ -24,13 +24,18 @@ Picture::~Picture()
 const char** Picture::GetStrArray(void)
 {
     static const char* name[11] = {
-        _("setting_p_picture_setting"), 
-        _("setting_p_picture_mode"), _("setting_p_picture_mode_type_standard"), 
-        _("setting_p_picture_scale"), "16:9", 
-        _("setting_p_picture_color_temp"), _("setting_p_picture_color_temp_type_standard"), 
-        _("setting_p_picture_rate"), _("setting_p_picture_rate_100"), 
-        _("setting_p_picture_power_bank_mode"), _("setting_p_picture_power_bank_mode_low")
+        "setting_p_picture_setting", 
+        "setting_p_picture_mode", "", 
+        "setting_p_picture_scale", "", 
+        "setting_p_picture_color_temp", "", 
+        "setting_p_picture_rate", "setting_p_picture_rate_100", 
+        "setting_p_picture_power_bank_mode", ""
     };
+    name[2] = mode.name[mode.type];
+    name[4] = ScaleName[scale];
+    name[6] = ColorTemperature.name[ColorTemperature.type];
+    //name[8] = ScaleName[scale];
+    name[10] = PowerBankModeName[PowerBankMode];
     return name;
 }
 
@@ -148,11 +153,11 @@ const char** Picture::PictureMode::GetStrArray(void)
 {
     //const char** name = nullptr;
     static const char* name[5] = { 
-    _("setting_p_picture_mode"), 
-    _("setting_p_picture_mode_contrast"), 
-    _("setting_p_picture_mode_brightness"), 
-    _("setting_p_picture_mode_colour"), 
-    _("setting_p_picture_mode_sharpness") };
+    "setting_p_picture_mode", 
+    "setting_p_picture_mode_contrast", 
+    "setting_p_picture_mode_brightness", 
+    "setting_p_picture_mode_colour", 
+    "setting_p_picture_mode_sharpness" };
     return name;
 }
 
@@ -262,10 +267,10 @@ const char* Picture::PictureMode::GetStr(int index)
 const char** Picture::PictureColorTemperature::GetStrArray(void)
 {
     static const char* name[4] = { 
-    _("setting_p_picture_color_temp"), 
-    _("setting_p_picture_color_temp_red"), 
-    _("setting_p_picture_color_temp_green"), 
-    _("setting_p_picture_color_temp_blue") };
+    "setting_p_picture_color_temp", 
+    "setting_p_picture_color_temp_red", 
+    "setting_p_picture_color_temp_green", 
+    "setting_p_picture_color_temp_blue" };
     return name;
 }
 

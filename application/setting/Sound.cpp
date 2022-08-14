@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 13:38:33
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 14:36:00
+ * @LastEditTime: 2022-08-15 01:19:50
  * @FilePath: /gui/application/setting/Sound.cpp
  * @Description: None
  * @other: None
@@ -23,10 +23,13 @@ Sound::~Sound()
 const char** Sound::GetStrArray(void)
 {
     static const char* name[7] = {
-    _("setting_p_sound_setting"),
-    _("setting_p_sound_mode"), _("setting_p_sound_mode_type_standard"), 
-    _("setting_p_sound_surround"), _("setting_p_sound_surround_off"), 
-    _("setting_p_sound_auto_volume"), _("setting_p_sound_auto_volume_off") };
+    "setting_p_sound_setting",
+    "setting_p_sound_mode", "", 
+    "setting_p_sound_surround", "", 
+    "setting_p_sound_auto_volume", "" };
+    name[2] = mode.name[mode.type];
+    name[4] = SurroundName[surround];
+    name[6] = AutoVolumeName[AutoVolume];
     return name;
 }
 
@@ -116,9 +119,9 @@ const char** Sound::SoundMode::GetStrArray(void)
 {
     //const char** name = nullptr;
     static const char* name[3] = { 
-    _("setting_p_sound_mode"), 
-    _("setting_p_sound_mode_treble"), 
-    _("setting_p_sound_mode_bass") };
+    "setting_p_sound_mode", 
+    "setting_p_sound_mode_treble", 
+    "setting_p_sound_mode_bass" };
     return name;
 }
 

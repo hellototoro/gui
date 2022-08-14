@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 20:52:16
+ * @LastEditTime: 2022-08-15 01:06:42
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -10,6 +10,10 @@
 #include <stdio.h>
 #include "System.h"
 #include "application/ConfigParam.h"
+#include "application/ui/LanguageScreen.h"
+#include "application/ui/ui_com.h"
+
+extern lv_obj_t* SettingPanel;
 
 namespace Setting {
 
@@ -24,11 +28,13 @@ System::~System()
 const char** System::GetStrArray(void)
 {
     static const char* name[6] = {
-    _("setting_p_system_setting"), 
-    _("setting_p_system_language"), _("setting_p_system_chinese"), 
-    _("setting_p_system_osd_time"), _("setting_p_system_osd_time_off"), 
-    _("setting_p_system_restore_factory_mode") 
+    "setting_p_system_setting", 
+    "setting_p_system_language", "", 
+    "setting_p_system_osd_time", "", 
+    "setting_p_system_restore_factory_mode" 
     };
+    name[2] = LanguageName[language];
+    name[4] = OsdTimeName[OsdTime];
     return name;
 }
 
@@ -42,7 +48,7 @@ void System::SelectedValue(int index)
     switch (index)
     {
     case static_cast<int>(Setting_SystemRestoreFactory):
-        WriteConfigFile_I("guide_flag.flag", 1);
+        WriteConfigFile_I("guide_flag.flag", 1);//test
         WriteConfigFile_S("default_language.language", "en-GB");
         break;
 
@@ -58,6 +64,8 @@ void System::IncreaseUserValue(int index)
     {
     case static_cast<int>(Setting_SystemLanguage):
         IncreaseValueComm(language, 0, sizeof(LanguageName)/sizeof(LanguageName[0]));
+        SaveCurrentLanguageType(language);
+        refresh_all_lable_text(lv_scr_act());
         break;
 
     case static_cast<int>(Setting_SystemOsdTime):
@@ -75,6 +83,8 @@ void System::DecreaseUserValue(int index)
     {
     case static_cast<int>(Setting_SystemLanguage):
         DecreaseValueComm(language, 0, sizeof(LanguageName)/sizeof(LanguageName[0]));
+        SaveCurrentLanguageType(language);
+        refresh_all_lable_text(lv_scr_act());
         break;
 
     case static_cast<int>(Setting_SystemOsdTime):

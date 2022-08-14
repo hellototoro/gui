@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-13 21:21:14
+ * @LastEditTime: 2022-08-15 01:29:21
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -69,13 +69,9 @@ static void CreateMainPanel(lv_obj_t* parent)
         {    0,  -38},
         {   -8,  -38}
     };
-    const char* str[6];
-    str[0] = _("main_p_u_disk");//盘设置信号源苹果安卓无线投屏西班牙德英意大利法语简体中文
-    str[1] = _("main_setting");
-    str[2] = _("main_source");
-    str[3] = _("main_ios");
-    str[4] = _("main_android");
-    str[5] = _("main_dlna");
+    static const char* str[6] = {//盘设置信号源苹果安卓无线投屏西班牙德英意大利法语简体中文
+    "main_p_u_disk", "main_setting", "main_source", "main_ios", "main_android", "main_dlna" };
+
     static const lv_img_dsc_t* image_src[] = {
         & ui_img_udisk_n_png,
         & ui_img_setting_n_png,
@@ -115,11 +111,23 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_obj_set_size(ui_lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         lv_obj_set_pos(ui_lab, lab_area[i][0], lab_area[i][1]);
         lv_obj_set_align(ui_lab, LV_ALIGN_CENTER);
-        lv_label_set_text(ui_lab, str[i]);
+        ui_lab->user_data = (void*)str[i];
+        lv_label_set_text(ui_lab, _(str[i]));
         lv_obj_set_style_text_color(ui_lab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(ui_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
     lv_group_focus_obj(lv_obj_get_child(ui_Main_Panel, LastFocusedObjIndex));
+
+    /*lv_obj_t* img = lv_img_create(parent);
+    lv_img_set_src(img, LV_SYMBOL_DOWNLOAD);
+    //lv_img_set_zoom(img,1024);
+    //lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(img, -600, -300);
+    lv_obj_set_align(img, LV_ALIGN_CENTER);
+    lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_text_font(img, &lv_font_montserrat_48, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_color(img, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);*/
 }
 
 static void CreateSourcePanel(lv_obj_t* parent)
@@ -181,7 +189,8 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_size(ui_LAB_SourceType, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(ui_LAB_SourceType, 0, 84);
     lv_obj_set_align(ui_LAB_SourceType, LV_ALIGN_CENTER);
-    lv_label_set_text(ui_LAB_SourceType, _("source_p_u_disk"));
+    ui_LAB_SourceType->user_data = "source_p_u_disk";
+    lv_label_set_text(ui_LAB_SourceType, _(ui_LAB_SourceType->user_data));
     lv_obj_set_style_text_color(ui_LAB_SourceType, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(ui_LAB_SourceType, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LAB_SourceType, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -296,9 +305,10 @@ static void source_event_handler(lv_event_t* event)
     int index = lv_obj_get_index(lv_group_get_focused(group));
     lv_img_set_src(ui_IMG_SourceType, source_img_src[index]);
     if(index == 0)
-        lv_label_set_text(ui_LAB_SourceType, _("source_p_u_disk"));
+        ui_LAB_SourceType->user_data = (void*)"source_p_u_disk";
     else if(index == 1)
-        lv_label_set_text(ui_LAB_SourceType, _("source_p_hdim"));
+        ui_LAB_SourceType->user_data = (void*)"source_p_hdim";
+    lv_label_set_text(ui_LAB_SourceType, _(ui_LAB_SourceType->user_data));
 }
 
 static void ExitHome(ActiveScreen screen)

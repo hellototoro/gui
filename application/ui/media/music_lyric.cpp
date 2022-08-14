@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:54
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 15:09:37
+ * @LastEditTime: 2022-08-15 01:38:10
  * @FilePath: /gui/application/ui/media/music_lyric.cpp
  * @Description: None
  * @other: None
@@ -49,7 +49,7 @@ void music_lyric::load(const char* file_name)
     }
     if (size() == 0) {
         start_time_list.push_back(0);
-        lic_list.push_back(_("no_lyric"));
+        lic_list.push_back("no_lyric");
     }
     if(lic_file->is_open())
         lic_file->close();

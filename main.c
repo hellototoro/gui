@@ -49,16 +49,6 @@ static void exit_console(int signo);
 int main(int argc, char *argv[])
 {
     #ifdef HCCHIP_GCC
-    hdmi_init();
-    hdmi_hotplug_enable();
-    hdmi_rx_start();
-    while (1)
-    {
-        /* code */
-    }
-    
-    #endif
-    #ifdef HCCHIP_GCC
     if (argc == 2){
         strncpy(m_wifi_module_name, argv[1], sizeof(m_wifi_module_name)-1);
         wifi_api_set_module(m_wifi_module_name);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:29
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 16:50:57
+ * @LastEditTime: 2022-08-15 00:54:05
  * @FilePath: /gui/application/ui/LanguageScreen.h
  * @Description: None
  * @other: None
@@ -26,7 +26,11 @@ enum LanguageType {
     LanguageNumber
 };
 
+extern const char* Language[];
+
 extern const char* DefaultLanguage;
+extern int DefaultLanguageIndex;
+extern void SaveCurrentLanguageType(int index);
 
 #ifdef __cplusplus
 } /*extern "C"*/
