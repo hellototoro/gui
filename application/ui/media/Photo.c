@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 09:03:20
+ * @LastEditTime: 2022-08-17 23:38:15
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -19,7 +19,7 @@ lv_obj_t* PreScreen;
 static void event_handler(lv_event_t* event);
 static void SetStyleForPlayBar(lv_obj_t* bar);
 
-lv_obj_t* creat_photo_window(lv_obj_t* foucsed_obj)
+lv_obj_t* creat_photo_window(char* file_name)
 {
     PreScreen = lv_scr_act();
     #ifdef HOST_GCC
@@ -35,10 +35,9 @@ lv_obj_t* creat_photo_window(lv_obj_t* foucsed_obj)
     lv_obj_add_event_cb(PhotoScreen, event_handler, LV_EVENT_KEY, NULL);
     lv_obj_clear_flag(PhotoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
-    MediaComInit(PhotoScreen, MEDIA_PHOTO, PhotoHandler, old_group);
+    MediaComInit(PhotoScreen, MEDIA_PHOTO, PhotoHandler);
     CreateMediaArray(MEDIA_PHOTO);
-    LocateMediaIndex(MEDIA_PHOTO, ((FileStr *)(foucsed_obj->user_data))->name);
+    LocateMediaIndex(MEDIA_PHOTO, file_name);
     PlayMedia(PhotoHandler, GetCurrentMediaName());
 
     SetStyleForPlayBar(CreatePlayBar(PhotoScreen));

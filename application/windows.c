@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:58
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-04 19:01:42
+ * @LastEditTime: 2022-08-17 08:57:08
  * @FilePath: /gui/application/windows.c
  * @Description: None
  * @other: None
@@ -17,7 +17,6 @@ ActiveScreen CurrentScreen;
 ActiveScreen DefaultScreen;
 
 window *CurrentWindow;
-window *LastWindow;
 
 window *Windows[] = {
     &LanguageWindow,
@@ -27,6 +26,7 @@ window *Windows[] = {
 
 void WindowsManager(void)
 {
+    static window *LastWindow = NULL;
     CurrentWindow = Windows[CurrentScreen];
     if (LastWindow != CurrentWindow) {
         if(CurrentWindow) {

@@ -10,7 +10,7 @@
 #ifndef __UI_MEDIA_SCREEN_H__
 #define __UI_MEDIA_SCREEN_H__
 
-#include "application/ui/resource/ui.h"
+#include "application/ui/ui_com.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
 #endif

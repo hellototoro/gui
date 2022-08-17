@@ -2,21 +2,20 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-15 00:34:38
+ * @LastEditTime: 2022-08-17 22:45:57
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
  */
 #include "SettingScreen.h"
 #include "application/setting/Setting.h"
-#include "ui_com.h"
 
-lv_obj_t* ui_SettingScreen;
-lv_obj_t* SettingPanel;
-lv_obj_t* SubSettingPanel;
-lv_group_t* SettingGroup;
-lv_obj_t* LastFocused;
-lv_obj_t* SubLastFocused;
+static lv_obj_t* SettingRootScreen;
+static lv_obj_t* MainPanel;
+static lv_obj_t* SubPanel;
+static lv_group_t* MainGroup;
+static lv_obj_t* LastFocused;
+static lv_obj_t* SubLastFocused;
 
 enum CategoryList {
     NetWork,
@@ -29,91 +28,8 @@ enum CategoryList {
     CategoryNumber
 };
 
-static void event_handler(lv_event_t* event);
 void CreateSettingPanel(void* user_data, bool BgTransp);
 void CreateSubSettingPanel(void* user_data, bool BgTransp);
-
-void CreateSettingScreen(lv_obj_t* parent, lv_group_t* group)
-{
-    static const lv_coord_t img_area[CategoryNumber][2] = {//{ x, y}
-        {-330,    0},
-        {-110, -102},
-        { 110, -102},
-        { 330, -102},
-        {-110,  101},
-        { 110,  101},
-        { 330,  101}
-    };
-    static const lv_coord_t lab_area[CategoryNumber][2] = {//{ x, y}
-        { 0, 75},
-        { 0, 45},
-        { 0, 45},
-        { 0, 45},
-        { 0, 45},
-        { 0, 45},
-        { 0, 45}
-    };
-    static const char* str[CategoryNumber] =  { 
-    "setting_p_net_work", 
-    "setting_p_projector", 
-    "setting_p_picture", 
-    "setting_p_sound", 
-    "setting_p_system", 
-    "setting_p_upgrade", 
-    "setting_p_projector_info" };
-    static const lv_img_dsc_t* image_src[CategoryNumber] = {
-        & ui_img_network_setting_png,
-        & ui_img_projector_setting_png,
-        & ui_img_pic_setting_png,
-        & ui_img_sound_setting_png,
-        & ui_img_system_setting_png,
-        & ui_img_update_setting_png,
-        & ui_img_projector_info_png,
-    };
-    // ui_SettingScreen
-    ui_SettingScreen = lv_obj_create(parent);
-    lv_obj_set_size(ui_SettingScreen, 1280, 720);
-    lv_obj_clear_flag(ui_SettingScreen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(ui_SettingScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_SettingScreen, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_SettingScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_SettingScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    //HomeScreenGroup = lv_group_create();
-    //set_group_activity(HomeScreenGroup);
-    SettingGroup = create_new_group(group);
-    set_group_activity(SettingGroup);
-    for (int i = 0; i < CategoryNumber; i++) {
-        lv_obj_t* ui_Image = lv_img_create(ui_SettingScreen);
-        lv_img_set_src(ui_Image, image_src[i]);
-        lv_obj_set_width(ui_Image, LV_SIZE_CONTENT);
-        lv_obj_set_height(ui_Image, LV_SIZE_CONTENT);
-        lv_obj_set_x(ui_Image, img_area[i][0]);
-        lv_obj_set_y(ui_Image, img_area[i][1]);
-        lv_obj_set_align(ui_Image, LV_ALIGN_CENTER);
-        lv_obj_add_flag(ui_Image, LV_OBJ_FLAG_ADV_HITTEST);
-        lv_obj_clear_flag(ui_Image, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_style_radius(ui_Image, 20, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_color(ui_Image, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_opa(ui_Image, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_width(ui_Image, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_group_add_obj(SettingGroup, ui_Image);
-        lv_obj_add_event_cb(ui_Image, event_handler, LV_EVENT_KEY, NULL);
-
-        lv_obj_t* ui_Label = lv_label_create(ui_Image);
-        lv_obj_set_width(ui_Label, LV_SIZE_CONTENT);
-        lv_obj_set_height(ui_Label, LV_SIZE_CONTENT);
-        lv_obj_set_x(ui_Label, lab_area[i][0]);
-        lv_obj_set_y(ui_Label, lab_area[i][1]);
-        lv_obj_set_align(ui_Label, LV_ALIGN_CENTER);
-        ui_Label->user_data = const_cast<char*>(str[i]);
-        lv_label_set_text(ui_Label, _(str[i]));
-        lv_obj_set_style_text_color(ui_Label, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_opa(ui_Label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(ui_Label, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
-    lv_group_focus_obj(lv_obj_get_child(ui_SettingScreen, 0));
-}
 
 static void event_handler(lv_event_t* event)
 {
@@ -160,6 +76,7 @@ static void event_handler(lv_event_t* event)
         switch (index)
         {
         case NetWork:
+            CreateNetWorkPanel(SettingRootScreen);
             break;
 
         case Position:
@@ -188,8 +105,8 @@ static void event_handler(lv_event_t* event)
         }
         break;
     case LV_KEY_ESC:
-        delete_group(SettingGroup);
-        lv_obj_del_async(ui_SettingScreen);
+        delete_group(MainGroup);
+        lv_obj_del_async(SettingRootScreen);
     break;
 
     default:
@@ -220,7 +137,7 @@ static void setting_item_key_event_handler(lv_event_t* event)
         Setting->DecreaseUserValue(index);
         target->spec_attr->children[1]->user_data = const_cast<char*>(Setting->GetStr(index));
         lv_label_set_text(target->spec_attr->children[1], _(Setting->GetStr(index)));
-        if(lv_obj_is_valid(SubSettingPanel)) {
+        if(lv_obj_is_valid(SubPanel)) {
             lv_slider_set_value(target->spec_attr->children[2], Setting->GetUserValue(index), LV_ANIM_OFF);
         }
         break;
@@ -231,7 +148,7 @@ static void setting_item_key_event_handler(lv_event_t* event)
         Setting->IncreaseUserValue(index);
         target->spec_attr->children[1]->user_data = const_cast<char*>(Setting->GetStr(index));
         lv_label_set_text(target->spec_attr->children[1], _(Setting->GetStr(index)));
-        if(lv_obj_is_valid(SubSettingPanel)) {
+        if(lv_obj_is_valid(SubPanel)) {
             lv_slider_set_value(target->spec_attr->children[2], Setting->GetUserValue(index), LV_ANIM_OFF);
         }
         break;
@@ -242,13 +159,13 @@ static void setting_item_key_event_handler(lv_event_t* event)
         lv_group_focus_next(group);
         break;
     case LV_KEY_ESC:
-        SettingGroup = delete_group(SettingGroup);
-        if(lv_obj_is_valid(SubSettingPanel)) {
+        MainGroup = delete_group(MainGroup);
+        if(lv_obj_is_valid(SubPanel)) {
             LastFocused = SubLastFocused;
-            lv_obj_del_async(SubSettingPanel);
+            lv_obj_del_async(SubPanel);
         }
         else {
-            lv_obj_del_async(SettingPanel);
+            lv_obj_del_async(MainPanel);
             delete Setting;
         }
         break;
@@ -281,6 +198,83 @@ static void focused_handler(lv_group_t* group)
     LastFocused = obj;
 }
 
+void CreateSettingScreen(lv_obj_t* parent)
+{
+    static const lv_coord_t img_area[CategoryNumber][2] = {//{ x, y}
+        {-330,    0},
+        {-110, -102},
+        { 110, -102},
+        { 330, -102},
+        {-110,  101},
+        { 110,  101},
+        { 330,  101} };
+    static const lv_coord_t lab_area[CategoryNumber][2] = {//{ x, y}
+        { 0, 75},
+        { 0, 45},
+        { 0, 45},
+        { 0, 45},
+        { 0, 45},
+        { 0, 45},
+        { 0, 45} };
+    static const char* str[CategoryNumber] =  { 
+    "setting_p_net_work", 
+    "setting_p_projector", 
+    "setting_p_picture", 
+    "setting_p_sound", 
+    "setting_p_system", 
+    "setting_p_upgrade", 
+    "setting_p_projector_info" };
+    static const lv_img_dsc_t* image_src[CategoryNumber] = {
+        & ui_img_network_setting_png,
+        & ui_img_projector_setting_png,
+        & ui_img_pic_setting_png,
+        & ui_img_sound_setting_png,
+        & ui_img_system_setting_png,
+        & ui_img_update_setting_png,
+        & ui_img_projector_info_png };
+
+    SettingRootScreen = lv_obj_create(parent);
+    lv_obj_set_size(SettingRootScreen, 1280, 720);
+    lv_obj_clear_flag(SettingRootScreen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(SettingRootScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(SettingRootScreen, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(SettingRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(SettingRootScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    MainGroup = create_new_group(get_activity_group());
+    set_group_activity(MainGroup);
+    for (int i = 0; i < CategoryNumber; i++) {
+        lv_obj_t* img = lv_img_create(SettingRootScreen);
+        lv_img_set_src(img, image_src[i]);
+        lv_obj_set_width(img, LV_SIZE_CONTENT);
+        lv_obj_set_height(img, LV_SIZE_CONTENT);
+        lv_obj_set_x(img, img_area[i][0]);
+        lv_obj_set_y(img, img_area[i][1]);
+        lv_obj_set_align(img, LV_ALIGN_CENTER);
+        lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
+        lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_radius(img, 20, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_color(img, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_opa(img, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_width(img, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_group_add_obj(MainGroup, img);
+        lv_obj_add_event_cb(img, event_handler, LV_EVENT_KEY, NULL);
+
+        lv_obj_t* lab = lv_label_create(img);
+        lv_obj_set_width(lab, LV_SIZE_CONTENT);
+        lv_obj_set_height(lab, LV_SIZE_CONTENT);
+        lv_obj_set_x(lab, lab_area[i][0]);
+        lv_obj_set_y(lab, lab_area[i][1]);
+        lv_obj_set_align(lab, LV_ALIGN_CENTER);
+        lab->user_data = const_cast<char*>(str[i]);
+        lv_label_set_text(lab, _(str[i]));
+        lv_obj_set_style_text_color(lab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(lab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(lab, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    lv_group_focus_obj(lv_obj_get_child(SettingRootScreen, 0));
+}
+
 void CreateSettingPanel(void* user_data, bool BgTransp)
 {
     Setting::Base* Setting = static_cast<Setting::Base*>(user_data);
@@ -288,19 +282,18 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
     uint8_t only_text_item_num = Setting->GetOnlyTextItemNum();
     const char** text = Setting->GetStrArray();
 
-    SettingPanel = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(SettingPanel, 1280, 720);
-    lv_obj_clear_flag(SettingPanel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(SettingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(SettingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    MainPanel = lv_obj_create(lv_scr_act());
+    lv_obj_set_size(MainPanel, 1280, 720);
+    lv_obj_clear_flag(MainPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(MainPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     if (BgTransp)
-        lv_obj_set_style_bg_opa(SettingPanel, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(MainPanel, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     else
-        lv_obj_set_style_bg_opa(SettingPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(SettingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(MainPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    // SettingPanelLayout
-    lv_obj_t* SettingPanelLayout = lv_obj_create(SettingPanel);
+    lv_obj_t* SettingPanelLayout = lv_obj_create(MainPanel);
     lv_obj_set_width(SettingPanelLayout, 800);
     lv_obj_set_height(SettingPanelLayout, 90 * (ItemNum + 1));
     lv_obj_set_x(SettingPanelLayout, 0);
@@ -333,10 +326,9 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    SettingGroup = create_new_group(SettingGroup);
-    set_group_activity(SettingGroup);
+    MainGroup = create_new_group(MainGroup);
+    set_group_activity(MainGroup);
     for(int i = 0; i < ItemNum; ++i) {
-        // item_panel
         lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
         lv_obj_set_width(item_panel, 800);
         lv_obj_set_height(item_panel, 90);
@@ -350,11 +342,10 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_border_side(item_panel, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_color(item_panel, lv_color_hex(0xEF16E9), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(item_panel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_group_add_obj(SettingGroup, item_panel);
+        lv_group_add_obj(MainGroup, item_panel);
         lv_obj_add_event_cb(item_panel, setting_item_key_event_handler, LV_EVENT_KEY, NULL);
-        lv_group_set_focus_cb(SettingGroup, focused_handler);
+        lv_group_set_focus_cb(MainGroup, focused_handler);
 
-        // item_text1
         lv_obj_t* item_text1 = lv_label_create(item_panel);
         lv_obj_set_width(item_text1, LV_SIZE_CONTENT);
         lv_obj_set_height(item_text1, LV_SIZE_CONTENT);
@@ -375,7 +366,6 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
             continue;
         }
 
-        // item_text2
         lv_obj_t* item_text2 = lv_label_create(item_panel);
         lv_obj_set_width(item_text2, LV_SIZE_CONTENT);
         lv_obj_set_height(item_text2, LV_SIZE_CONTENT);
@@ -389,7 +379,6 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_text_opa(item_text2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(item_text2, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        // item_image1
         lv_obj_t* item_image1 = lv_img_create(item_panel);
         lv_img_set_src(item_image1, &ui_img_menu_arrow_right32_png);
         lv_obj_set_width(item_image1, LV_SIZE_CONTENT);
@@ -402,7 +391,6 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_img_recolor(item_image1, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_img_recolor_opa(item_image1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        // item_image2
         lv_obj_t* item_image2 = lv_img_create(item_panel);
         lv_img_set_src(item_image2, &ui_img_menu_arrow_left32_png);
         lv_obj_set_width(item_image2, LV_SIZE_CONTENT);
@@ -415,7 +403,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_img_recolor(item_image2, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_img_recolor_opa(item_image2, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
-    LastFocused = NULL;
+    LastFocused = nullptr;
     lv_group_focus_obj(lv_obj_get_child(SettingPanelLayout, 1));
 }
 
@@ -426,19 +414,18 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
     uint8_t ItemNum = Setting->GetItemNum();
     const char** text = Setting->GetStrArray();
 
-    SubSettingPanel = lv_obj_create(SettingPanel);
-    lv_obj_set_size(SubSettingPanel, 1280, 720);
-    lv_obj_clear_flag(SubSettingPanel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(SubSettingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(SubSettingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    SubPanel = lv_obj_create(MainPanel);
+    lv_obj_set_size(SubPanel, 1280, 720);
+    lv_obj_clear_flag(SubPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(SubPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(SubPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     if (BgTransp)
-        lv_obj_set_style_bg_opa(SubSettingPanel, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(SubPanel, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     else
-        lv_obj_set_style_bg_opa(SubSettingPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(SubSettingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(SubPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(SubPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    // SettingPanelLayout
-    lv_obj_t* SettingPanelLayout = lv_obj_create(SubSettingPanel);
+    lv_obj_t* SettingPanelLayout = lv_obj_create(SubPanel);
     lv_obj_set_width(SettingPanelLayout, 600);
     lv_obj_set_height(SettingPanelLayout, 70 * (ItemNum + 1));
     lv_obj_set_x(SettingPanelLayout, 0);
@@ -471,8 +458,8 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    SettingGroup = create_new_group(SettingGroup);
-    set_group_activity(SettingGroup);
+    MainGroup = create_new_group(MainGroup);
+    set_group_activity(MainGroup);
     for(int i = 0; i < ItemNum; ++i) {
         // item_panel
         lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
@@ -488,9 +475,9 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_border_side(item_panel, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_color(item_panel, lv_color_hex(0xEF16E9), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(item_panel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_group_add_obj(SettingGroup, item_panel);
+        lv_group_add_obj(MainGroup, item_panel);
         lv_obj_add_event_cb(item_panel, setting_item_key_event_handler, LV_EVENT_KEY, NULL);
-        lv_group_set_focus_cb(SettingGroup, focused_handler);
+        lv_group_set_focus_cb(MainGroup, focused_handler);
 
         // item_text1
         lv_obj_t* item_text1 = lv_label_create(item_panel);
@@ -530,6 +517,6 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
         lv_obj_clear_state(slider, LV_STATE_FOCUS_KEY);
     }
     SubLastFocused = LastFocused;
-    LastFocused = NULL;
+    LastFocused = nullptr;
     lv_group_focus_obj(lv_obj_get_child(SettingPanelLayout, 1));
 }

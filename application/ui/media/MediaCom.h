@@ -10,7 +10,7 @@
 #ifndef __MEDIA_COM_H__
 #define __MEDIA_COM_H__
 
-#include "application/ui/resource/ui.h"
+#include "application/ui/ui_com.h"
 #include "media_list.h"
 #include "MediaFile.h"
 #ifdef HCCHIP_GCC
@@ -58,7 +58,7 @@ typedef media_handle_t MediaHandle;
 
 extern char current_path[];
 extern int current_path_size;
-extern void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group);
+extern void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl);
 extern void MediaComDeinit(void);
 extern MediaList* CreateMediaList(MediaType media_type);
 extern bool MediaListIsEmpty(MediaType media_type);

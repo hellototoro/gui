@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 09:05:53
+ * @LastEditTime: 2022-08-17 22:56:03
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -23,10 +23,8 @@
 #include "hcapi/com_api.h"
 #include "hcapi/os_api.h"
 #endif
-#include "application/ui/ui_com.h"
 #include "application/ui/Volume.h"
 #include "application/key_map.h"
-#include "lv_i18n/src/lv_i18n.h"
 
 char current_path[100];
 int current_path_size = sizeof(current_path);
@@ -47,8 +45,7 @@ int current_playing_index;
 bool PlayingAnimation_Flag;
 pthread_t MediaMonitorTask_Id;
 
-lv_group_t* Old_Group;
-lv_group_t* Player_Group;
+static lv_group_t* MainGroup;
 lv_timer_t* PlayBar_Timer;
 lv_timer_t* PlayState_Timer;
 
@@ -73,37 +70,30 @@ MediaList* GetMediaList(MediaType media_type);
 DLNode * GetNextMediaNode(MediaList* list, PlayListMode mode);
 DLNode * GetPreMediaNode(MediaList* list, PlayListMode mode);
 /************动画*************/
-static void anim_callback_set_y(lv_anim_t * a, int32_t v);
-static int32_t anim_callback_get_y(lv_anim_t * a);
 static void ShowUpAnimation(lv_obj_t * TargetObject, int delay);
 static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
 static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_number);
 static void ShowOffPlayList(void);
 static void SetTotalTimeAndProgress(uint32_t total_time);
 
-void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl, lv_group_t* old_group)
+void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl)
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
     CurrentPlayMode = RandPlay;
     CurrentMediaScreen = MediaScreen;
-    #ifdef HCCHIP_GCC
-    //MediaMonitorInit(current_media_hdl);
-    #endif
     srand(time(0));
     PlayingAnimation_Flag = false;
 
     //设置组
-    Old_Group = old_group;
-    Player_Group = lv_group_create();
-    set_group_activity(Player_Group);
+    MainGroup = create_new_group(get_activity_group());
+    set_group_activity(MainGroup);
 }
 
 void MediaComDeinit(void)
 {
     //step3 恢复默认组
-    set_group_activity(Old_Group);
-    lv_group_del(Player_Group);
+    delete_group(MainGroup);
 
     //step4 清除定时器
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO)
@@ -644,7 +634,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         lv_obj_set_style_bg_img_recolor(ctrl_bar, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_img_recolor_opa(ctrl_bar, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        lv_group_add_obj(Player_Group, ctrl_bar);
+        lv_group_add_obj(MainGroup, ctrl_bar);
         lv_obj_add_event_cb(ctrl_bar, key_event_handler, LV_EVENT_ALL, NULL);
     }
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -737,8 +727,8 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_style_border_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //设置组
-    Player_Group = create_new_group(Player_Group);
-    set_group_activity(Player_Group);
+    MainGroup = create_new_group(MainGroup);
+    set_group_activity(MainGroup);
     for(int i = 0; i < file_number; i++) {
         // file_panel
         lv_obj_t* file_panel = lv_obj_create(FileListPanel);
@@ -757,7 +747,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_style_bg_color(file_panel, lv_color_hex(0xA5CAC3), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_bg_opa(file_panel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_opa(file_panel, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_group_add_obj(Player_Group, file_panel);
+        lv_group_add_obj(MainGroup, file_panel);
         lv_obj_add_event_cb(file_panel, play_list_event_handler, LV_EVENT_KEY, NULL);
 
         // file_name
@@ -797,19 +787,9 @@ static void ShowOffPlayList(void)
 }
 
 /************动画*************/
-static void anim_callback_set_y(lv_anim_t * a, int32_t v)
-{
-    lv_obj_set_y((lv_obj_t *)a->user_data, v);
-}
-
-static int32_t anim_callback_get_y(lv_anim_t * a)
-{
-    return lv_obj_get_y_aligned((lv_obj_t *)a->user_data);
-}
-
 static void anim_callback_delete_obj(struct _lv_anim_t *a)
 {
-    Player_Group = delete_group(Player_Group);
+    MainGroup = delete_group(MainGroup);
     lv_obj_del_async((lv_obj_t *)a->user_data);
     PlayingAnimation_Flag = false;
 }

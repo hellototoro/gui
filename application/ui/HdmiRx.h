@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-21 20:34:50
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 21:43:15
+ * @LastEditTime: 2022-08-16 22:21:34
  * @FilePath: /gui/application/ui/HdmiRx.h
  * @Description: None
  * @other: None
@@ -10,7 +10,7 @@
 #ifndef __UI_HDMI_RX_H__
 #define __UI_HDMI_RX_H__
 
-#include "application/ui/resource/ui.h"
+#include "application/ui/ui_com.h"
 
 #ifdef __cplusplus
 extern "C" {

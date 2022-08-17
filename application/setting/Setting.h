@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:25:49
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-04 19:17:00
+ * @LastEditTime: 2022-08-15 14:14:46
  * @FilePath: /gui/application/setting/Setting.h
  * @Description: None
  * @other: None
@@ -13,6 +13,7 @@
 #include "Picture.h"
 #include "Sound.h"
 #include "System.h"
+#include "NetWork.h"
 
 namespace Setting {
 

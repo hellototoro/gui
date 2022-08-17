@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-15 01:06:42
+ * @LastEditTime: 2022-08-17 21:38:58
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -12,8 +12,6 @@
 #include "application/ConfigParam.h"
 #include "application/ui/LanguageScreen.h"
 #include "application/ui/ui_com.h"
-
-extern lv_obj_t* SettingPanel;
 
 namespace Setting {
 
@@ -48,9 +46,12 @@ void System::SelectedValue(int index)
     switch (index)
     {
     case static_cast<int>(Setting_SystemRestoreFactory):
-        WriteConfigFile_I("guide_flag.flag", 1);//test
-        WriteConfigFile_S("default_language.language", "en-GB");
-        break;
+    {
+        CreateMsgBox(lv_scr_act(), "Are you sure!");
+        //WriteConfigFile_I("guide_flag.flag", 1);//test
+        //WriteConfigFile_S("default_language.language", "en-GB");
+    }
+    break;
 
     default:
         break;

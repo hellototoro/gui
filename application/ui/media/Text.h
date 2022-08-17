@@ -10,13 +10,13 @@
 #ifndef __TEXT_H__
 #define __TEXT_H__
 
-#include "application/ui/resource/ui.h"
+#include "application/ui/ui_com.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern lv_obj_t* creat_text_window(lv_obj_t* foucsed_obj);
+extern lv_obj_t* creat_text_window(char* file_name);
 extern void LoadText(char* file_name);
 extern void RefreshText(const char* text);
 

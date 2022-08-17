@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-21 20:34:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 21:44:21
+ * @LastEditTime: 2022-08-17 22:33:34
  * @FilePath: /gui/application/ui/HdmiRx.c
  * @Description: None
  * @other: None
@@ -105,22 +105,6 @@ static enum TVSYS tv_sys_720p = TVSYS_720P_60;
 static struct mediaplayer g_mp;
 #endif
 
-void anim_callback_set_x(lv_anim_t * a, int32_t v)
-{
-    lv_obj_set_x((lv_obj_t *)a->user_data, v);
-}
-int32_t anim_callback_get_x(lv_anim_t * a)
-{
-    return lv_obj_get_x_aligned((lv_obj_t *)a->user_data);
-}
-void anim_callback_set_y(lv_anim_t * a, int32_t v)
-{
-    lv_obj_set_y((lv_obj_t *)a->user_data, v);
-}
-int32_t anim_callback_get_y(lv_anim_t * a)
-{
-    return lv_obj_get_y_aligned((lv_obj_t *)a->user_data);
-}
 
 void AutoMoving_Animation(lv_obj_t * TargetObject, int delay)
 {
@@ -161,7 +145,6 @@ void CreateHdmiRxScreen(void)
     #endif
     return;
 
-    //lv_obj_set_size(ui_SettingScreen, 1280, 720);
     lv_obj_clear_flag(HdmiRxScreen, LV_OBJ_FLAG_SCROLLABLE);
     //lv_obj_set_style_radius(HdmiRxScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(HdmiRxScreen, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);

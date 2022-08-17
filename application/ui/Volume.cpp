@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-14 12:49:52
+ * @LastEditTime: 2022-08-17 22:36:18
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
@@ -23,8 +23,6 @@ uint8_t Volume;
 
 static void CreateVolumePanel(lv_obj_t* parent);
 static void VolumeTimer_cb(lv_timer_t * timer);
-static int32_t anim_callback_get_opacity(lv_anim_t * a);
-static void anim_callback_set_opacity(lv_anim_t * a, int32_t v);
 static void fade_up_Animation(lv_obj_t * TargetObject, int delay);
 static void fade_down_Animation(lv_obj_t * TargetObject, int delay);
 static void anim_callback_delete_obj(struct _lv_anim_t *a);
@@ -112,16 +110,6 @@ static void VolumeTimer_cb(lv_timer_t * timer)
     fade_down_Animation(VolumePanel, 300);
     PlayingFadeDownAnimation_Flag = true;
     lv_timer_del(VolumeTimer);
-}
-
-static int32_t anim_callback_get_opacity(lv_anim_t * a)
-{
-    return lv_obj_get_style_opa((lv_obj_t *)a->user_data, 0);
-}
-
-static void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
-{
-    lv_obj_set_style_opa((lv_obj_t *)a->user_data, v, 0);
 }
 
 static void fade_up_Animation(lv_obj_t * TargetObject, int delay)

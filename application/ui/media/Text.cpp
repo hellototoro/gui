@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:14:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-21 13:07:22
+ * @LastEditTime: 2022-08-17 23:39:26
  * @FilePath: /gui/application/ui/media/Text.cpp
  * @Description: None
  * @other: None
@@ -16,7 +16,6 @@
 #include "Text.h"
 #include "MediaFile.h"
 #include "MediaCom.h"
-#include "application/ui/ui_com.h"
 
 lv_obj_t* TextScreen;
 lv_obj_t* TextPanel;
@@ -34,22 +33,15 @@ static void SetStyleForPlayBar(lv_obj_t* bar);
 static void CreateTextPanel(lv_obj_t* parent);
 void LoadText_t(char* file_name);
 
-lv_obj_t* creat_text_window(lv_obj_t* foucsed_obj)
+lv_obj_t* creat_text_window(char* file_name)
 {
-    lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
-    Text_Group = create_new_group(old_group);
+    Text_Group = create_new_group(get_activity_group());
     set_group_activity(Text_Group);
 
     TextBuff = new std::vector<std::string>;
-    LoadText(((FileStr *)(foucsed_obj->user_data))->name);
+    LoadText(file_name);
 
     CreateTextScreen(lv_scr_act());
-    
-    //lv_obj_t* MusicName = lv_label_create(TextPanel);
-    //RefreshText(nullptr);
-    //lv_label_set_text(MusicName, buff.c_str());
-    //lv_textarea_set_text(TextPanel, buff.c_str());
-    //SetStyleForPlayBar(CreatePlayBar(TextScreen));
     return TextScreen;
 }
 

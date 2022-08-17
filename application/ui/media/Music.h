@@ -10,7 +10,7 @@
 #ifndef __MUSIC_H__
 #define __MUSIC_H__
 
-#include "application/ui/resource/ui.h"
+#include "application/ui/ui_com.h"
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
@@ -23,7 +23,7 @@ extern "C" {
 extern media_handle_t *MusicHandler;
 #endif
 
-extern lv_obj_t* creat_music_window(lv_obj_t* foucsed_obj);
+extern lv_obj_t* creat_music_window(char* file_name);
 extern void close_music_window(lv_obj_t* music_window);
 extern void SetCurrentMusicTitle(char* file_name);
 extern void SetCurrentMusicCover(const lv_img_dsc_t* cover);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:45
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-09 13:33:29
+ * @LastEditTime: 2022-08-17 08:56:38
  * @FilePath: /gui/application/windows.h
  * @Description: None
  * @other: None
@@ -40,7 +40,6 @@ typedef struct window
 
 extern ActiveScreen CurrentScreen;
 extern ActiveScreen DefaultScreen;
-extern window *CurrentWindow;
 extern window *Windows[];
 
 extern void WindowsManager(void);

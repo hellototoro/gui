@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:09:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-15 00:32:54
+ * @LastEditTime: 2022-08-16 22:23:29
  * @FilePath: /gui/application/setting/System.h
  * @Description: None
  * @other: None
@@ -12,7 +12,6 @@
 
 #include <stdint.h>
 #include "Base.h"
-#include "lv_i18n/src/lv_i18n.h"
 
 namespace Setting {
 

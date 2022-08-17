@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 09:01:56
+ * @LastEditTime: 2022-08-17 23:35:34
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -19,7 +19,7 @@ lv_obj_t* PreScreen;
 static void event_handler(lv_event_t* event);
 static void SetStyleForPlayBar(lv_obj_t* bar);
 
-lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
+lv_obj_t* creat_video_window(char* file_name)
 {
     PreScreen = lv_scr_act();
     #ifdef HOST_GCC
@@ -35,10 +35,9 @@ lv_obj_t* creat_video_window(lv_obj_t* foucsed_obj)
     lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
     lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_group_t* old_group = (lv_group_t*)lv_obj_get_group(foucsed_obj);
-    MediaComInit(VideoScreen, MEDIA_VIDEO, VideoHandler, old_group);
+    MediaComInit(VideoScreen, MEDIA_VIDEO, VideoHandler);
     CreateMediaArray(MEDIA_VIDEO);
-    LocateMediaIndex(MEDIA_VIDEO, ((FileStr *)(foucsed_obj->user_data))->name);
+    LocateMediaIndex(MEDIA_VIDEO, file_name);
     PlayMedia(VideoHandler, GetCurrentMediaName());
 
     SetStyleForPlayBar(CreatePlayBar(VideoScreen));

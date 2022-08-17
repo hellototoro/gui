@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-15 01:29:21
+ * @LastEditTime: 2022-08-17 23:29:21
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -11,20 +11,18 @@
 #include <stdio.h>
 #include "HomeScreen.h"
 #include "application/windows.h"
-#include "ui_com.h"
 #include "Volume.h"
 #include "application/key_map.h"
 #include "SettingScreen.h"
 #include "HdmiRx.h"
-#include "lv_i18n/src/lv_i18n.h"
 
-lv_obj_t* ui_HomeScreen;
-lv_obj_t* ui_Main_Panel;
-lv_obj_t* ui_Source_Panel;
-lv_obj_t* ui_IMG_SourceType;
-lv_obj_t* ui_LAB_SourceType;
-lv_group_t* HomeScreenGroup;
-int LastFocusedObjIndex;
+static lv_obj_t* HomeRootScreen;
+static lv_obj_t* MainPanel;
+static lv_obj_t* SourcePanel;
+static lv_obj_t* SourceTypeImg;
+static lv_obj_t* SourceTypeLab;
+static lv_group_t* MainGroup;
+static int LastFocusedObjIndex;
 
 enum CategoryList {
     UDisk,
@@ -47,154 +45,9 @@ static const lv_img_dsc_t* source_img_src[] = {
     &ui_img_hdmi_big_png
 };
 
-static void event_handler(lv_event_t* event);
+static void CreateMainPanel(lv_obj_t* parent);
+static void CreateSourcePanel(lv_obj_t* parent);
 static void ExitHome(ActiveScreen screen);
-static void source_event_handler(lv_event_t* event);
-
-static void CreateMainPanel(lv_obj_t* parent)
-{
-    static const lv_coord_t img_area[CategoryNumber][4] = {//{ x, y, w, h}
-        { -226, -82, 430, 231},
-        {  118, -82, 200, 231},
-        {  345,   0, 200, 395},
-        { -342, 130, 200, 135},
-        { -110, 130, 200, 135},
-        {  118, 130, 200, 135}
-    };
-    static const lv_coord_t lab_area[CategoryNumber][2] = {//{ x, y}
-        { -124,  -60},
-        {    0,  -60},
-        {    0, -142},
-        {    0,  -38},
-        {    0,  -38},
-        {   -8,  -38}
-    };
-    static const char* str[6] = {//盘设置信号源苹果安卓无线投屏西班牙德英意大利法语简体中文
-    "main_p_u_disk", "main_setting", "main_source", "main_ios", "main_android", "main_dlna" };
-
-    static const lv_img_dsc_t* image_src[] = {
-        & ui_img_udisk_n_png,
-        & ui_img_setting_n_png,
-        & ui_img_source_n_png,
-        & ui_img_ios_cast_n_png,
-        & ui_img_android_cast_n_png,
-        & ui_img_dlna_cast_n_png
-    };
-
-    // ui_Main_Panel
-    ui_Main_Panel = lv_obj_create(parent);
-    lv_obj_set_size(ui_Main_Panel, 1085, 650);
-    lv_obj_set_pos(ui_Main_Panel, 0, 0);
-    lv_obj_set_align(ui_Main_Panel, LV_ALIGN_CENTER);
-    lv_obj_set_style_bg_opa(ui_Main_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_Main_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    HomeScreenGroup = lv_group_create();
-    set_group_activity(HomeScreenGroup);
-    for (int i = 0; i < CategoryNumber; i++) {
-        lv_obj_t* ui_btn = lv_obj_create(ui_Main_Panel);
-        lv_obj_set_size(ui_btn, img_area[i][2], img_area[i][3]);
-        lv_obj_set_pos(ui_btn, img_area[i][0], img_area[i][1]);
-        lv_obj_set_align(ui_btn, LV_ALIGN_CENTER);
-        lv_obj_set_style_radius(ui_btn, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_bg_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_border_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_shadow_opa(ui_btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_bg_img_src(ui_btn, image_src[i], LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_border_color(ui_btn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_opa(ui_btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_border_width(ui_btn, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_group_add_obj(HomeScreenGroup, ui_btn);
-        lv_obj_add_event_cb(ui_btn, event_handler, LV_EVENT_KEY, NULL);
-
-        lv_obj_t* ui_lab = lv_label_create(ui_btn);
-        lv_obj_set_size(ui_lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-        lv_obj_set_pos(ui_lab, lab_area[i][0], lab_area[i][1]);
-        lv_obj_set_align(ui_lab, LV_ALIGN_CENTER);
-        ui_lab->user_data = (void*)str[i];
-        lv_label_set_text(ui_lab, _(str[i]));
-        lv_obj_set_style_text_color(ui_lab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(ui_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
-    lv_group_focus_obj(lv_obj_get_child(ui_Main_Panel, LastFocusedObjIndex));
-
-    /*lv_obj_t* img = lv_img_create(parent);
-    lv_img_set_src(img, LV_SYMBOL_DOWNLOAD);
-    //lv_img_set_zoom(img,1024);
-    //lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(img, -600, -300);
-    lv_obj_set_align(img, LV_ALIGN_CENTER);
-    lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_text_font(img, &lv_font_montserrat_48, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_color(img, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);*/
-}
-
-static void CreateSourcePanel(lv_obj_t* parent)
-{
-    ui_Source_Panel = lv_obj_create(parent);
-    lv_obj_set_size(ui_Source_Panel, 1280, 720);
-    lv_obj_clear_flag(ui_Source_Panel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(ui_Source_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(ui_Source_Panel, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_Source_Panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_Source_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    HomeScreenGroup = create_new_group(HomeScreenGroup);
-    set_group_activity(HomeScreenGroup);
-    // ui_BTN_Source_USB
-    lv_obj_t* ui_BTN_Source_USB = lv_btn_create(ui_Source_Panel);
-    lv_obj_set_size(ui_BTN_Source_USB, 113, 107);
-    lv_obj_set_pos(ui_BTN_Source_USB, -87, 160);
-    lv_obj_set_align(ui_BTN_Source_USB, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_BTN_Source_USB, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(ui_BTN_Source_USB, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BTN_Source_USB, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_BTN_Source_USB, &ui_img_usb2_n_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_BTN_Source_USB, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_BTN_Source_USB, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_BTN_Source_USB, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_obj_set_style_border_opa(ui_BTN_Source_USB, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_obj_set_style_border_width(ui_BTN_Source_USB, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_group_add_obj(HomeScreenGroup, ui_BTN_Source_USB);
-    lv_obj_add_event_cb(ui_BTN_Source_USB, source_event_handler, LV_EVENT_KEY, NULL);
-
-    // ui_BTN_Source_HDMI
-    lv_obj_t* ui_BTN_Source_HDMI = lv_btn_create(ui_Source_Panel);
-    lv_obj_set_size(ui_BTN_Source_HDMI, 113, 107);
-    lv_obj_set_pos(ui_BTN_Source_HDMI, 87, 160);
-    lv_obj_set_align(ui_BTN_Source_HDMI, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_BTN_Source_HDMI, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(ui_BTN_Source_HDMI, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_BTN_Source_HDMI, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_img_src(ui_BTN_Source_HDMI, &ui_img_hdmi_n_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_BTN_Source_HDMI, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_shadow_opa(ui_BTN_Source_HDMI, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_BTN_Source_HDMI, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_obj_set_style_border_opa(ui_BTN_Source_HDMI, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_obj_set_style_border_width(ui_BTN_Source_HDMI, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_group_add_obj(HomeScreenGroup, ui_BTN_Source_HDMI);
-    lv_obj_add_event_cb(ui_BTN_Source_HDMI, source_event_handler, LV_EVENT_KEY, NULL);
-
-    // ui_IMG_SourceType
-    ui_IMG_SourceType = lv_img_create(ui_Source_Panel);
-    lv_img_set_src(ui_IMG_SourceType, &ui_img_usb2_big_png);
-    lv_obj_set_size(ui_IMG_SourceType, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(ui_IMG_SourceType, 0, -80);
-    lv_obj_set_align(ui_IMG_SourceType, LV_ALIGN_CENTER);
-    lv_obj_add_flag(ui_IMG_SourceType, LV_OBJ_FLAG_ADV_HITTEST);
-    lv_obj_clear_flag(ui_IMG_SourceType, LV_OBJ_FLAG_SCROLLABLE);
-    // ui_LAB_SourceType
-    ui_LAB_SourceType = lv_label_create(ui_IMG_SourceType);
-    lv_obj_set_size(ui_LAB_SourceType, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(ui_LAB_SourceType, 0, 84);
-    lv_obj_set_align(ui_LAB_SourceType, LV_ALIGN_CENTER);
-    ui_LAB_SourceType->user_data = "source_p_u_disk";
-    lv_label_set_text(ui_LAB_SourceType, _(ui_LAB_SourceType->user_data));
-    lv_obj_set_style_text_color(ui_LAB_SourceType, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_LAB_SourceType, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LAB_SourceType, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
-}
 
 static void event_handler(lv_event_t* event)
 {
@@ -246,11 +99,11 @@ static void event_handler(lv_event_t* event)
                 ExitHome(MediaScreen);
                 break;
             case Setting:
-                CreateSettingScreen(ui_HomeScreen, HomeScreenGroup);
+                CreateSettingScreen(HomeRootScreen);
                 //ExitHome(SettingScreen);
                 break;
             case Source:
-                CreateSourcePanel(ui_HomeScreen);
+                CreateSourcePanel(HomeRootScreen);
                 break;
             default:
                 break;
@@ -295,25 +148,154 @@ static void source_event_handler(lv_event_t* event)
         lv_group_focus_next(group);
         break;
     case LV_KEY_ESC:
-        HomeScreenGroup = delete_group(HomeScreenGroup);
-        lv_obj_del_async(ui_Source_Panel);
+        MainGroup = delete_group(MainGroup);
+        lv_obj_del_async(SourcePanel);
         return;
     default:
         break;
     }
-    //lv_img_set_src(ui_IMG_SourceType, source_img_src[lv_obj_get_index(target)]);
     int index = lv_obj_get_index(lv_group_get_focused(group));
-    lv_img_set_src(ui_IMG_SourceType, source_img_src[index]);
+    lv_img_set_src(SourceTypeImg, source_img_src[index]);
     if(index == 0)
-        ui_LAB_SourceType->user_data = (void*)"source_p_u_disk";
+        SourceTypeLab->user_data = (void*)"source_p_u_disk";
     else if(index == 1)
-        ui_LAB_SourceType->user_data = (void*)"source_p_hdim";
-    lv_label_set_text(ui_LAB_SourceType, _(ui_LAB_SourceType->user_data));
+        SourceTypeLab->user_data = (void*)"source_p_hdim";
+    lv_label_set_text(SourceTypeLab, _(SourceTypeLab->user_data));
+}
+
+static void CreateMainPanel(lv_obj_t* parent)
+{
+    static const lv_coord_t img_area[CategoryNumber][4] = {//{ x, y, w, h}
+        { -226, -82, 430, 231},
+        {  118, -82, 200, 231},
+        {  345,   0, 200, 395},
+        { -342, 130, 200, 135},
+        { -110, 130, 200, 135},
+        {  118, 130, 200, 135} };
+    static const lv_coord_t lab_area[CategoryNumber][2] = {//{ x, y}
+        { -124,  -60},
+        {    0,  -60},
+        {    0, -142},
+        {    0,  -38},
+        {    0,  -38},
+        {   -8,  -38} };
+    static const char* str[6] = {
+        "main_p_u_disk", "main_setting", "main_source", 
+        "main_ios", "main_android", "main_dlna" };
+    static const lv_img_dsc_t* image_src[] = {
+        & ui_img_udisk_n_png,
+        & ui_img_setting_n_png,
+        & ui_img_source_n_png,
+        & ui_img_ios_cast_n_png,
+        & ui_img_android_cast_n_png,
+        & ui_img_dlna_cast_n_png };
+
+    MainPanel = lv_obj_create(parent);
+    lv_obj_set_size(MainPanel, 1085, 650);
+    lv_obj_set_pos(MainPanel, 0, 0);
+    lv_obj_set_align(MainPanel, LV_ALIGN_CENTER);
+    lv_obj_set_style_bg_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    MainGroup = create_new_group(NULL);
+    set_group_activity(MainGroup);
+    for (int i = 0; i < CategoryNumber; i++) {
+        lv_obj_t* lv_obj = lv_obj_create(MainPanel);
+        lv_obj_set_size(lv_obj, img_area[i][2], img_area[i][3]);
+        lv_obj_set_pos(lv_obj, img_area[i][0], img_area[i][1]);
+        lv_obj_set_align(lv_obj, LV_ALIGN_CENTER);
+        lv_obj_set_style_radius(lv_obj, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(lv_obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_border_opa(lv_obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_shadow_opa(lv_obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_src(lv_obj, image_src[i], LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_border_color(lv_obj, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_opa(lv_obj, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_width(lv_obj, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_group_add_obj(MainGroup, lv_obj);
+        lv_obj_add_event_cb(lv_obj, event_handler, LV_EVENT_KEY, NULL);
+
+        lv_obj_t* lv_lab = lv_label_create(lv_obj);
+        lv_obj_set_size(lv_lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_pos(lv_lab, lab_area[i][0], lab_area[i][1]);
+        lv_obj_set_align(lv_lab, LV_ALIGN_CENTER);
+        lv_lab->user_data = (void*)str[i];
+        lv_label_set_text(lv_lab, _(str[i]));
+        lv_obj_set_style_text_color(lv_lab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(lv_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    lv_group_focus_obj(lv_obj_get_child(MainPanel, LastFocusedObjIndex));
+
+    //CreateMsgBox(MainPanel, "Are you sure!");//hj test
+}
+
+static void CreateSourcePanel(lv_obj_t* parent)
+{
+    SourcePanel = lv_obj_create(parent);
+    lv_obj_set_size(SourcePanel, 1280, 720);
+    lv_obj_clear_flag(SourcePanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(SourcePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(SourcePanel, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(SourcePanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(SourcePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    MainGroup = create_new_group(get_activity_group());
+    set_group_activity(MainGroup);
+
+    lv_obj_t* btn = lv_btn_create(SourcePanel);
+    lv_obj_set_size(btn, 113, 107);
+    lv_obj_set_pos(btn, -87, 160);
+    lv_obj_set_align(btn, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(btn, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(btn, &ui_img_usb2_n_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(btn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_set_style_border_opa(btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_set_style_border_width(btn, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_group_add_obj(MainGroup, btn);
+    lv_obj_add_event_cb(btn, source_event_handler, LV_EVENT_KEY, NULL);
+
+    btn = lv_btn_create(SourcePanel);
+    lv_obj_set_size(btn, 113, 107);
+    lv_obj_set_pos(btn, 87, 160);
+    lv_obj_set_align(btn, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(btn, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(btn, &ui_img_hdmi_n_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_shadow_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(btn, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_set_style_border_opa(btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_set_style_border_width(btn, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_group_add_obj(MainGroup, btn);
+    lv_obj_add_event_cb(btn, source_event_handler, LV_EVENT_KEY, NULL);
+
+    SourceTypeImg = lv_img_create(SourcePanel);
+    lv_img_set_src(SourceTypeImg, &ui_img_usb2_big_png);
+    lv_obj_set_size(SourceTypeImg, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(SourceTypeImg, 0, -80);
+    lv_obj_set_align(SourceTypeImg, LV_ALIGN_CENTER);
+    lv_obj_add_flag(SourceTypeImg, LV_OBJ_FLAG_ADV_HITTEST);
+    lv_obj_clear_flag(SourceTypeImg, LV_OBJ_FLAG_SCROLLABLE);
+
+    SourceTypeLab = lv_label_create(SourceTypeImg);
+    lv_obj_set_size(SourceTypeLab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(SourceTypeLab, 0, 84);
+    lv_obj_set_align(SourceTypeLab, LV_ALIGN_CENTER);
+    SourceTypeLab->user_data = "source_p_u_disk";
+    lv_label_set_text(SourceTypeLab, _(SourceTypeLab->user_data));
+    lv_obj_set_style_text_color(SourceTypeLab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(SourceTypeLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(SourceTypeLab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
 static void ExitHome(ActiveScreen screen)
 {
-    LastFocusedObjIndex = lv_obj_get_index(lv_group_get_focused(HomeScreenGroup));
+    LastFocusedObjIndex = lv_obj_get_index(lv_group_get_focused(MainGroup));
     CurrentScreen = screen;
 }
 
@@ -321,24 +303,24 @@ static void HomeInit(lv_obj_t* parent, void *param)
 {
     (void)param;
 
-    ui_HomeScreen = lv_obj_create(parent);
-    lv_obj_set_size(ui_HomeScreen, 1280, 720);
-    lv_obj_set_style_bg_color(ui_HomeScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_HomeScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    HomeRootScreen = lv_obj_create(parent);
+    lv_obj_set_size(HomeRootScreen, 1280, 720);
+    lv_obj_set_style_bg_color(HomeRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    CreateMainPanel(ui_HomeScreen);
+    CreateMainPanel(HomeRootScreen);
 }
 
 static void LoadHome(void)
 {
-    lv_disp_load_scr(ui_HomeScreen);
-    //lv_scr_load_anim(ui_HomeScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    lv_disp_load_scr(HomeRootScreen);
+    //lv_scr_load_anim(HomeRootScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
 static void HomeClose(void)
 {
-    lv_group_del(HomeScreenGroup);
-    lv_obj_del(ui_HomeScreen);
+    delete_group(MainGroup);
+    lv_obj_del(HomeRootScreen);
 }
 
 window HomeWindow = {

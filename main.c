@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-12 08:21:20
+ * @LastEditTime: 2022-08-17 20:44:54
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -16,19 +16,13 @@
 #include <pthread.h>
 #include <semaphore.h>
 #ifdef HCCHIP_GCC
-#include "hcapi/lvgl/lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
-#include "application/windows.h"
-#ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
 #include "hcapi/key.h"
 #include "hcapi/wifi_api.h"
 #endif
 #include "application/ui/ui_com.h"
+#include "application/windows.h"
 #include "application/SystemInit.h"
-#include "application/ui/HdmiRx.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
@@ -82,6 +76,7 @@ int main(int argc, char *argv[])
     #ifdef HOST_GCC
     sdl_init_2();
     #endif
+    group_init();
     get_keypad_indev();
 
     SystemInit();
