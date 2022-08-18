@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 22:56:03
+ * @LastEditTime: 2022-08-18 18:19:24
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -86,7 +86,7 @@ void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* medi
     PlayingAnimation_Flag = false;
 
     //设置组
-    MainGroup = create_new_group(get_activity_group());
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
 }
 
@@ -727,15 +727,13 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_style_border_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     //设置组
-    MainGroup = create_new_group(MainGroup);
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for(int i = 0; i < file_number; i++) {
         // file_panel
         lv_obj_t* file_panel = lv_obj_create(FileListPanel);
         lv_obj_set_width(file_panel, 1140);
         lv_obj_set_height(file_panel, 75);
-        //lv_obj_set_x(file_panel, 0);
-        //lv_obj_set_y(file_panel, -275 + i * 90);
         lv_obj_set_align(file_panel, LV_ALIGN_CENTER);
         lv_obj_clear_flag(file_panel, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(file_panel, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -758,18 +756,6 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_set_y(file_name, 0);
         lv_label_set_text(file_name, name_list[i]);
         lv_obj_set_style_text_font(file_name, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-        // file_info
-        /*lv_obj_t* file_info = lv_label_create(file_panel);
-        lv_obj_set_width(file_info, LV_SIZE_CONTENT);
-        lv_obj_set_height(file_info, LV_SIZE_CONTENT);
-        lv_obj_set_x(file_info, -10);
-        lv_obj_set_y(file_info, 20);
-        lv_obj_set_align(file_info, LV_ALIGN_BOTTOM_LEFT);
-        lv_label_set_text(file_info, "");
-        lv_obj_set_style_text_color(file_info, lv_color_hex(0x808080), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_opa(file_info, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(file_info, &ui_font_MyFont24, LV_PART_MAIN | LV_STATE_DEFAULT);*/
     }
     lv_group_focus_obj(lv_obj_get_child(FileListPanel, current_playing_index));
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:29:21
+ * @LastEditTime: 2022-08-18 23:14:23
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -197,7 +197,7 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MainGroup = create_new_group(NULL);
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for (int i = 0; i < CategoryNumber; i++) {
         lv_obj_t* lv_obj = lv_obj_create(MainPanel);
@@ -225,8 +225,6 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_obj_set_style_text_font(lv_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
     lv_group_focus_obj(lv_obj_get_child(MainPanel, LastFocusedObjIndex));
-
-    //CreateMsgBox(MainPanel, "Are you sure!");//hj test
 }
 
 static void CreateSourcePanel(lv_obj_t* parent)
@@ -239,7 +237,7 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(SourcePanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(SourcePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MainGroup = create_new_group(get_activity_group());
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
 
     lv_obj_t* btn = lv_btn_create(SourcePanel);
@@ -293,17 +291,9 @@ static void CreateSourcePanel(lv_obj_t* parent)
     lv_obj_set_style_text_font(SourceTypeLab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
-static void ExitHome(ActiveScreen screen)
+static void HomeInit(void)
 {
-    LastFocusedObjIndex = lv_obj_get_index(lv_group_get_focused(MainGroup));
-    CurrentScreen = screen;
-}
-
-static void HomeInit(lv_obj_t* parent, void *param)
-{
-    (void)param;
-
-    HomeRootScreen = lv_obj_create(parent);
+    HomeRootScreen = lv_obj_create(NULL);
     lv_obj_set_size(HomeRootScreen, 1280, 720);
     lv_obj_set_style_bg_color(HomeRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -313,18 +303,19 @@ static void HomeInit(lv_obj_t* parent, void *param)
 
 static void LoadHome(void)
 {
-    lv_disp_load_scr(HomeRootScreen);
+    lv_scr_load_anim(HomeRootScreen, LV_SCR_LOAD_ANIM_NONE, 0, 0, true);
     //lv_scr_load_anim(HomeRootScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
-static void HomeClose(void)
+static void ExitHome(ActiveScreen screen)
 {
-    delete_group(MainGroup);
-    lv_obj_del(HomeRootScreen);
+    LastFocusedObjIndex = lv_obj_get_index(lv_group_get_focused(MainGroup));
+    delete_all_group();
+    //lv_obj_del_async(HomeRootScreen);
+    CurrentScreen = screen;
 }
 
 window HomeWindow = {
     .ScreenInit = HomeInit,
     .ScreenLoad = LoadHome,
-    .ScreenClose = HomeClose
 };

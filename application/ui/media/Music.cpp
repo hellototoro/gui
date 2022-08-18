@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:37:36
+ * @LastEditTime: 2022-08-18 17:58:07
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -76,7 +76,6 @@ void close_music_window(lv_obj_t* music_window)
     //step2 清理播放列表
     DestroyMediaArray();
 
-    //step3 恢复默认组
     lv_group_del(MainGroup);
 
     MediaComDeinit();

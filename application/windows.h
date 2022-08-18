@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:45
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 08:56:38
+ * @LastEditTime: 2022-08-18 17:32:28
  * @FilePath: /gui/application/windows.h
  * @Description: None
  * @other: None
@@ -31,10 +31,8 @@ typedef enum  {
 
 typedef struct window
 {
-	void (*ScreenInit) (lv_obj_t* parent, void *param);
+	void (*ScreenInit) (void);
     void (*ScreenLoad) (void);
-    void (*ScreenClose) (void);
-    void *param;
 }window;
 
 

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:29:45
+ * @LastEditTime: 2022-08-18 23:14:42
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -33,7 +33,7 @@ static lv_obj_t* LangImage;
 static lv_group_t* MainGroup;
 
 static void event_handler(lv_event_t* event);
-static void ExitHome(ActiveScreen screen);
+static void ExitLanguage(ActiveScreen screen);
 
 void SaveCurrentLanguageType(int index)
 {
@@ -64,7 +64,7 @@ void event_handler(lv_event_t* event)
             if (index == English || index == Chinese) {
                 WriteConfigFile_I("guide_flag.flag", 0);
                 SaveCurrentLanguageType(index);
-                ExitHome(HomeScreen);
+                ExitLanguage(HomeScreen);
             }
             break;
         case LV_KEY_ESC:
@@ -106,7 +106,7 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_flex_flow(MainPanel, LV_FLEX_FLOW_COLUMN);
 
-    MainGroup = create_new_group(NULL);
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for (int i = 0; i < LanguageNumber; i++) {
         lv_obj_t* obj = lv_obj_create(MainPanel);
@@ -141,11 +141,9 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     lv_group_focus_obj(lv_obj_get_child(MainPanel, English));
 }
 
-static void LanguageInit(lv_obj_t* parent, void *param)
+static void LanguageInit(void)
 {
-    (void)param;
-
-    LanguageRootScreen = lv_obj_create(parent);
+    LanguageRootScreen = lv_obj_create(NULL);
     lv_obj_set_size(LanguageRootScreen, 1280, 720);
     lv_obj_set_style_bg_color(LanguageRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(LanguageRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -177,24 +175,20 @@ static void LanguageInit(lv_obj_t* parent, void *param)
     CreateLanguagePanel(LanguageRootScreen);
 }
 
-static void ExitHome(ActiveScreen screen)
-{
-    CurrentScreen = screen;
-}
-
-static void LanguageClose(void)
-{
-    delete_group(MainGroup);
-    lv_obj_del(LanguageRootScreen);
-}
-
 static void LoadLanguage(void)
 {
-    lv_disp_load_scr(LanguageRootScreen);
+    lv_scr_load_anim(LanguageRootScreen, LV_SCR_LOAD_ANIM_NONE, 0, 0, true);
+    //lv_scr_load_anim(LanguageRootScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+}
+
+static void ExitLanguage(ActiveScreen screen)
+{
+    delete_all_group();
+    //lv_obj_del(LanguageRootScreen);
+    CurrentScreen = screen;
 }
 
 window LanguageWindow = {
     .ScreenInit = LanguageInit,
     .ScreenLoad = LoadLanguage,
-    .ScreenClose = LanguageClose
 };

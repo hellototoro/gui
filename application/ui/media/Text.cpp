@@ -35,7 +35,7 @@ void LoadText_t(char* file_name);
 
 lv_obj_t* creat_text_window(char* file_name)
 {
-    Text_Group = create_new_group(get_activity_group());
+    Text_Group = create_new_group();
     set_group_activity(Text_Group);
 
     TextBuff = new std::vector<std::string>;

@@ -241,7 +241,7 @@ void CreateSettingScreen(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(SettingRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(SettingRootScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MainGroup = create_new_group(get_activity_group());
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for (int i = 0; i < CategoryNumber; i++) {
         lv_obj_t* img = lv_img_create(SettingRootScreen);
@@ -326,7 +326,7 @@ void CreateSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MainGroup = create_new_group(MainGroup);
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for(int i = 0; i < ItemNum; ++i) {
         lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
@@ -458,7 +458,7 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
     lv_obj_set_style_text_opa(title_text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(title_text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MainGroup = create_new_group(MainGroup);
+    MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for(int i = 0; i < ItemNum; ++i) {
         // item_panel

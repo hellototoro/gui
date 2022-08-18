@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:39:34
+ * @LastEditTime: 2022-08-18 23:14:00
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -42,7 +42,7 @@ typedef enum {
 
 static CategoryList FileFilter;
 
-lv_obj_t* ui_MediaScreen;
+static lv_obj_t* MediaRootScreen;
 lv_obj_t* ui_Category_Panel;
 lv_obj_t* ui_File_List_Panel;
 lv_obj_t* ui_LAB_Real_Path;
@@ -59,7 +59,7 @@ static void ReturnUpper(void);
 static void RefreshFileWithFile(CategoryList filter);
 static void return_handler(lv_event_t* event);
 static void FilterFile(CategoryList file_type);
-static void ExitMedia(void);
+static void ExitMedia(ActiveScreen screen);
 
 static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
 {
@@ -115,7 +115,7 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
     break;
     case LV_KEY_ESC:
         if(IsRootPath(current_path)) {
-            ExitMedia();
+            ExitMedia(HomeScreen);
         }
         else if (!lv_obj_is_valid(CurrentMediaWindow)) {
             ReturnUpper();
@@ -181,7 +181,7 @@ static void file_list_handler(lv_event_t* event)
                 {
                 case FILE_DIR:
                     FileListPanelStack.push(ui_File_List_Panel);
-                    CreateFilePanel(ui_MediaScreen);
+                    CreateFilePanel(MediaRootScreen);
                     set_group_activity(FileListGroup);
                     strcat(current_path, "/");
                     strcat(current_path, ((FileStr *)(target->user_data))->name);
@@ -305,7 +305,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    CategoryGroup = create_new_group(nullptr);
+    CategoryGroup = create_new_group();
     set_group_activity(CategoryGroup);
     for (int i = 0; i < CategoryNumber; i++) {
         lv_obj_t* ui_BTN = lv_btn_create(ui_Category_Panel);
@@ -479,31 +479,21 @@ static void CreateFilePanel(lv_obj_t* parent)
     lv_obj_set_style_border_opa(ui_File_List_Panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(ui_File_List_Panel, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    FileListGroup = create_new_group(FileListGroup);
+    FileListGroup = create_new_group();
     lv_group_add_obj(FileListGroup, ui_File_List_Panel);
 }
 
-static void ExitMedia(void)
+static void MediaInit(void)
 {
-    DestroyAllMediaList();
-    MediaFileDeInit();
-    memset(current_path, 0, current_path_size );
-    CurrentScreen = HomeScreen;
-}
+    MediaRootScreen = lv_obj_create(nullptr);
+    lv_obj_set_size(MediaRootScreen, 1280, 720);
+    lv_obj_clear_flag(MediaRootScreen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(MediaRootScreen, lv_color_hex(0x0C9D89), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(MediaRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(MediaRootScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(MediaRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-static void MediaInit(lv_obj_t* parent, void *param)
-{
-    (void)param;
-
-    ui_MediaScreen = lv_obj_create(parent);
-    lv_obj_set_size(ui_MediaScreen, 1280, 720);
-    lv_obj_clear_flag(ui_MediaScreen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(ui_MediaScreen, lv_color_hex(0x0C9D89), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_MediaScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_MediaScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_MediaScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_t* ui_LAB_Path = lv_label_create(ui_MediaScreen);
+    lv_obj_t* ui_LAB_Path = lv_label_create(MediaRootScreen);
     lv_obj_set_size(ui_LAB_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(ui_LAB_Path, -336, -300);
     lv_obj_set_align(ui_LAB_Path, LV_ALIGN_CENTER);
@@ -513,7 +503,7 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_obj_set_style_text_opa(ui_LAB_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LAB_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LAB_Real_Path = lv_label_create(ui_MediaScreen);
+    ui_LAB_Real_Path = lv_label_create(MediaRootScreen);
     lv_obj_set_size(ui_LAB_Real_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(ui_LAB_Real_Path, 360, -300);
     lv_obj_set_align(ui_LAB_Real_Path, LV_ALIGN_LEFT_MID);
@@ -523,8 +513,8 @@ static void MediaInit(lv_obj_t* parent, void *param)
     lv_obj_set_style_text_align(ui_LAB_Real_Path, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    CreateCategoryPanel(ui_MediaScreen);
-    CreateFilePanel(ui_MediaScreen);
+    CreateCategoryPanel(MediaRootScreen);
+    CreateFilePanel(MediaRootScreen);
     MediaFileInit();
     strcat(current_path, media_dir);
     ShowFileList(GetFileList(current_path));
@@ -532,25 +522,25 @@ static void MediaInit(lv_obj_t* parent, void *param)
 
 static void LoadMedia(void)
 {
-    lv_disp_load_scr(ui_MediaScreen);
-    //lv_scr_load_anim(ui_MediaScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+    lv_scr_load_anim(MediaRootScreen, LV_SCR_LOAD_ANIM_NONE, 0, 0, true);
+    //lv_scr_load_anim(MediaRootScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
 }
 
-static void MediaClose(void)
+static void ExitMedia(ActiveScreen screen)
 {
+    DestroyAllMediaList();
+    MediaFileDeInit();
+    memset(current_path, 0, current_path_size );
     if (!FileListPanelStack.empty()) {
         FileListGroup = delete_group(FileListGroup);
         FileListPanelStack.pop();
     }
-    delete_group(FileListGroup);
-    delete_group(CategoryGroup);
-    //lv_group_del(CategoryGroup);
-    //lv_group_del(FileListGroup);
-    lv_obj_del(ui_MediaScreen);
+    delete_all_group();
+    //lv_obj_del(MediaRootScreen);
+    CurrentScreen = screen;
 }
 
 window MediaWindow = {
     .ScreenInit = MediaInit,
     .ScreenLoad = LoadMedia,
-    .ScreenClose = MediaClose
 };

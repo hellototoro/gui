@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-04 19:12:38
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-14 22:56:33
+ * @LastEditTime: 2022-08-18 17:34:30
  * @FilePath: /gui/application/SystemInit.cpp
  * @Description: None
  * @other: None
@@ -31,4 +31,5 @@ void SystemInit(void)
         lv_i18n_init(lv_i18n_language_pack);
         lv_i18n_set_locale(DefaultLanguage);
     }
+    CurrentScreen = DefaultScreen;
 }

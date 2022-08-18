@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:58
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 08:57:08
+ * @LastEditTime: 2022-08-18 18:21:35
  * @FilePath: /gui/application/windows.c
  * @Description: None
  * @other: None
@@ -30,10 +30,8 @@ void WindowsManager(void)
     CurrentWindow = Windows[CurrentScreen];
     if (LastWindow != CurrentWindow) {
         if(CurrentWindow) {
-            CurrentWindow->ScreenInit(NULL, NULL);
+            CurrentWindow->ScreenInit();
             CurrentWindow->ScreenLoad();
-            if(LastWindow)
-                LastWindow->ScreenClose();
         }
         LastWindow = CurrentWindow;
     }

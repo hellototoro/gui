@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 20:44:54
+ * @LastEditTime: 2022-08-18 23:07:58
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -80,7 +80,6 @@ int main(int argc, char *argv[])
     get_keypad_indev();
 
     SystemInit();
-    CurrentScreen = DefaultScreen;
     while(1) {
         WindowsManager();
         pthread_mutex_lock(&lvgl_task_mutex);
