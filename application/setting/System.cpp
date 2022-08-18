@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 21:38:58
+ * @LastEditTime: 2022-08-18 10:55:20
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -47,9 +47,10 @@ void System::SelectedValue(int index)
     {
     case static_cast<int>(Setting_SystemRestoreFactory):
     {
-        CreateMsgBox(lv_scr_act(), "Are you sure!");
-        //WriteConfigFile_I("guide_flag.flag", 1);//test
-        //WriteConfigFile_S("default_language.language", "en-GB");
+        CreateMsgBox(lv_scr_act(), "Are you sure!", [] () { 
+            WriteConfigFile_I("guide_flag.flag", 1);//test
+            WriteConfigFile_S("default_language.language", "en-GB");
+        });
     }
     break;
 

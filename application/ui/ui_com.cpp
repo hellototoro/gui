@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 00:13:56
+ * @LastEditTime: 2022-08-18 10:48:41
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -90,7 +90,7 @@ void refresh_all_lable_text(lv_obj_t* parent)
     lv_obj_tree_walk(parent, obj_tree_walk_cb, nullptr);
 }
 
-lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title)
+lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
 {
     auto event_cb = [] (lv_event_t* event) {
             lv_event_code_t code = lv_event_get_code(event);
@@ -109,12 +109,13 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title)
                     break;
                 case LV_KEY_ENTER:
                     if (index == 1) { //ok
-
+                        MsgBoxFunc_t SelectedFunc = MsgBoxFunc_t(parent->user_data);
+                        SelectedFunc();
                     }
-                    else if (index == 2) {//cancel
-                        delete_group(group);
-                        lv_obj_del_async(parent);
-                    }
+                    delete_group(group);
+                    lv_obj_del_async(parent);
+                    //else if (index == 2) {//cancel
+                    //}
                     break;
                 case LV_KEY_ESC:
                     delete_group(group);
@@ -128,6 +129,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title)
     lv_obj_t* MsgBoxPanel = lv_obj_create(parent);
     lv_obj_set_size(MsgBoxPanel, 500, 300);
     lv_obj_center(MsgBoxPanel);
+    MsgBoxPanel->user_data = reinterpret_cast<void*>(func);
 
     lv_obj_t* text = lv_label_create(MsgBoxPanel);
     lv_obj_set_size(text,LV_SIZE_CONTENT,LV_SIZE_CONTENT);
@@ -147,7 +149,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title)
     lv_obj_set_style_text_font(ok_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_center(ok_lab);
     lv_group_add_obj(MainGroup, btn_ok);
-    lv_obj_add_event_cb(btn_ok, event_cb, LV_EVENT_KEY, NULL);
+    lv_obj_add_event_cb(btn_ok, event_cb, LV_EVENT_KEY, nullptr);
 
     lv_obj_t* btn_cancel = lv_btn_create(MsgBoxPanel);
     lv_obj_set_size(btn_cancel, 110, 60);
@@ -158,7 +160,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title)
     lv_obj_set_style_text_font(cancel_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_center(cancel_lab);
     lv_group_add_obj(MainGroup, btn_cancel);
-    lv_obj_add_event_cb(btn_cancel, event_cb, LV_EVENT_KEY, NULL);
+    lv_obj_add_event_cb(btn_cancel, event_cb, LV_EVENT_KEY, nullptr);
     lv_group_focus_obj(lv_obj_get_child(MsgBoxPanel, 2));
 
     return MsgBoxPanel;
