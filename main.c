@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 23:07:58
+ * @LastEditTime: 2022-08-19 17:18:18
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -23,6 +23,7 @@
 #include "application/ui/ui_com.h"
 #include "application/windows.h"
 #include "application/SystemInit.h"
+#include "application/NetWorkApi.h"
 
 #ifdef HOST_GCC
 extern int sdl_init_2(void);
@@ -71,12 +72,13 @@ int main(int argc, char *argv[])
     api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();
     //key_regist(NULL);
+    NetWorkInit();
     #endif
 
     #ifdef HOST_GCC
     sdl_init_2();
     #endif
-    group_init();
+    //group_init();
     get_keypad_indev();
 
     SystemInit();

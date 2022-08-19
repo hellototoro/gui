@@ -577,9 +577,9 @@ int wifi_sys_ap_init_list()
     //just temp test
     static wifi_ap_info_t tmp_ap_info[] = {
         {
-            .ssid = "TP-LINK_WPA3",
-            .pwd = "12345678",
-            .pwd_count = 8,
+            .ssid = "HONOR",
+            .pwd = "a12345678",
+            .pwd_count = 9,
             .enctypt_mode_support = WIFI_ENCRYPT_MODE_WPA2PSK_AES,
         },
         {

@@ -1,6 +1,10 @@
 #ifndef __COM_LIST_H__
 #define __COM_LIST_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #define prefetch(x)				x
 /*
  * Simple doubly linked list implementation.
@@ -31,14 +35,14 @@ struct list_head {
  * This is only for internal list manipulation where we know
  * the prev/next entries already!
  */
-static __inline__ void __list_add(struct list_head * new,
+static __inline__ void __list_add(struct list_head * _new,
 	struct list_head * prev,
 	struct list_head * next)
 {
-	next->prev = new;
-	new->next = next;
-	new->prev = prev;
-	prev->next = new;
+	next->prev = _new;
+	_new->next = next;
+	_new->prev = prev;
+	prev->next = _new;
 }
 
 /**
@@ -49,9 +53,9 @@ static __inline__ void __list_add(struct list_head * new,
  * Insert a new entry after the specified head.
  * This is good for implementing stacks.
  */
-static __inline__ void list_add(struct list_head *new, struct list_head *head)
+static __inline__ void list_add(struct list_head *_new, struct list_head *head)
 {
-	__list_add(new, head, head->next);
+	__list_add(_new, head, head->next);
 }
 
 /**
@@ -62,9 +66,9 @@ static __inline__ void list_add(struct list_head *new, struct list_head *head)
  * Insert a new entry before the specified head.
  * This is useful for implementing queues.
  */
-static __inline__ void list_add_tail(struct list_head *new, struct list_head *head)
+static __inline__ void list_add_tail(struct list_head *_new, struct list_head *head)
 {
-	__list_add(new, head->prev, head);
+	__list_add(_new, head->prev, head);
 }
 
 /*
@@ -216,5 +220,8 @@ static __inline__ void list_splice(struct list_head *list, struct list_head *hea
          pos = list_entry(pos->member.prev, typeof(*pos), member))
 
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __COM_LIST_H__ */
