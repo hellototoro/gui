@@ -2,19 +2,20 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-19 21:53:41
+ * @LastEditTime: 2022-08-20 13:59:13
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
  */
 #include <string.h>
+#include <iostream>
 #include "NetWork.h"
 #include "application/NetWorkApi.h"
 
 static lv_obj_t* NetWorkPanel;
 static lv_obj_t* WiFiPanel;
-static lv_obj_t* ui_ConnectedPanel;
-static lv_obj_t* ui_AvailablePanel;
+static lv_obj_t* ConnectedPanel;
+static lv_obj_t* AvailablePanel;
 static lv_obj_t* ConnectPanel;
 static lv_obj_t* PwdArea;
 static lv_obj_t* Checkbox;
@@ -43,6 +44,7 @@ enum {
 
 void CreateWiFiPanel(lv_obj_t* parent);
 void CreateConnectPanel(lv_obj_t* parent);
+void SpinAnimation(lv_obj_t * TargetObject, int delay);
 
 void CreateNetWorkPanel(lv_obj_t* parent)
 {
@@ -196,8 +198,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
                         break;
                     }
                 }
-                else if (parent == ui_AvailablePanel) {
-                    if (index != (lv_obj_get_child_cnt(ui_AvailablePanel) - 1))
+                else if (parent == AvailablePanel) {
+                    if (index != (lv_obj_get_child_cnt(AvailablePanel) - 1))
                         lv_group_focus_next(group);
                 }
                 break;
@@ -206,7 +208,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
                     lv_group_focus_prev(group);
                 break;
             case LV_KEY_RIGHT:
-                if (!(parent == ui_AvailablePanel && (index == (lv_obj_get_child_cnt(ui_AvailablePanel) - 1))))
+                if (!(parent == AvailablePanel && (index == (lv_obj_get_child_cnt(AvailablePanel) - 1))))
                     lv_group_focus_next(group);
                 break;
             case LV_KEY_ENTER:
@@ -220,6 +222,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
                             lv_obj_add_state(target->spec_attr->children[0], LV_STATE_CHECKED);
                         break;
                     case WiFiPanel_Refresh:
+                        lv_obj_clear_state(target, LV_STATE_FOCUSED);
+                        SpinAnimation(target, 1000);
                         break;
                     case WiFiPanel_Add:
                         break;
@@ -229,8 +233,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
                         break;
                     }
                 }
-                else if (ui_AvailablePanel == lv_obj_get_parent(target)) {
-                    CreateConnectPanel(NetWorkPanel);
+                else if (AvailablePanel == lv_obj_get_parent(target)) {
+                    CreateConnectPanel(WiFiPanel);
                 }
                 break;
             case LV_KEY_ESC:
@@ -321,19 +325,19 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_label_set_text(text1, "已连接WLAN");
     lv_obj_set_style_text_font(text1, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_ConnectedPanel = lv_obj_create(WiFiPanel);
-    lv_obj_set_width(ui_ConnectedPanel, 980);
-    lv_obj_set_height(ui_ConnectedPanel, 70);
-    lv_obj_set_x(ui_ConnectedPanel, 0);
-    lv_obj_set_y(ui_ConnectedPanel, -180);
-    lv_obj_set_align(ui_ConnectedPanel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_ConnectedPanel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(ui_ConnectedPanel, lv_color_hex(0xEA9253), LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_obj_set_style_bg_opa(ui_ConnectedPanel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-    lv_group_add_obj(MainGroup, ui_ConnectedPanel);
-    lv_obj_add_event_cb(ui_ConnectedPanel, event_cb, LV_EVENT_KEY, nullptr);
+    ConnectedPanel = lv_obj_create(WiFiPanel);
+    lv_obj_set_width(ConnectedPanel, 980);
+    lv_obj_set_height(ConnectedPanel, 70);
+    lv_obj_set_x(ConnectedPanel, 0);
+    lv_obj_set_y(ConnectedPanel, -180);
+    lv_obj_set_align(ConnectedPanel, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(ConnectedPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(ConnectedPanel, lv_color_hex(0xEA9253), LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_obj_set_style_bg_opa(ConnectedPanel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+    lv_group_add_obj(MainGroup, ConnectedPanel);
+    lv_obj_add_event_cb(ConnectedPanel, event_cb, LV_EVENT_KEY, nullptr);
 
-    lv_obj_t* WifiName = lv_label_create(ui_ConnectedPanel);
+    lv_obj_t* WifiName = lv_label_create(ConnectedPanel);
     lv_obj_set_width(WifiName, 600);
     lv_obj_set_height(WifiName, LV_SIZE_CONTENT);
     lv_obj_set_x(WifiName, -170);
@@ -345,7 +349,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_set_style_text_align(WifiName, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(WifiName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t* WifiIcon = lv_img_create(ui_ConnectedPanel);
+    lv_obj_t* WifiIcon = lv_img_create(ConnectedPanel);
     lv_img_set_src(WifiIcon, &ui_img_wifi_64_png);
     lv_obj_set_width(WifiIcon, LV_SIZE_CONTENT);
     lv_obj_set_height(WifiIcon, LV_SIZE_CONTENT);
@@ -364,15 +368,15 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_label_set_text(text3, "可用WLAN");
     lv_obj_set_style_text_font(text3, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_AvailablePanel = lv_obj_create(WiFiPanel);
-    lv_obj_set_width(ui_AvailablePanel, 1020);
-    lv_obj_set_height(ui_AvailablePanel, 425);
-    lv_obj_set_x(ui_AvailablePanel, 0);
-    lv_obj_set_y(ui_AvailablePanel, 120);
-    lv_obj_set_align(ui_AvailablePanel, LV_ALIGN_CENTER);
-    lv_obj_set_scrollbar_mode(ui_AvailablePanel,LV_SCROLLBAR_MODE_OFF);
-    lv_obj_set_style_border_opa(ui_AvailablePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_flex_flow(ui_AvailablePanel, LV_FLEX_FLOW_COLUMN);
+    AvailablePanel = lv_obj_create(WiFiPanel);
+    lv_obj_set_width(AvailablePanel, 1020);
+    lv_obj_set_height(AvailablePanel, 425);
+    lv_obj_set_x(AvailablePanel, 0);
+    lv_obj_set_y(AvailablePanel, 120);
+    lv_obj_set_align(AvailablePanel, LV_ALIGN_CENTER);
+    lv_obj_set_scrollbar_mode(AvailablePanel,LV_SCROLLBAR_MODE_OFF);
+    lv_obj_set_style_border_opa(AvailablePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_flex_flow(AvailablePanel, LV_FLEX_FLOW_COLUMN);
 
     #ifdef HCCHIP_GCC
     wifi_ap_info_t *wifi_list = nullptr;
@@ -387,7 +391,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
         if (wifi_list[i].ssid[0] == '\0')
             continue;
         #endif
-        lv_obj_t* AvailableSubPanel = lv_obj_create(ui_AvailablePanel);
+        lv_obj_t* AvailableSubPanel = lv_obj_create(AvailablePanel);
         lv_obj_set_width(AvailableSubPanel, 980);
         lv_obj_set_height(AvailableSubPanel, 70);
         lv_obj_set_x(AvailableSubPanel, 0);
@@ -429,6 +433,17 @@ void CreateInputCodePanel(lv_obj_t* parent)
 {
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
+
+    /*lv_obj_t* dummy = lv_obj_create(parent);
+    lv_group_add_obj(MainGroup, dummy);
+    lv_obj_add_event_cb(dummy, [] (lv_event_t* event) {
+        lv_obj_t* target = lv_event_get_target(event);
+        lv_group_focus_obj(Keyboard);
+        //lv_textarea_set_text(PwdArea, "");
+        lv_obj_del_async(target);
+    }, LV_EVENT_KEY, nullptr);*/
+    static int i = 0;
+
     Keyboard = lv_keyboard_create(parent);
     lv_keyboard_set_mode(Keyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
     lv_obj_set_width(Keyboard, 1130);
@@ -447,7 +462,6 @@ void CreateInputCodePanel(lv_obj_t* parent)
         }
     }, LV_EVENT_KEY, nullptr);
     lv_keyboard_set_textarea(Keyboard, PwdArea);
-    //lv_group_focus_obj(Keyboard);
 }
 
 void CreateConnectPanel(lv_obj_t* parent)
@@ -483,7 +497,7 @@ void CreateConnectPanel(lv_obj_t* parent)
                     {
                     case ConnectPanel_CodeArea://
                         lv_obj_set_y(ConnectPanel, -150);//-150
-                        CreateInputCodePanel(NetWorkPanel);
+                        CreateInputCodePanel(WiFiPanel);
                         break;
                     case ConnectPanel_Checkbox:
 
@@ -548,10 +562,11 @@ void CreateConnectPanel(lv_obj_t* parent)
     lv_textarea_set_text(PwdArea, "");
     lv_textarea_set_password_mode(PwdArea, true);
     lv_textarea_set_one_line(PwdArea, true);
-    if("" == "") lv_textarea_set_accepted_chars(PwdArea, NULL);
-    else lv_textarea_set_accepted_chars(PwdArea, "");
-    lv_textarea_set_text(PwdArea, "");
+    //if("" == "") lv_textarea_set_accepted_chars(PwdArea, NULL);
+    //else lv_textarea_set_accepted_chars(PwdArea, "");
+    //lv_textarea_set_text(PwdArea, "");
     lv_textarea_set_placeholder_text(PwdArea, "code");
+    lv_obj_set_style_text_font(PwdArea, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_add_obj(MainGroup, PwdArea);
     lv_obj_add_event_cb(PwdArea, event_cb, LV_EVENT_ALL, nullptr);
 
@@ -559,8 +574,8 @@ void CreateConnectPanel(lv_obj_t* parent)
     lv_checkbox_set_text(Checkbox, "show code");
     lv_obj_set_width(Checkbox, LV_SIZE_CONTENT);
     lv_obj_set_height(Checkbox, LV_SIZE_CONTENT);
-    lv_obj_set_x(Checkbox, -200);
-    lv_obj_set_y(Checkbox, 0);
+    lv_obj_set_x(Checkbox, -220);
+    lv_obj_set_y(Checkbox, 10);
     lv_obj_set_align(Checkbox, LV_ALIGN_CENTER);
     lv_obj_add_flag(Checkbox, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_style_text_font(Checkbox, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -606,4 +621,24 @@ void CreateConnectPanel(lv_obj_t* parent)
     lv_obj_set_align(CancelLab, LV_ALIGN_CENTER);
     lv_label_set_text(CancelLab, "取消");
     lv_obj_set_style_text_font(CancelLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+}
+
+void SpinAnimation(lv_obj_t * TargetObject, int delay)
+{
+    lv_anim_t PropertyAnimation;
+    lv_anim_init(&PropertyAnimation);
+    lv_anim_set_time(&PropertyAnimation, 1000);
+    lv_anim_set_user_data(&PropertyAnimation, TargetObject);
+    lv_anim_set_custom_exec_cb(&PropertyAnimation, anim_callback_set_image_angle);
+    lv_anim_set_values(&PropertyAnimation, 0, 3600);
+    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_linear);
+    lv_anim_set_delay(&PropertyAnimation, delay + 0);
+    lv_anim_set_playback_time(&PropertyAnimation, 0);
+    lv_anim_set_playback_delay(&PropertyAnimation, 0);
+    lv_anim_set_repeat_count(&PropertyAnimation, 0);
+    lv_anim_set_repeat_delay(&PropertyAnimation, 0);
+    lv_anim_set_early_apply(&PropertyAnimation, false);
+    lv_anim_set_get_value_cb(&PropertyAnimation, &anim_callback_get_image_angle);
+    lv_anim_start(&PropertyAnimation);
+
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 20:00:51
+ * @LastEditTime: 2022-08-20 13:53:45
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -203,4 +203,14 @@ int32_t anim_callback_get_opacity(lv_anim_t * a)
 void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
 {
     lv_obj_set_style_opa((lv_obj_t *)a->user_data, v, 0);
+}
+
+void anim_callback_set_image_angle(lv_anim_t * a, int32_t v)
+{
+    lv_img_set_angle((lv_obj_t *)a->user_data, v);
+}
+
+int32_t anim_callback_get_image_angle(lv_anim_t * a)
+{
+    return lv_img_get_angle((lv_obj_t *)a->user_data);
 }

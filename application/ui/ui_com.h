@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 18:05:15
+ * @LastEditTime: 2022-08-20 13:52:22
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -36,6 +36,8 @@ extern void anim_callback_set_y(lv_anim_t * a, int32_t v);
 extern int32_t anim_callback_get_y(lv_anim_t * a);
 extern int32_t anim_callback_get_opacity(lv_anim_t * a);
 extern void anim_callback_set_opacity(lv_anim_t * a, int32_t v);
+extern void anim_callback_set_image_angle(lv_anim_t * a, int32_t v);
+extern int32_t anim_callback_get_image_angle(lv_anim_t * a);
 
 
 #ifdef __cplusplus
