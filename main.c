@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
     #ifdef HOST_GCC
     sdl_init_2();
     #endif
-    //group_init();
+    group_init();
     get_keypad_indev();
 
     SystemInit();

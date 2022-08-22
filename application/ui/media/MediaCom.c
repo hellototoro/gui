@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 18:19:24
+ * @LastEditTime: 2022-08-22 14:52:56
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -344,6 +344,7 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
         else if(CurrentPlayingType == MEDIA_MUSIC) {
             SetCurrentMusicTitle(file_name);
             LoadLyric(file_name);
+            MusicCoverSpinRun();
         }
     }
 }

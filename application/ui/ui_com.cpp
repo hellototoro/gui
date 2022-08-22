@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-20 13:53:45
+ * @LastEditTime: 2022-08-22 19:48:41
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -19,8 +19,10 @@ lv_group_t* activity_group = nullptr;
 void group_init(void)
 {
     lv_group_t * group = lv_group_get_default();
-    if (!group) {
+    if (group) {
+        //group = lv_group_create();
         lv_group_del(group);
+        //lv_group_set_default(nullptr);
     }
 }
 
@@ -205,12 +207,31 @@ void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
     lv_obj_set_style_opa((lv_obj_t *)a->user_data, v, 0);
 }
 
-void anim_callback_set_image_angle(lv_anim_t * a, int32_t v)
+void anim_callback_set_image_angle(void * var, int32_t v)
 {
-    lv_img_set_angle((lv_obj_t *)a->user_data, v);
+    lv_img_set_angle(static_cast<lv_obj_t *>(var), v);
 }
 
 int32_t anim_callback_get_image_angle(lv_anim_t * a)
 {
-    return lv_img_get_angle((lv_obj_t *)a->user_data);
+    return lv_img_get_angle((lv_obj_t *)a->var);
+}
+
+void SpinAnimation(lv_obj_t * TargetObject, int delay, int time)
+{
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_var(&a, TargetObject);
+    lv_anim_set_values(&a, 0, 3600);
+    lv_anim_set_time(&a, time);
+    lv_anim_set_exec_cb(&a, anim_callback_set_image_angle);
+    lv_anim_set_path_cb(&a, lv_anim_path_linear);
+    lv_anim_set_delay(&a, delay + 0);
+    lv_anim_set_playback_time(&a, 0);
+    lv_anim_set_playback_delay(&a, 0);
+    lv_anim_set_repeat_count(&a, LV_ANIM_REPEAT_INFINITE);
+    lv_anim_set_repeat_delay(&a, 0);
+    lv_anim_set_early_apply(&a, false);
+    lv_anim_set_get_value_cb(&a, &anim_callback_get_image_angle);
+    lv_anim_start(&a);
 }

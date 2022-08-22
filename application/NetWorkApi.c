@@ -1,7 +1,9 @@
-#include <stdbool.h>
+#include <stdio.h>
+#include <pthread.h>
+#include <stdlib.h>
+#include <unistd.h>
 #include "NetWorkApi.h"
 #ifdef HCCHIP_GCC
-#include <stdio.h>
 #include "hcapi/com_api.h"
 #include "hcapi/cast_api.h"
 #endif
@@ -234,7 +236,6 @@ static void hc_network_monitor_start()
     }
 }
 
-
 int NetWorkInit(void)
 {
     control_msg_t ctl_msg;
@@ -289,27 +290,18 @@ int NetWorkInit(void)
     return -1;*/
 }
 
-void WiFi_Scan(void)
+wifi_ap_info_t* WiFi_GetAPList( int *ap_count)
 {
     int ret = API_FAILURE;
-    //wifi_ap_info_t *wifi_info = NULL;
-
-    ret = wifi_ap_scan(WiFi_handle);
-    if (ret == API_SUCCESS) 
-        printf(" *** wifi_ap_scan() OK!");
-
-}
-
-void WiFi_GetAPList(wifi_ap_info_t **wifi_list, int *ap_count)
-{
-    int ret = API_FAILURE;
-    ret = wifi_ap_list_get(WiFi_handle, wifi_list, ap_count);
+    wifi_ap_info_t *wifi_list = NULL;
+    ret = wifi_ap_list_get(WiFi_handle, &wifi_list, ap_count);
     if (ret == 0) 
         printf("*** wifi_ap_list_get() OK, ap_count = %d!\n", *ap_count);
     //list the ap
     /*for (int i = 0; i < *ap_count; i ++){
         printf("ssid[%d]: %s, quality: %d%%\n", i, (*wifi_list[i]).ssid, (*wifi_list[i]).quality);
     }*/
+    return wifi_list;
 }
 
 void WiFi_Connect(wifi_ap_info_t *wifi_info)
@@ -327,14 +319,50 @@ void WiFi_Connect(wifi_ap_info_t *wifi_info)
     }
 }
 
-bool WiFi_HasConnected(void)
-{
-    bool ret = false;
-    return ret;
-}
-
 void WiFi_GetConnectedInfo(wifi_ap_info_t* info)
 {
     
 }
 #endif
+
+static void* WiFi_ScanTask(void* arg)
+{
+    NetWorkTaskCallBack WiFi_ScanCallBack = arg;
+    #ifdef HCCHIP_GCC
+    if (wifi_ap_scan(WiFi_handle) == API_SUCCESS) 
+        printf(" *** wifi_ap_scan() OK!");
+    #else
+    usleep(1000*1000);
+    #endif
+    if(WiFi_ScanCallBack)
+        WiFi_ScanCallBack();
+    pthread_exit(NULL);
+}
+
+void WiFi_Scan(NetWorkTaskCallBack cb)
+{
+    int res;
+    pthread_t thread_id = 0;
+    pthread_attr_t attr;
+    res = pthread_attr_init(&attr);
+    if (res != 0) {
+        perror("Attribute creation failed");
+        exit(EXIT_FAILURE);
+    }
+    res = pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
+    if (res != 0) {
+        perror("Setting detached attribute failed");
+        exit(EXIT_FAILURE);
+    }
+    res = pthread_create(&thread_id, &attr, WiFi_ScanTask, cb);
+    if (res != 0) {
+        perror("Thread creation failed");
+        exit(EXIT_FAILURE);
+    }
+}
+
+bool WiFi_IsConnected(void)
+{
+    bool ret = false;
+    return ret;
+}

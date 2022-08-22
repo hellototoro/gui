@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 17:58:07
+ * @LastEditTime: 2022-08-22 14:57:33
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -241,4 +241,14 @@ static void CreateLyricPanel(lv_obj_t* parent)
     lv_obj_set_scroll_snap_y(LyricPanel, LV_SCROLL_SNAP_CENTER);
     lv_obj_set_flex_flow(LyricPanel, LV_FLEX_FLOW_COLUMN);
     MainGroup = lv_group_create();
+}
+
+void MusicCoverSpinRun(void)
+{
+    SpinAnimation(MusicCover, LV_ANIM_PLAYTIME_INFINITE, 6000);
+}
+
+void MusicCoverSpinStop(void)
+{
+    lv_anim_del(MusicCover, nullptr);
 }
