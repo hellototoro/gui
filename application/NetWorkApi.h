@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-19 15:46:16
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-22 21:36:28
+ * @LastEditTime: 2022-08-27 11:45:23
  * @FilePath: /gui/application/NetWorkApi.h
  * @Description: None
  * @other: None
@@ -23,7 +23,8 @@ typedef void (*NetWorkTaskCallBack)(void);
 
 #ifdef HCCHIP_GCC
 extern int NetWorkInit(void);
-extern wifi_ap_info_t* WiFi_GetAPList( int *ap_count);
+extern int WiFi_GetAPCount(void);
+extern wifi_ap_info_t* WiFi_GetAPList(void);
 extern void WiFi_Connect(wifi_ap_info_t *wifi_info);
 #endif
 extern void WiFi_Scan(NetWorkTaskCallBack cb);

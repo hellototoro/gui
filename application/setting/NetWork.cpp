@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-22 22:14:37
+ * @LastEditTime: 2022-08-27 11:46:07
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -643,7 +643,8 @@ static void WiFiRefreshAvailableList(void)
     };
     int ap_count = 0;
     #ifdef HCCHIP_GCC
-    wifi_ap_info_t *wifi_list = WiFi_GetAPList(&ap_count);
+    wifi_ap_info_t *wifi_list = WiFi_GetAPList();
+    ap_count = WiFi_GetAPCount();
     #else
     ap_count = 10;
     #endif

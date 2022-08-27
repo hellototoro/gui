@@ -1,3 +1,12 @@
+/*
+ * @Author: totoro huangjian921@outlook.com
+ * @Date: 2022-08-19 15:46:16
+ * @LastEditors: totoro huangjian921@outlook.com
+ * @LastEditTime: 2022-08-27 11:56:11
+ * @FilePath: /gui/application/NetWorkApi.c
+ * @Description: None
+ * @other: None
+ */
 #include <stdio.h>
 #include <pthread.h>
 #include <stdlib.h>
@@ -15,6 +24,8 @@
 #define HOST_AP_CHNNNEL 6
 
 void *WiFi_handle = NULL;
+wifi_ap_info_t *g_wifi_list;
+int g_ap_count;
 
 static int hc_dhcpc_start()
 {
@@ -290,20 +301,6 @@ int NetWorkInit(void)
     return -1;*/
 }
 
-wifi_ap_info_t* WiFi_GetAPList( int *ap_count)
-{
-    int ret = API_FAILURE;
-    wifi_ap_info_t *wifi_list = NULL;
-    ret = wifi_ap_list_get(WiFi_handle, &wifi_list, ap_count);
-    if (ret == 0) 
-        printf("*** wifi_ap_list_get() OK, ap_count = %d!\n", *ap_count);
-    //list the ap
-    /*for (int i = 0; i < *ap_count; i ++){
-        printf("ssid[%d]: %s, quality: %d%%\n", i, (*wifi_list[i]).ssid, (*wifi_list[i]).quality);
-    }*/
-    return wifi_list;
-}
-
 void WiFi_Connect(wifi_ap_info_t *wifi_info)
 {
     int ret = API_FAILURE;
@@ -331,6 +328,8 @@ static void* WiFi_ScanTask(void* arg)
     #ifdef HCCHIP_GCC
     if (wifi_ap_scan(WiFi_handle) == API_SUCCESS) 
         printf(" *** wifi_ap_scan() OK!");
+    if (wifi_ap_list_get(WiFi_handle, &g_wifi_list, &g_ap_count) == API_SUCCESS) 
+        printf("*** wifi_ap_list_get() OK, ap_count = %d!\n", g_ap_count);
     #else
     usleep(1000*1000);
     #endif
@@ -359,6 +358,16 @@ void WiFi_Scan(NetWorkTaskCallBack cb)
         perror("Thread creation failed");
         exit(EXIT_FAILURE);
     }
+}
+
+int WiFi_GetAPCount(void)
+{
+    return g_ap_count;
+}
+
+wifi_ap_info_t* WiFi_GetAPList(void)
+{
+    return g_wifi_list;
 }
 
 bool WiFi_IsConnected(void)
