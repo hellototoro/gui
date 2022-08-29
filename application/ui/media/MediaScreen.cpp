@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 23:14:00
+ * @LastEditTime: 2022-08-28 20:42:08
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -381,7 +381,6 @@ static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* p
 static void ShowFileList(FileList *file_list)
 {
     lv_obj_t* ui_back = lv_btn_create(ui_File_List_Panel);
-    ui_back->user_data = NULL;
     ui_back->user_data = const_cast<char*>("media_file_p_return");
     DrawCell(ui_back, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
     lv_group_add_obj(FileListGroup, ui_back);

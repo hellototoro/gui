@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-19 15:46:16
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-27 11:56:11
+ * @LastEditTime: 2022-08-27 21:19:09
  * @FilePath: /gui/application/NetWorkApi.c
  * @Description: None
  * @other: None
@@ -24,8 +24,10 @@
 #define HOST_AP_CHNNNEL 6
 
 void *WiFi_handle = NULL;
+#ifdef HCCHIP_GCC
 wifi_ap_info_t *g_wifi_list;
 int g_ap_count;
+#endif
 
 static int hc_dhcpc_start()
 {
@@ -320,6 +322,17 @@ void WiFi_GetConnectedInfo(wifi_ap_info_t* info)
 {
     
 }
+
+int WiFi_GetAPCount(void)
+{
+    return g_ap_count;
+}
+
+wifi_ap_info_t* WiFi_GetAPList(void)
+{
+    return g_wifi_list;
+}
+
 #endif
 
 static void* WiFi_ScanTask(void* arg)
@@ -358,16 +371,6 @@ void WiFi_Scan(NetWorkTaskCallBack cb)
         perror("Thread creation failed");
         exit(EXIT_FAILURE);
     }
-}
-
-int WiFi_GetAPCount(void)
-{
-    return g_ap_count;
-}
-
-wifi_ap_info_t* WiFi_GetAPList(void)
-{
-    return g_wifi_list;
 }
 
 bool WiFi_IsConnected(void)

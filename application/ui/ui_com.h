@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-22 19:40:59
+ * @LastEditTime: 2022-08-28 20:42:18
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -16,6 +16,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+typedef struct ObjNavigation
+{
+    lv_key_t dir;
+    lv_obj_t* obj[4];
+}ObjNavigation_t;
 
 typedef void (*MsgBoxFunc_t)(void);
 
