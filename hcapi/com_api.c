@@ -7,12 +7,12 @@
 #include <ffplayer.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
-
-#include "hcapi/lvgl/lvgl.h"
-#include "hcapi/lv_drivers/display/fbdev.h"
-#include "hc_src/hc_lvgl_init.h"
-
-
+#include <linux/fb.h>
+#include <hcuapi/fb.h>
+#include "lvgl/lvgl.h"
+#include "lv_drivers/display/fbdev.h"
+#include <hccast/hccast_wifi_mgr.h>
+#include "gpio_ctrl.h"
 #include "com_api.h"
 #include "cast_api.h"
 #include "os_api.h"
@@ -21,6 +21,9 @@
 static uint32_t m_control_msg_id = INVALID_ID;
 static cast_play_state_t m_cast_play_state = CAST_STATE_IDLE;
 static bool m_ffplay_init = false;
+
+void *g_gpio_reset_hld = NULL;
+
 
 int api_system_init()
 {
@@ -39,16 +42,19 @@ int api_audio_init()
 
 int api_lvgl_init(int width, int height)
 {
+    extern int hc_lvgl_init(void);
     return hc_lvgl_init();
 }
 
 static void *m_logo_player = NULL;
 int api_logo_show(const char *file)
 {
-
     char *file_path = file;
     
-    api_logo_off();
+    if (m_logo_player){
+        printf("%s(), line:%d. logo already show!\n", __func__, __LINE__);
+        return -1;
+    }
 
     if (!file)
         file_path = BACK_LOGO;
@@ -70,15 +76,19 @@ int api_logo_show(const char *file)
 
     //stop 
     //hcplayer_stop2(m_logo_player, false, false);
-    printf("Show logo: %s ok!\n", file_path);
+    printf("=============================Show logo: %s ok!=============================\n", file_path);
     return 0;
 }
 
 int api_logo_off()
 {
     if (m_logo_player)
-        hcplayer_stop(m_logo_player);
-    m_logo_player = NULL;
+    {
+        //hcplayer_stop(m_logo_player);
+       	hcplayer_stop2(m_logo_player,true,true);
+    	m_logo_player = NULL;
+		printf("=============================Close logo: ok!=============================\n");
+    }	
     return 0;
 }
 
@@ -178,7 +188,7 @@ bool api_is_ip_addr(char *ip_buff)
 
 #define MAC_ADDRESS_PATH   WIFI_MAC_PATH// ETHE_MAC_PATH
 /**get the mac address, after modprobe cmmand, the ip address of wlan0
- * should be save tho "/sys/class/net/wlan0/address"
+ * should be saved to "/sys/class/net/wlan0/address"
  * @param
  * @return
  */
@@ -186,9 +196,13 @@ int api_get_mac_addr(char *mac)
 {
     int ret;
     char buffer[32] = {0};
+    if (mac == NULL) 
+        return -1;
+
     FILE *fp = fopen(MAC_ADDRESS_PATH, "r");
-    if (mac == NULL) return -1;
-    if (fp == NULL) return -1;
+    if (fp == NULL) 
+        return -1;
+
     fread(buffer, 1, 32, fp);
     fclose(fp);
     buffer[strlen(buffer)-1] = '\0';
@@ -202,12 +216,16 @@ int api_get_mac_addr(char *mac)
 
 }
 
+int api_get_wifi_freq_mode(void)
+{
+    return (int)hccast_wifi_mgr_freq_support_mode();
+}
 
 void app_ffplay_init(void)
 {
     if (m_ffplay_init) return;
 
-    hcplayer_init(5);
+    hcplayer_init(1);
     m_ffplay_init = true;
 }
 
@@ -227,15 +245,6 @@ void app_exit(void)
         api_message_delete(m_control_msg_id);
 
     app_ffplay_deinit();
-#ifdef CAST_AIRCAST_ENABLE    
-    cast_airpaly_close();
-#endif
-#ifdef CAST_DLNA_ENABLE    
-    cast_dlna_close();
-#endif
-#ifdef CAST_MIRACAST_ENABLE    
-    cast_miracast_close();
-#endif    
 }
 
 void api_sleep_ms(uint32_t ms)
@@ -273,4 +282,97 @@ int api_shell_exe_result(char *cmd)
 
     return ret;
 
+}
+
+static unsigned int crc_table[256];
+static volatile bool m_crc_init = false;
+static void api_crc_table_init(void)  
+{  
+    unsigned int c;  
+    unsigned int i, j;  
+    
+    if (m_crc_init)
+        return;
+
+    for (i = 0; i < 256; i++) {  
+        c = (unsigned int)i;  
+        for (j = 0; j < 8; j++) {  
+            if (c & 1)  
+                c = 0xedb88320L ^ (c >> 1);  
+            else  
+                c = c >> 1;  
+        }  
+        crc_table[i] = c;  
+    }  
+
+    m_crc_init = true;
+}  
+
+unsigned int api_crc32(unsigned int crc,unsigned char *buffer, unsigned int size)  
+{  
+    unsigned int i;  
+
+    api_crc_table_init();
+
+    for (i = 0; i < size; i++) {  
+        crc = crc_table[(crc ^ buffer[i]) & 0xff] ^ (crc >> 8);  
+    }  
+    return crc ;  
+}  
+
+int api_osd_show_onoff(bool on_off)
+{
+    // Open the file for reading and writing
+    int fbfd = open("/dev/fb0", O_RDWR);
+    uint32_t blank_mode;
+
+    if(fbfd == -1) {
+        printf("%s(), line: %d. Error: cannot open framebuffer device", __func__, __LINE__);
+        return API_FAILURE;
+    }
+
+    if (on_off)
+        blank_mode = FB_BLANK_UNBLANK;
+    else
+        blank_mode = FB_BLANK_NORMAL;
+
+    if (ioctl(fbfd, FBIOBLANK, blank_mode) != 0) {
+        printf("%s(), line: %d. Error: FBIOBLANK", __func__, __LINE__);
+    }
+
+    close(fbfd);
+    return API_SUCCESS;
+}
+
+int api_gpio_init(void)
+{
+    gpio_info_t gpio_info;
+
+    //reset gpio
+    gpio_info.number = PINPAD_L08;
+    gpio_info.direction = GPIO_DIR_IN;
+    g_gpio_reset_hld = gpio_open(&gpio_info);
+
+    if (NULL == g_gpio_reset_hld){
+        return API_FAILURE;
+    }
+
+    return API_SUCCESS;
+}
+
+int api_gpio_deinit(void)
+{
+    if (g_gpio_reset_hld){
+        gpio_close(g_gpio_reset_hld);
+        g_gpio_reset_hld = NULL;
+    }
+    return API_SUCCESS;
+}
+
+
+void api_system_reboot(void)
+{
+    printf("%s(): reboot now!!\n", __func__);
+    system("reboot");
+    while(1);
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:45
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 17:32:28
+ * @LastEditTime: 2022-08-29 22:30:20
  * @FilePath: /gui/application/windows.h
  * @Description: None
  * @other: None
@@ -10,11 +10,7 @@
 #ifndef __APPLICATION_WINDOWS_H__
 #define __APPLICATION_WINDOWS_H__
 
-#ifdef HCCHIP_GCC
-#include "hcapi/lvgl/lvgl.h"
-#else
 #include "lvgl/lvgl.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

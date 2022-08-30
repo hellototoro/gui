@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-29 09:01:00
+ * @LastEditTime: 2022-08-30 13:08:49
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -16,7 +16,6 @@
 #include "SettingScreen.h"
 #include "HdmiRx.h"
 #include "SyncScreen.h"
-#include "application/DetectHotPlug.h"
 
 static lv_obj_t* HomeRootScreen;
 static lv_obj_t* MainPanel;
@@ -224,7 +223,6 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    CreateDetectTask();
     UdiskDetectPanel = lv_obj_create(parent);
     lv_obj_set_width(UdiskDetectPanel, 189);
     lv_obj_set_height(UdiskDetectPanel, 83);

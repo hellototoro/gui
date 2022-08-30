@@ -2,42 +2,34 @@
 # Makefile
 #
 CC ?= gcc
-LVGL_DIR_NAME ?= lvgl
 ROOT_DIR ?= ${shell pwd}
-LVGL_DIR ?= ${shell pwd}/hcapi
 
 SYS_DIR = -I$(ROOT_DIR) \
 		-I$(STAGING_DIR)/usr/include \
-		-I$(STAGING_DIR)/usr/include/hcuapi \
-		-I$(STAGING_DIR)/usr/include/libgoahead
+		-I$(STAGING_DIR)/usr/include/hcuapi
 
-#SYS_DIR += -I$(STAGING_DIR)/usr/include/Neptune \
-#		-I$(STAGING_DIR)/usr/include/Platinum \
+LVGL_HEADERS = -I$(STAGING_DIR)/usr/include/lvgl/ \
+		-I$(STAGING_DIR)/usr/include/lvgl/lvgl
 
 
-CFLAGS ?= -O0 -g $(SYS_DIR)/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare
+
+CFLAGS ?= -O3 $(SYS_DIR)/ -Wall -Wshadow -Wundef -Wmissing-prototypes -Wno-discarded-qualifiers -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wmissing-prototypes -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wno-discarded-qualifiers -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare
 CPPFLAGS ?= -O0 -g0 $(SYS_DIR)/ -Wall -Wshadow -Wundef -Wall -Wextra -Wno-unused-function -Wno-error=strict-prototypes -Wpointer-arith -fno-strict-aliasing -Wno-error=cpp -Wuninitialized -Wmaybe-uninitialized -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-error=pedantic -Wno-sign-compare -Wno-error=missing-prototypes -Wdouble-promotion -Wclobbered -Wdeprecated -Wempty-body -Wtype-limits -Wshift-negative-value -Wstack-usage=2048 -Wno-unused-value -Wno-unused-parameter -Wno-missing-field-initializers -Wuninitialized -Wmaybe-uninitialized -Wall -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wtype-limits -Wsizeof-pointer-memaccess -Wno-format-nonliteral -Wpointer-arith -Wno-cast-qual -Wunreachable-code -Wno-switch-default -Wreturn-type -Wmultichar -Wformat-security -Wno-ignored-qualifiers -Wno-sign-compare
 
 CFLAGS += -DHCCHIP_GCC
 CPPFLAGS += -DHCCHIP_GCC
 #CPPFLAGS += -std=c++17
-CPPFLAGS += "-I$(ROOT_DIR)/boost_1_79_0"
+CFLAGS += $(LVGL_HEADERS)
+CPPFLAGS += "-I$(ROOT_DIR)/boost_1_79_0" $(CFLAGS)
 
-LDFLAGS ?= -lm
+LDFLAGS ?= -lm -llvgl -lmiracast -laircast -ldlna
 BIN = gui_app
 
-# CAST_LIBS = -lneptune -lplatinum  -ldlna-porting
-# 
 GUI_LIBS = -lffplayer -lpthread -lge -Wl,--start-group -lstdc++ $(CAST_LIBS) -Wl,--end-group
-GUI_LIBS += -lwpa_client
+GUI_LIBS += -lcjson -lwpa_client -lhccast-com -lhccast-net -lhccast-wl -lmdns -lcrypto -lhcfota
 
-#LIBS = -lffplayer -lpthread
-
-#Collect the files to compile
 MAINSRC = ./main.cpp
 
-#include $(LVGL_DIR)/lvgl/lvgl.mk
-#include $(LVGL_DIR)/lv_drivers/lv_drivers.mk
 include $(ROOT_DIR)/hcapi/hcapi.mk
 include $(ROOT_DIR)/application/gui_app.mk
 include $(ROOT_DIR)/lv_i18n/lv_i18n.mk
@@ -53,7 +45,6 @@ MAINOBJ = $(MAINSRC:.cpp=$(OBJEXT))
 
 ## MAINOBJ -> OBJFILES
 
-#all: default gui_app
 all: make_gui_app
 
 %.o: %.c

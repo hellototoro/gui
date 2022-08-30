@@ -2,11 +2,7 @@
 #define __KEY_H__
 
 #include <stdint.h> //uint32_t
-#ifdef HCCHIP_GCC
-#include "hcapi/lvgl/lvgl.h"
-#else
 #include "lvgl/lvgl.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

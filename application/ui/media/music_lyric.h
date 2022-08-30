@@ -2,19 +2,15 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-25 12:42:19
- * @FilePath: /gui/application/ui/music_lyric.h
+ * @LastEditTime: 2022-08-29 22:30:57
+ * @FilePath: /gui/application/ui/media/music_lyric.h
  * @Description: None
  * @other: None
  */
 #ifndef __MUSIC_LYRIC_H__
 #define __MUSIC_LYRIC_H__
 
-#ifdef HCCHIP_GCC
-#include "hcapi/lvgl/lvgl.h"
-#else
 #include "lvgl/lvgl.h"
-#endif
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
