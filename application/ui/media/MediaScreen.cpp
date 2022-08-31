@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-28 20:42:08
+ * @LastEditTime: 2022-08-31 12:41:07
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -13,7 +13,6 @@
 #include <list>
 #include "MediaScreen.h"
 #include "application/windows.h"
-#include "MediaFile.h"
 #include "MediaCom.h"
 #include "Video.h"
 #include "Music.h"
@@ -29,19 +28,10 @@
 #define FileListPanelHeight 615
 #define FileWidth 150
 #define FileHeight 180
+
+MediaFileCategoryList FileFilter;
+
 static const uint16_t FileListPanelRowNumber = FileListPanelWidth/FileWidth;
-
-typedef enum {
-    All,
-    Vedio = FILE_VIDEO,
-    Music,
-    Photo,
-    Text,
-    CategoryNumber
-} CategoryList;
-
-static CategoryList FileFilter;
-
 static lv_obj_t* MediaRootScreen;
 lv_obj_t* ui_Category_Panel;
 lv_obj_t* ui_File_List_Panel;
@@ -56,9 +46,9 @@ static void ShowDisk(void);
 static void ShowFileList(FileList *file_list);
 static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* pic, const char* str);
 static void ReturnUpper(void);
-static void RefreshFileWithFile(CategoryList filter);
+static void RefreshFileWithFile(MediaFileCategoryList filter);
 static void return_handler(lv_event_t* event);
-static void FilterFile(CategoryList file_type);
+static void FilterFile(MediaFileCategoryList file_type);
 static void ExitMedia(ActiveScreen screen);
 
 static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
@@ -139,10 +129,9 @@ static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
         }
     }
     else if (parents == ui_Category_Panel) {
-        FileFilter = static_cast<CategoryList>(lv_obj_get_index(target));
+        FileFilter = static_cast<MediaFileCategoryList>(lv_obj_get_index(target));
         FilterFile(FileFilter);
     }
-
 }
 
 static void defocused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
@@ -240,7 +229,7 @@ static void return_handler(lv_event_t* event)
     }
 }
 
-static void FilterFile(CategoryList filter_type)
+static void FilterFile(MediaFileCategoryList filter_type)
 {
     static const lv_img_dsc_t* image_src[] = {
         NULL,
@@ -249,7 +238,7 @@ static void FilterFile(CategoryList filter_type)
         &ui_img_image_png,
         &ui_img_text_png,
         &ui_img_other_png };
-    static CategoryList last_filter_type = All;
+    static MediaFileCategoryList last_filter_type = MediaFile_All;
     
     if (last_filter_type != filter_type) {
         FileStr* file = NULL;
@@ -258,12 +247,12 @@ static void FilterFile(CategoryList filter_type)
         uint16_t non_dir_number = GetNonDirNumber(current_list);
         uint16_t media_number = GetMediaListSize(static_cast<MediaType>(filter_type));
         int first_file_index = dir_number + 1;//第一个非文件夹对象
-        int end_index = first_file_index + ((filter_type == All) ? non_dir_number : media_number);
+        int end_index = first_file_index + ((filter_type == MediaFile_All) ? non_dir_number : media_number);
         GetNextFile(NULL);
         for (int i = first_file_index; i < end_index; i++) {
             do {
                 file = GetNextFile(current_list->NonDirList);
-            } while ((file != NULL) && (filter_type != All) && (file->type != (FileType)filter_type));
+            } while ((file != NULL) && (filter_type != MediaFile_All) && (file->type != (FileType)filter_type));
             if (file == NULL) break;
             child = lv_obj_get_child(ui_File_List_Panel, i);
             if (child != NULL) {
@@ -279,7 +268,7 @@ static void FilterFile(CategoryList filter_type)
                 lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_ALL, NULL);
             }
         }
-        if (filter_type != All) {
+        if (filter_type != MediaFile_All) {
             uint16_t obj_number = lv_obj_get_child_cnt(ui_File_List_Panel);
             for (int i = end_index; i < obj_number; i++) {
                 lv_obj_del_async(lv_obj_get_child(ui_File_List_Panel, i));
@@ -307,7 +296,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
 
     CategoryGroup = create_new_group();
     set_group_activity(CategoryGroup);
-    for (int i = 0; i < CategoryNumber; i++) {
+    for (int i = 0; i < MediaFile_CategoryNumber; i++) {
         lv_obj_t* ui_BTN = lv_btn_create(ui_Category_Panel);
         lv_obj_set_size(ui_BTN, 265, 50);
         lv_obj_set_pos(ui_BTN, -30, -160 + i * 80);
@@ -343,8 +332,8 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_style_img_recolor(ui_IMG, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_img_recolor_opa(ui_IMG, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
-    lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, 0));
-    FileFilter = All;
+    //FileFilter = MediaFile_All;
+    lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, FileFilter));
 }
 
 static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* pic, const char* str)
@@ -419,7 +408,7 @@ static void ShowFileList(FileList *file_list)
             image = (lv_img_dsc_t* )&ui_img_other_png;
             break;
         }
-        if (FileFilter != All) {//必须放在 AddToMediaList 函数后面，因为就算过滤掉此类型，也要将其加入媒体文件列表里面
+        if (FileFilter != MediaFile_All) {//必须放在 AddToMediaList 函数后面，因为就算过滤掉此类型，也要将其加入媒体文件列表里面
             if ((file->type != FILE_DIR) && ((uint8_t)file->type != (uint8_t)FileFilter)) {
                 continue;
             }
@@ -512,8 +501,8 @@ static void MediaInit(void)
     lv_obj_set_style_text_align(ui_LAB_Real_Path, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    CreateCategoryPanel(MediaRootScreen);
     CreateFilePanel(MediaRootScreen);
+    CreateCategoryPanel(MediaRootScreen);
     MediaFileInit();
     strcat(current_path, media_dir);
     ShowFileList(GetFileList(current_path));

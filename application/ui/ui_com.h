@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-28 20:42:18
+ * @LastEditTime: 2022-08-31 14:45:49
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -36,6 +36,7 @@ extern void delete_all_group(void);
 extern lv_indev_t* get_keypad_indev(void);
 extern void refresh_all_lable_text(lv_obj_t* parent);
 extern lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func);
+extern lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func);
 extern void anim_callback_set_x(lv_anim_t * a, int32_t v);
 extern int32_t anim_callback_get_x(lv_anim_t * a);
 extern void anim_callback_set_y(lv_anim_t * a, int32_t v);

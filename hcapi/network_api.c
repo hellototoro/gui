@@ -91,7 +91,7 @@ static void hccast_ap_dlna_aircast_stop(void)
 
 static int wifi_mgr_callback_func(hccast_wifi_event_e event, void* in, void* out)
 {
-    log(DEMO, INFO, "[%s] event: %d", __func__,event);
+    _log(DEMO, INFO, "[%s] event: %d", __func__,event);
     control_msg_t ctl_msg = {0};
 
     switch (event)
@@ -107,14 +107,14 @@ static int wifi_mgr_callback_func(hccast_wifi_event_e event, void* in, void* out
         {
             hccast_wifi_scan_result_t *res = (hccast_wifi_scan_result_t*)out;
 
-            log(DEMO, INFO, "AP NUM: %d\n***********", res->ap_num);
+            _log(DEMO, INFO, "AP NUM: %d\n***********", res->ap_num);
 
             for (int i = 0; i < res->ap_num; i++)
             {
-                log(DEMO, INFO, "ssid: %s, quality: %d", res->apinfo[i].ssid, res->apinfo[i].quality);
+                _log(DEMO, INFO, "ssid: %s, quality: %d", res->apinfo[i].ssid, res->apinfo[i].quality);
             }
 
-            log(DEMO, INFO, "\n***********");
+            _log(DEMO, INFO, "\n***********");
             ctl_msg.msg_type = MSG_TYPE_NETWORK_WIFI_SCAN_DONE;
             api_control_send_msg(&ctl_msg);
 
@@ -126,7 +126,7 @@ static int wifi_mgr_callback_func(hccast_wifi_event_e event, void* in, void* out
         }
         case HCCAST_WIFI_CONNECT_SSID:
         {
-            log(DEMO, INFO, "SSID: %s", (char*)out);
+            _log(DEMO, INFO, "SSID: %s", (char*)out);
             break;
         }
         case HCCAST_WIFI_CONNECT_RESULT: //station
@@ -134,14 +134,14 @@ static int wifi_mgr_callback_func(hccast_wifi_event_e event, void* in, void* out
             hccast_udhcp_result_t* result = (hccast_udhcp_result_t*) out;
             if (result)
             {
-                log(DEMO, INFO, "state: %d", result->stat);
+                _log(DEMO, INFO, "state: %d", result->stat);
                 if (result->stat)
                 {
-                    log(DEMO, INFO, "ifname: %s", result->ifname);
-                    log(DEMO, INFO, "ip addr: %s", result->ip);
-                    log(DEMO, INFO, "mask addr: %s", result->mask);
-                    log(DEMO, INFO, "gw addr: %s", result->gw);
-                    log(DEMO, INFO, "dns: %s", result->dns);
+                    _log(DEMO, INFO, "ifname: %s", result->ifname);
+                    _log(DEMO, INFO, "ip addr: %s", result->ip);
+                    _log(DEMO, INFO, "mask addr: %s", result->mask);
+                    _log(DEMO, INFO, "gw addr: %s", result->gw);
+                    _log(DEMO, INFO, "dns: %s", result->dns);
 
                     hccast_net_ifconfig(result->ifname, result->ip, result->mask, result->gw);
                     hccast_net_set_dns(result->ifname, result->dns);
@@ -190,7 +190,7 @@ static int wifi_mgr_callback_func(hccast_wifi_event_e event, void* in, void* out
 
                 hostap_discover_ok = 1;
 
-                log(WIFI, INFO, "addr: %s", inet_ntoa(tmp_addr));
+                _log(WIFI, INFO, "addr: %s", inet_ntoa(tmp_addr));
 
                 strncpy(m_wifi_config.connected_phone_ip, inet_ntoa(tmp_addr), MAX_IP_STR_LEN);
 
@@ -959,7 +959,7 @@ static void hostap_config_init(void)
     strncpy(conf.pwd, data_mgr_get_device_psk(), sizeof(conf.pwd));
     strncpy(conf.ssid, data_mgr_get_device_name(), sizeof(conf.ssid));
 
-    log(DEMO, INFO, "wifi mode: %d, wifi ch: %d", conf.mode, conf.channel);
+    _log(DEMO, INFO, "wifi mode: %d, wifi ch: %d", conf.mode, conf.channel);
 
     hccast_wifi_mgr_hostap_set_conf(&conf);
 }

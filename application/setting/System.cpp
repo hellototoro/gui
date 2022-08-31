@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 10:55:20
+ * @LastEditTime: 2022-08-31 14:54:18
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -12,6 +12,9 @@
 #include "application/ConfigParam.h"
 #include "application/ui/LanguageScreen.h"
 #include "application/ui/ui_com.h"
+#ifdef HCCHIP_GCC
+#include "hcapi/com_api.h"
+#endif
 
 namespace Setting {
 
@@ -50,7 +53,13 @@ void System::SelectedValue(int index)
         CreateMsgBox(lv_scr_act(), "Are you sure!", [] () { 
             WriteConfigFile_I("guide_flag.flag", 1);//test
             WriteConfigFile_S("default_language.language", "en-GB");
+            #ifdef HCCHIP_GCC
+            CreateSpinBox(lv_scr_act(), _("请稍等..."), 3, api_system_reboot);
+            #else
+            CreateSpinBox(lv_scr_act(), _("请稍等..."), 3, nullptr);
+            #endif
         });
+        
     }
     break;
 

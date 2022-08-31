@@ -26,7 +26,7 @@ struct callbackname##Node { \
 	int id; \
 }; \
 struct callbackname##List { \
-	LIST_HEAD(callbackname##ListHead, callbackname##Node) head; \
+	_LIST_HEAD(callbackname##ListHead, callbackname##Node) head; \
 	pthread_mutex_t mutex; \
 }; 
 

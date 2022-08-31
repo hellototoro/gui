@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-22 19:48:41
+ * @LastEditTime: 2022-08-31 14:57:53
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -106,7 +106,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
 {
     auto event_cb = [] (lv_event_t* event) {
         lv_obj_t* target = lv_event_get_target(event);
-        lv_obj_t* parent = lv_obj_get_parent(target);
+        lv_obj_t* _parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
         int index = lv_obj_get_index(target);
@@ -120,17 +120,15 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
                 break;
             case LV_KEY_ENTER:
                 if (index == 1) { //ok
-                    MsgBoxFunc_t SelectedFunc = MsgBoxFunc_t(parent->user_data);
-                    SelectedFunc();
+                    MsgBoxFunc_t SelectedFunc = MsgBoxFunc_t(_parent->user_data);
+                    if (SelectedFunc) SelectedFunc();
                 }
                 delete_group(group);
-                lv_obj_del_async(parent);
-                //else if (index == 2) {//cancel
-                //}
+                lv_obj_del_async(_parent);
                 break;
             case LV_KEY_ESC:
                 delete_group(group);
-                lv_obj_del_async(parent);
+                lv_obj_del_async(_parent);
                 break;
             default:
                 break;
@@ -175,6 +173,43 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
     lv_group_focus_obj(lv_obj_get_child(MsgBoxPanel, 2));
 
     return MsgBoxPanel;
+}
+
+lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func)
+{
+    lv_obj_t* SpinBox = lv_obj_create(parent);
+    lv_obj_set_width(SpinBox, 500);
+    lv_obj_set_height(SpinBox, 300);
+    lv_obj_set_align(SpinBox, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(SpinBox, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    SpinBox->user_data = reinterpret_cast<void*>(func);
+
+    lv_obj_t* title_lab = lv_label_create(SpinBox);
+    lv_obj_set_width(title_lab, LV_SIZE_CONTENT);   /// 1
+    lv_obj_set_height(title_lab, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_x(title_lab, 0);
+    lv_obj_set_y(title_lab, 70);
+    lv_obj_set_align(title_lab, LV_ALIGN_CENTER);
+    lv_label_set_text(title_lab, title);
+    lv_obj_set_style_text_font(title_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_t* spinner = lv_spinner_create(SpinBox, 1000, 90);
+    lv_obj_set_width(spinner, 60);
+    lv_obj_set_height(spinner, 60);
+    lv_obj_set_x(spinner, 0);
+    lv_obj_set_y(spinner, -40);
+    lv_obj_set_align(spinner, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(spinner, LV_OBJ_FLAG_CLICKABLE);      /// Flags
+
+    lv_timer_create([] (lv_timer_t * timer) {
+        lv_obj_t* obj = static_cast<lv_obj_t*>(timer->user_data);
+        MsgBoxFunc_t SpinnerFunc = MsgBoxFunc_t(obj->user_data);
+        if (SpinnerFunc) SpinnerFunc();
+        lv_obj_del(obj);
+        lv_timer_del(timer);
+    }, time_s*1000, SpinBox);
+
+    return SpinBox;
 }
 
 void anim_callback_set_x(lv_anim_t * a, int32_t v)

@@ -181,7 +181,7 @@ static int cast_get_wifi_mac(unsigned char *mac)
 #ifdef DLNA_SUPPORT
 int hccast_dlna_callback_func(hccast_dlna_event_e event, void* in, void* out)
 {
-    log(DEMO, INFO, "[%s] event: %d", __func__,event);
+    _log(DEMO, INFO, "[%s] event: %d", __func__,event);
     char *str_tmp = NULL;
 
     switch (event)
@@ -214,7 +214,7 @@ int hccast_dlna_callback_func(hccast_dlna_event_e event, void* in, void* out)
 #ifdef MIRACAST_SUPPORT
 int hccast_mira_callback_func(hccast_mira_event_e event, void* in, void* out)
 {
-    log(DEMO, INFO, "[%s] event: %d", __func__, event);
+    _log(DEMO, INFO, "[%s] event: %d", __func__, event);
     control_msg_t ctl_msg = {0};
     char *str_tmp = NULL;
 
@@ -228,20 +228,20 @@ int hccast_mira_callback_func(hccast_mira_event_e event, void* in, void* out)
                 if (str_tmp)
                 {
                     sprintf((char *)in, "%s_mira", str_tmp);
-                    log(DEMO, INFO, "HCCAST_MIRA_GET_DEVICE_NAME:%s\n", str_tmp);
+                    _log(DEMO, INFO, "HCCAST_MIRA_GET_DEVICE_NAME:%s\n", str_tmp);
                 }
             }
             break;
         }
         case HCCAST_MIRA_SSID_DONE:
         {
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_SSID_DONE\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_SSID_DONE\n",__func__);
             ctl_msg.msg_type = MSG_TYPE_CAST_MIRACAST_SSID_DONE;
             break;
         }
         case HCCAST_MIRA_GET_CUR_WIFI_INFO:
         {
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_GET_CUR_WIFI_INFO\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_GET_CUR_WIFI_INFO\n",__func__);
             char cur_ssid[64] = {0};
             hccast_wifi_ap_info_t *cur_ap;
             hccast_wifi_mgr_get_connect_ssid(cur_ssid, sizeof(cur_ssid));
@@ -253,35 +253,35 @@ int hccast_mira_callback_func(hccast_mira_event_e event, void* in, void* out)
         case HCCAST_MIRA_CONNECT:
         {
             //miracast connect start
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_CONNECT\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_CONNECT\n",__func__);
 			ctl_msg.msg_type = MSG_TYPE_CAST_MIRACAST_CONNECTING;
             break;
         }
         case HCCAST_MIRA_CONNECTED:
         {
             //miracast connect success
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_CONNECTED\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_CONNECTED\n",__func__);
 			ctl_msg.msg_type = MSG_TYPE_CAST_MIRACAST_CONNECTED;
             break;
         }
         case HCCAST_MIRA_DISCONNECT:
         {
             //miracast disconnect
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_DISCONNECT\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_DISCONNECT\n",__func__);
             break;
         }
 
         case HCCAST_MIRA_START_DISP:
         {
             //miracast start
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_START_DISP\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_START_DISP\n",__func__);
             ctl_msg.msg_type = MSG_TYPE_CAST_MIRACAST_START;
             break;
         }
         case HCCAST_MIRA_STOP_DISP:
         {
             //miracast stop
-            log(DEMO, DEBUG, "[%s]HCCAST_MIRA_STOP_DISP\n",__func__);
+            _log(DEMO, DEBUG, "[%s]HCCAST_MIRA_STOP_DISP\n",__func__);
             ctl_msg.msg_type = MSG_TYPE_CAST_MIRACAST_STOP;
             break;
         }
@@ -299,16 +299,16 @@ int hccast_mira_callback_func(hccast_mira_event_e event, void* in, void* out)
     if (MSG_TYPE_CAST_MIRACAST_STOP == ctl_msg.msg_type)
     {
         //printf("[%s] wait cast root start tick: %d\n",__func__,(int)time(NULL));
-        bool win_cast_root_wait_open(uint32_t timeout);
-        win_cast_root_wait_open(20000);
+        //bool win_cast_root_wait_open(uint32_t timeout);
+        //win_cast_root_wait_open(20000);
         //printf("[%s] wait cast root end tick: %d\n",__func__,(int)time(NULL));
     }
 
     if (MSG_TYPE_CAST_MIRACAST_START == ctl_msg.msg_type)
     {
         //printf("[%s] wait cast play start tick: %d\n",__func__,(int)time(NULL));
-        bool win_cast_play_wait_open(uint32_t timeout);
-        win_cast_play_wait_open(20000);
+        //bool win_cast_play_wait_open(uint32_t timeout);
+        //win_cast_play_wait_open(20000);
         //printf("[%s] wait cast play end tick: %d\n",__func__,(int)time(NULL));
     }
 
@@ -397,16 +397,16 @@ int hccast_air_callback_event(hccast_air_event_e event, void* in, void* out)
         //the next dlna url play is starting, then the UI/logo may block the dlna playing.
         //So here exit callback function wait for win cast root UI opening
         printf("[%s] wait cast root start tick: %d\n",__func__,(int)time(NULL));
-        bool win_cast_root_wait_open(uint32_t timeout);
-        win_cast_root_wait_open(20000);
+        //bool win_cast_root_wait_open(uint32_t timeout);
+        //win_cast_root_wait_open(20000);
         printf("[%s] wait cast root end tick: %d\n",__func__,(int)time(NULL));
     }
 
     if (MSG_TYPE_CAST_AIRMIRROR_START == ctl_msg.msg_type)
     {
         printf("[%s] wait cast play start tick: %d\n",__func__,(int)time(NULL));
-        bool win_cast_play_wait_open(uint32_t timeout);
-        win_cast_play_wait_open(20000);
+        //bool win_cast_play_wait_open(uint32_t timeout);
+        //win_cast_play_wait_open(20000);
         printf("[%s] wait cast play end tick: %d\n",__func__,(int)time(NULL));
     }
 

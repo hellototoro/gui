@@ -44,7 +44,7 @@ static volatile int log_level = LOG_LEVEL_INFO | LOG_LEVEL_WARN | LOG_LEVEL_ERR;
             printf("["#modules"]"LOG_PREFIX_ERR"[%s %d]: "format"\n", __FUNCTION__, __LINE__, ##arg);           \
     } while (0)
 
-#define log(modules, level, format, arg...) LOG_##level(modules, format, ##arg)
+#define _log(modules, level, format, arg...) LOG_##level(modules, format, ##arg)
 
 
 #endif
