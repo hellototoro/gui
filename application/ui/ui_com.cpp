@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 14:57:53
+ * @LastEditTime: 2022-09-01 01:16:30
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -20,9 +20,7 @@ void group_init(void)
 {
     lv_group_t * group = lv_group_get_default();
     if (group) {
-        //group = lv_group_create();
         lv_group_del(group);
-        //lv_group_set_default(nullptr);
     }
 }
 

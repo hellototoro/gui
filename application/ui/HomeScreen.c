@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 14:18:08
+ * @LastEditTime: 2022-09-01 16:09:45
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -29,6 +29,8 @@ static lv_obj_t* UdiskDetectPanel;
 static lv_group_t* MainGroup;
 static int LastFocusedObjIndex;
 static bool LastUdiskStatus_PlugOut;
+
+extern pthread_mutex_t lvgl_task_mutex;
 
 enum HomeCategoryList {
     HOME_MOVIE,
@@ -278,6 +280,7 @@ static void* DetectHotPlugTask(void* arg)
     while (CurrentScreen == HomeScreen) {
         if (LastUdiskStatus_PlugOut != hotplug_usb_plugout()) {
             LastUdiskStatus_PlugOut = hotplug_usb_plugout();
+            pthread_mutex_lock(&lvgl_task_mutex);
             lv_obj_t* img = lv_obj_get_child(UdiskDetectPanel, 0);
             lv_obj_t* lab = lv_obj_get_child(UdiskDetectPanel, 1);
             if (LastUdiskStatus_PlugOut) {
@@ -288,6 +291,7 @@ static void* DetectHotPlugTask(void* arg)
                 lv_obj_add_flag(lab, LV_OBJ_FLAG_HIDDEN);     /// Flags
                 lv_obj_clear_flag(img, LV_OBJ_FLAG_HIDDEN);     /// Flags
             }
+            pthread_mutex_unlock(&lvgl_task_mutex);
         }
         usleep(1000 * 500);
     }

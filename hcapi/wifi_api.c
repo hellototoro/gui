@@ -39,8 +39,8 @@ typedef struct{
 static wifi_ap_info_t m_cur_wifi_info;
 
 
-static _LIST_HEAD (m_sys_ap_list_head);
-static _LIST_HEAD (m_wifi_handle_head);
+static LIST_HEAD (m_sys_ap_list_head);
+static LIST_HEAD (m_wifi_handle_head);
 
 
 #define WIFI_API_LOCK(lock) \

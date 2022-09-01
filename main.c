@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 13:08:45
+ * @LastEditTime: 2022-09-01 01:23:27
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -49,13 +49,11 @@ static void exit_console(int signo);
 int main(int argc, char *argv[])
 {
     #ifdef HCCHIP_GCC
-    if (argc == 2){
+    if (argc == 2) {
         strncpy(m_wifi_module_name, argv[1], sizeof(m_wifi_module_name)-1);
         wifi_api_set_module(m_wifi_module_name);
         printf("please modprobe %s!\n", m_wifi_module_name);
     }
-    app_ffplay_init();
-    api_logo_show(NULL);
     #endif
 
     if (pthread_mutex_init(&lvgl_task_mutex, NULL) != 0) {
@@ -69,17 +67,17 @@ int main(int argc, char *argv[])
     signal(SIGBUS, exit_console);
 
     #ifdef HCCHIP_GCC
-    api_gpio_init();
-
     api_system_init();
     api_video_init();
     api_audio_init();
-    data_mgr_load();
-    tv_sys_app_start_set(1); 
+    //data_mgr_load();
+    //tv_sys_app_start_set(1); 
+    app_ffplay_init();
+    //api_logo_show(NULL);
 
-    lv_fb_hotplug_support_set(false);
-    hotplug_init();
-    network_init();
+    //lv_fb_hotplug_support_set(false);
+    //hotplug_init();
+    //network_init();
     api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();
     //NetWorkInit();
@@ -96,8 +94,8 @@ int main(int argc, char *argv[])
         WindowsManager();
         pthread_mutex_lock(&lvgl_task_mutex);
         lv_task_handler();
-        usleep(5000);
         pthread_mutex_unlock(&lvgl_task_mutex);
+        usleep(5000);
     }
     return 0;
 }

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-27 11:46:07
+ * @LastEditTime: 2022-09-01 14:09:33
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -650,7 +650,6 @@ static void WiFiRefreshAvailableList(void)
     #endif
     lv_obj_t* child = NULL;
     int i;
-    //pthread_mutex_lock(&lvgl_task_mutex);
     for(i = 0; i < ap_count; ++i) {
         child = lv_obj_get_child(WiFiAvailableListPanel, i);
         if (!child) {
@@ -696,7 +695,6 @@ static void WiFiRefreshAvailableList(void)
     }
     lv_obj_add_flag(WiFiRefreshObj,LV_OBJ_FLAG_HIDDEN);
     lv_anim_del(WiFiRefreshObj, nullptr);
-    //pthread_mutex_unlock(&lvgl_task_mutex);
 }
 
 static void WiFiRefresh(void)

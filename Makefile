@@ -30,7 +30,7 @@ BIN = gui_app
 GUI_LIBS = -lffplayer -lpthread -lge -Wl,--start-group -lstdc++ $(CAST_LIBS) -Wl,--end-group
 GUI_LIBS += -lcjson -lwpa_client -lhccast-com -lhccast-net -lhccast-wl -lmdns -lcrypto -lhcfota
 
-MAINSRC = ./main.cpp
+MAINSRC = ./main.c
 
 include $(ROOT_DIR)/hcapi/hcapi.mk
 include $(ROOT_DIR)/application/gui_app.mk
@@ -43,7 +43,7 @@ COBJS = $(CSRCS:.c=$(OBJEXT))
 GUI_OBJS = $(GUI_APP_SRC:.c=$(OBJEXT))
 GUI_OBJS += $(GUI_APP_CPP_SRC:.cpp=$(OBJEXT))
 
-MAINOBJ = $(MAINSRC:.cpp=$(OBJEXT))
+MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
 
 ## MAINOBJ -> OBJFILES
 
