@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-19 19:35:54
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-15 01:38:10
+ * @LastEditTime: 2022-09-02 22:37:45
  * @FilePath: /gui/application/ui/media/music_lyric.cpp
  * @Description: None
  * @other: None
@@ -69,7 +69,10 @@ void music_lyric::clean(void)
 
 int music_lyric::get_start_time(int index)
 {
-    return start_time_list[index];
+    if (!start_time_list.empty())
+        return start_time_list[index];
+    else 
+        return 0;
 }
 
 string& music_lyric::get_one_line(int index)

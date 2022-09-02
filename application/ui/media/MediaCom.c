@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-22 14:52:56
+ * @LastEditTime: 2022-09-02 21:14:56
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -26,28 +26,31 @@
 #include "application/ui/Volume.h"
 #include "application/key_map.h"
 
+/* 全局变量 */
 char current_path[100];
 int current_path_size = sizeof(current_path);
-lv_obj_t* PlayBar;
-lv_obj_t* PlayListPanel;
-lv_obj_t* CurrentMediaScreen;
-lv_obj_t* LoadingPanel;
-MediaType CurrentPlayingType;
-PlayListMode CurrentPlayMode;
-MediaHandle* current_media_hdl;
-MediaList* media_list[MEDIA_MAX];
+
+/* 文件内全局变量 */
+static lv_obj_t* PlayBar;
+static lv_obj_t* PlayListPanel;
+static lv_obj_t* CurrentMediaScreen;
+static lv_obj_t* LoadingPanel;
+static MediaType CurrentPlayingType;
+static PlayListMode CurrentPlayMode;
+static MediaHandle* current_media_hdl;
+static MediaList* media_list[MEDIA_MAX];
 #ifdef HOST_GCC
-uint32_t played_time_host;
-lv_ffmpeg_player_cmd_t play_state;
+static uint32_t played_time_host;
+static lv_ffmpeg_player_cmd_t play_state;
 #endif
-file_name_t* media_file_name_array;
-int current_playing_index;
-bool PlayingAnimation_Flag;
-pthread_t MediaMonitorTask_Id;
+static file_name_t* media_file_name_array;
+static int current_playing_index;
+static bool PlayingAnimation_Flag;
+static pthread_t MediaMonitorTask_Id;
 
 static lv_group_t* MainGroup;
-lv_timer_t* PlayBar_Timer;
-lv_timer_t* PlayState_Timer;
+static lv_timer_t* PlayBar_Timer;
+static lv_timer_t* PlayState_Timer;
 
 static const lv_img_dsc_t* play_mode_image_src[PlayModeNumber] = {
     &ui_img_play_repeat_mode_new_png,
@@ -66,21 +69,30 @@ static const lv_img_dsc_t* play_list_image_src[MEDIA_MAX] = {
 
 extern pthread_mutex_t lvgl_task_mutex;
 
-MediaList* GetMediaList(MediaType media_type);
-DLNode * GetNextMediaNode(MediaList* list, PlayListMode mode);
-DLNode * GetPreMediaNode(MediaList* list, PlayListMode mode);
-/************动画*************/
-static void ShowUpAnimation(lv_obj_t * TargetObject, int delay);
-static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
+static MediaList* GetMediaList(MediaType media_type);
+static DLNode * GetNextMediaNode(MediaList* list, PlayListMode mode);
+static DLNode * GetPreMediaNode(MediaList* list, PlayListMode mode);
 static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_number);
 static void ShowOffPlayList(void);
 static void SetTotalTimeAndProgress(uint32_t total_time);
+static MediaList* CreateMediaList(MediaType media_type);
+static void DestroyMediaList(MediaType media_type);
+static uint16_t GetMediaArraySize(MediaType media_type);
+static void SetMediaIndex(int index);
+static char* GetPreMediaName(MediaType media_type, PlayListMode mode);
+static char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode);
+static file_name_t* GetMediaArray(void);
+static void LoadingMediaFileScreen(lv_obj_t* parent);
+static void CloseLoadingMediaFileScreen(void);
+/************动画*************/
+static void ShowUpAnimation(lv_obj_t * TargetObject, int delay);
+static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
 
 void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl)
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
-    CurrentPlayMode = RandPlay;
+    //CurrentPlayMode = RandPlay;
     CurrentMediaScreen = MediaScreen;
     srand(time(0));
     PlayingAnimation_Flag = false;
@@ -92,6 +104,7 @@ void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* medi
 
 void MediaComDeinit(void)
 {
+    current_media_hdl = NULL;
     //step3 恢复默认组
     delete_group(MainGroup);
 
@@ -103,16 +116,11 @@ void MediaComDeinit(void)
     CloseLoadingMediaFileScreen();
 }
 
-MediaList* CreateMediaList(MediaType media_type)
+static MediaList* CreateMediaList(MediaType media_type)
 {
     media_list[media_type] = (MediaList*) malloc(sizeof(MediaList));
     InitDList(media_list[media_type]);
     return media_list[media_type];
-}
-
-bool MediaListIsEmpty(MediaType media_type)
-{
-    return (media_list[media_type]->len ==0 ) ? true : false;
 }
 
 void AddToMediaList(MediaType media_type, char * media_name)
@@ -197,7 +205,7 @@ DLNode * GetPreMediaNode(MediaList* list, PlayListMode mode)
     return pre;
 }
 
-void DestroyMediaList(MediaType media_type)
+static void DestroyMediaList(MediaType media_type)
 {
     if (media_list[media_type] != NULL) {
         DestroyDList(media_list[media_type]);
@@ -212,29 +220,30 @@ void DestroyAllMediaList(void)
     }
 }
 
-void CreateMediaArray(MediaType media_type)
+void CreateMediaArray(void)
 {
-    int n = GetMediaListSize(media_type);
+    int n = GetMediaListSize(CurrentPlayingType);
     if (n == 0) return;
     DestroyMediaArray();
     current_playing_index = 0;
     media_file_name_array = (file_name_t*) malloc(sizeof(file_name_t) * n);
     GetNextMediaNode(NULL, OrderPlay);
     for (int i = 0; i < n; i++) {
-        media_file_name_array[i] = (char*) (GetNextMediaNode(GetMediaList(media_type), OrderPlay))->data;
+        media_file_name_array[i] = (char*) (GetNextMediaNode(GetMediaList(CurrentPlayingType), OrderPlay))->data;
     }
 }
 
-uint16_t GetMediaArraySize(MediaType media_type)
+static uint16_t GetMediaArraySize(MediaType media_type)
 {
     return GetMediaListSize(media_type);
 }
 
-uint16_t LocateMediaIndex(MediaType media_type, char * file_name)
+uint16_t LocateMediaIndex(char * file_name)
 {
     int i;
-    uint16_t n = GetMediaArraySize(media_type);
+    uint16_t n = GetMediaArraySize(CurrentPlayingType);
     for (i = 0; i < n; i++) {
+        if(file_name == NULL) break;
         if (strcmp(media_file_name_array[i], file_name) == 0) {
             current_playing_index = i;
             break;
@@ -243,15 +252,10 @@ uint16_t LocateMediaIndex(MediaType media_type, char * file_name)
     return current_playing_index;
 }
 
-void SetMediaIndex(int index)
+static void SetMediaIndex(int index)
 {
     if (index < GetMediaArraySize(CurrentPlayingType))
         current_playing_index = index;
-}
-
-int GetMediaIndex(void)
-{
-    return current_playing_index;
 }
 
 char* GetCurrentMediaName(void)
@@ -259,7 +263,7 @@ char* GetCurrentMediaName(void)
     return media_file_name_array[current_playing_index];
 }
 
-char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode)
+static char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode)
 {
     switch (next_mode) {
         case ManualPlay:
@@ -297,7 +301,7 @@ char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next
     return media_file_name_array[current_playing_index];
 }
 
-char* GetPreMediaName(MediaType media_type, PlayListMode mode)
+static char* GetPreMediaName(MediaType media_type, PlayListMode mode)
 {
     (void)mode;
     --current_playing_index;
@@ -306,7 +310,7 @@ char* GetPreMediaName(MediaType media_type, PlayListMode mode)
     return media_file_name_array[current_playing_index];
 }
 
-file_name_t* GetMediaArray(void)
+static file_name_t* GetMediaArray(void)
 {
     return media_file_name_array;
 }
@@ -319,7 +323,7 @@ void DestroyMediaArray(void)
     }
 }
 
-void PlayMedia(MediaHandle* media_hal, char * file_name)
+void PlayMedia(char * file_name)
 {
     if (file_name != NULL) {
         char file_path[100] = {0};
@@ -327,14 +331,14 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
         strcat(file_path, "/");
         strcat(file_path,  file_name);
         #ifdef HOST_GCC
-        lv_ffmpeg_player_set_src(media_hal, file_path);
-        lv_ffmpeg_player_set_cmd(media_hal, LV_FFMPEG_PLAYER_CMD_START);
+        lv_ffmpeg_player_set_src(current_media_hdl, file_path);
+        lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_START);
         play_state = LV_FFMPEG_PLAYER_CMD_START;
         played_time_host = 0;
         #elif defined(HCCHIP_GCC)
-        if (media_hal->state == MEDIA_PLAY)
-            media_stop(media_hal);
-        media_play(media_hal, file_path);
+        if (current_media_hdl->state == MEDIA_PLAY)
+            media_stop(current_media_hdl);
+        media_play(current_media_hdl, file_path);
         #endif
         if(CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO ) {
             #ifdef HCCHIP_GCC
@@ -349,7 +353,7 @@ void PlayMedia(MediaHandle* media_hal, char * file_name)
     }
 }
 
-void LoadingMediaFileScreen(lv_obj_t* parent)
+static void LoadingMediaFileScreen(lv_obj_t* parent)
 {
     if (lv_obj_is_valid(LoadingPanel))
         return;
@@ -377,7 +381,7 @@ void LoadingMediaFileScreen(lv_obj_t* parent)
     lv_obj_clear_flag(Spinner, LV_OBJ_FLAG_CLICKABLE);
 }
 
-void CloseLoadingMediaFileScreen(void)
+static void CloseLoadingMediaFileScreen(void)
 {
     if (lv_obj_is_valid(LoadingPanel))
         lv_obj_del(LoadingPanel);
@@ -446,10 +450,10 @@ static void key_event_handler(lv_event_t* event)
                     }
                     break;
                     case Previous:
-                        PlayMedia(current_media_hdl, GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
+                        PlayMedia(GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
                         break;
                     case Next:
-                        PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
+                        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
                         break;
                     case PlayList:
                         ShowOnPlayList(CurrentMediaScreen, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
@@ -504,7 +508,7 @@ static void play_list_event_handler(lv_event_t* event)
     {
         case LV_KEY_ENTER:
             SetMediaIndex(lv_obj_get_index(target));
-            PlayMedia(current_media_hdl, GetCurrentMediaName());
+            PlayMedia(GetCurrentMediaName());
             break;
         case LV_KEY_UP:
             lv_group_focus_prev(group);
@@ -548,7 +552,7 @@ static void ShowPlayedState(lv_timer_t * timer)
         if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
             lv_timer_pause(timer);
             #ifdef HOST_GCC
-            PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
+            PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
             if (played_time_host == 0)
                 SetTotalTimeAndProgress(20);
             #endif
@@ -822,7 +826,7 @@ void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
     case HCPLAYER_MSG_STATE_EOS:
         printf (">> app get eos, normal play end!\n");
         pthread_mutex_lock(&lvgl_task_mutex);
-        PlayMedia(current_media_hdl, GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
+        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
         pthread_mutex_unlock(&lvgl_task_mutex);
         //api_control_send_key(V_KEY_NEXT);
         break;

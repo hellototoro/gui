@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:35:34
+ * @LastEditTime: 2022-09-02 18:06:43
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -28,17 +28,17 @@ lv_obj_t* creat_video_window(char* file_name)
     lv_obj_center(VideoScreen);
     VideoHandler = VideoScreen;
     #elif defined(HCCHIP_GCC)
-    VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
     VideoScreen = lv_obj_create(NULL);
     lv_obj_set_style_bg_opa(VideoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
     #endif
-    lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
     lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
 
     MediaComInit(VideoScreen, MEDIA_VIDEO, VideoHandler);
-    CreateMediaArray(MEDIA_VIDEO);
-    LocateMediaIndex(MEDIA_VIDEO, file_name);
-    PlayMedia(VideoHandler, GetCurrentMediaName());
+    CreateMediaArray();
+    LocateMediaIndex(file_name);
+    PlayMedia(file_name);
 
     SetStyleForPlayBar(CreatePlayBar(VideoScreen));
     lv_disp_load_scr(VideoScreen);

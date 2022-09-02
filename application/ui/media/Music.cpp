@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-22 14:57:33
+ * @LastEditTime: 2022-09-02 21:19:29
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -47,10 +47,10 @@ lv_obj_t* creat_music_window(char* file_name)
     #endif
 
     MediaComInit(MusicScreen, MEDIA_MUSIC, MusicHandler);
-    CreateMediaArray(MEDIA_MUSIC);
-    LocateMediaIndex(MEDIA_MUSIC, file_name);
-    PlayMedia(MusicHandler, GetCurrentMediaName());
-    SetCurrentMusicTitle(GetCurrentMediaName());
+    CreateMediaArray();
+    LocateMediaIndex(file_name);
+    PlayMedia(file_name);
+    SetCurrentMusicTitle(file_name);
     SetCurrentMusicCover(&ui_img_music_cover2_png);
     
     SetStyleForPlayBar(CreatePlayBar(MusicScreen));

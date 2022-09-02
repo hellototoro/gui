@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-28 20:27:47
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 02:16:58
+ * @LastEditTime: 2022-09-02 22:47:21
  * @FilePath: /gui/application/setting/Picture.cpp
  * @Description: None
  * @other: None
@@ -55,7 +55,7 @@ Picture::~Picture()
 
 const char** Picture::GetStrArray(void)
 {
-    static const char* name[11] = {
+    static const char* name_list[11] = {
         "setting_p_picture_setting", 
         "setting_p_picture_mode", "", 
         "setting_p_picture_scale", "", 
@@ -63,12 +63,12 @@ const char** Picture::GetStrArray(void)
         "setting_p_picture_rate", "setting_p_picture_rate_100", 
         "setting_p_picture_power_bank_mode", ""
     };
-    name[2] = mode.name[mode.type];
-    name[4] = ScaleName[scale];
-    name[6] = ColorTemperature.name[ColorTemperature.type];
-    //name[8] = ScaleName[scale];
-    name[10] = PowerBankModeName[PowerBankMode];
-    return name;
+    name_list[2] = mode.name[mode.type];
+    name_list[4] = ScaleName[scale];
+    name_list[6] = ColorTemperature.name[ColorTemperature.type];
+    //name_list[8] = ScaleName[scale];
+    name_list[10] = PowerBankModeName[PowerBankMode];
+    return name_list;
 }
 
 int Picture::GetUserValue(int index)
@@ -136,34 +136,34 @@ void Picture::DecreaseUserValue(int index)
 
 const char* Picture::GetStr(int index)
 {
-    const char* name = nullptr;
+    const char* name_list = nullptr;
     switch (index)
     {
     case static_cast<int>(Setting_PictureMode):
-        name = mode.name[mode.type];
+        name_list = mode.name[mode.type];
         break;
 
     case static_cast<int>(Setting_PictureScale):
-        name = ScaleName[scale];
+        name_list = ScaleName[scale];
         break;
 
     case static_cast<int>(Setting_PictureColorTemperature):
-        name = ColorTemperature.name[ColorTemperature.type];
+        name_list = ColorTemperature.name[ColorTemperature.type];
         break;
 
     case static_cast<int>(Setting_PictureRatio):
         sprintf(RatioName, "%d%%", ratio);
-        name = RatioName;
+        name_list = RatioName;
         break;
 
     case static_cast<int>(Setting_PicturePowerBank):
-        name = PowerBankModeName[PowerBankMode];
+        name_list = PowerBankModeName[PowerBankMode];
         break;
 
     default:
         break;
     }
-    return name;
+    return name_list;
 }
 
 void* Picture::GetDerivedAddress(int index)
@@ -189,13 +189,13 @@ void* Picture::GetDerivedAddress(int index)
 const char** Picture::PictureMode::GetStrArray(void)
 {
     //const char** name = nullptr;
-    static const char* name[5] = { 
+    static const char* name_list[5] = { 
     "setting_p_picture_mode", 
     "setting_p_picture_mode_contrast", 
     "setting_p_picture_mode_brightness", 
     "setting_p_picture_mode_colour", 
     "setting_p_picture_mode_sharpness" };
-    return name;
+    return name_list;
 }
 
 int Picture::PictureMode::GetUserValue(int index)
@@ -272,43 +272,43 @@ void Picture::PictureMode::DecreaseUserValue(int index)
 
 const char* Picture::PictureMode::GetStr(int index)
 {
-    const char* name = nullptr;
+    const char* name_list = nullptr;
     switch (index)
     {
     case static_cast<int>(ModeType::Content_Contrast):
         sprintf(user.ContrastName, "%d", user.contrast);
-        name = user.ContrastName;
+        name_list = user.ContrastName;
         break;
 
     case static_cast<int>(ModeType::Content_Brightness):
         sprintf(user.BrightnessName, "%d", user.brightness);
-        name = user.BrightnessName;
+        name_list = user.BrightnessName;
         break;
 
     case static_cast<int>(ModeType::Content_Colour):
         sprintf(user.ColourName, "%d", user.colour);
-        name = user.ColourName;
+        name_list = user.ColourName;
         break;
 
     case static_cast<int>(ModeType::Content_Sharpness):
         sprintf(user.SharpnessName, "%d", user.sharpness);
-        name = user.SharpnessName;
+        name_list = user.SharpnessName;
         break;
     
     default:
         break;
     }
-    return name;
+    return name_list;
 }
 
 const char** Picture::PictureColorTemperature::GetStrArray(void)
 {
-    static const char* name[4] = { 
+    static const char* name_list[4] = { 
     "setting_p_picture_color_temp", 
     "setting_p_picture_color_temp_red", 
     "setting_p_picture_color_temp_green", 
     "setting_p_picture_color_temp_blue" };
-    return name;
+    return name_list;
 }
 
 int Picture::PictureColorTemperature::GetUserValue(int index)
@@ -374,28 +374,28 @@ void Picture::PictureColorTemperature::DecreaseUserValue(int index)
 
 const char* Picture::PictureColorTemperature::GetStr(int index)
 {
-    const char* name = nullptr;
+    const char* name_list = nullptr;
     switch (index)
     {
     case static_cast<int>(ColorTemperatureType::Content_Red):
         sprintf(user.RedName, "%d", user.red);
-        name = user.RedName;
+        name_list = user.RedName;
         break;
 
     case static_cast<int>(ColorTemperatureType::Content_Green):
         sprintf(user.GreenName, "%d", user.green);
-        name = user.GreenName;
+        name_list = user.GreenName;
         break;
 
     case static_cast<int>(ColorTemperatureType::Content_Blue):
         sprintf(user.BlueName, "%d", user.blue);
-        name = user.BlueName;
+        name_list = user.BlueName;
         break;
 
     default:
         break;
     }
-    return name;
+    return name_list;
 }
 
 }

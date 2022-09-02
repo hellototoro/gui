@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-22 18:52:18
- * @FilePath: /gui/application/ui/MediaFile.h
+ * @LastEditTime: 2022-09-02 19:54:58
+ * @FilePath: /gui/application/ui/media/MediaFile.h
  * @Description: None
  * @other: None
  */
@@ -18,9 +18,9 @@ extern "C" {
 #endif
 
 #ifdef HOST_GCC
-#define media_dir "/mnt"
+#define media_dir "mnt"
 #else
-#define media_dir "/media"
+#define media_dir "media"
 #endif
 
 typedef enum

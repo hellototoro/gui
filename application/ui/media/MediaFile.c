@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-30 13:02:18
- * @FilePath: /gui/application/ui/MediaFile.c
+ * @LastEditTime: 2022-09-02 21:17:27
+ * @FilePath: /gui/application/ui/media/MediaFile.c
  * @Description: None
  * @other: None
  */
@@ -160,7 +160,7 @@ FileStr* GetNextFile(LinkList *list)
 
 bool IsRootPath(const char * path)
 {
-    return strcmp(media_dir, path) == 0 ? true : false;
+    return strcmp(media_dir, path+1) == 0 ? true : false;
 }
 
 void CloseFileList(void)

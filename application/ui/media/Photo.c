@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:38:15
+ * @LastEditTime: 2022-09-02 21:19:07
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -36,9 +36,9 @@ lv_obj_t* creat_photo_window(char* file_name)
     lv_obj_clear_flag(PhotoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
     MediaComInit(PhotoScreen, MEDIA_PHOTO, PhotoHandler);
-    CreateMediaArray(MEDIA_PHOTO);
-    LocateMediaIndex(MEDIA_PHOTO, file_name);
-    PlayMedia(PhotoHandler, GetCurrentMediaName());
+    CreateMediaArray();
+    LocateMediaIndex(file_name);
+    PlayMedia(file_name);
 
     SetStyleForPlayBar(CreatePlayBar(PhotoScreen));
     lv_disp_load_scr(PhotoScreen);

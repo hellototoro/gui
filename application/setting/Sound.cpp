@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 13:38:33
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 02:17:31
+ * @LastEditTime: 2022-09-02 22:44:35
  * @FilePath: /gui/application/setting/Sound.cpp
  * @Description: None
  * @other: None
@@ -141,11 +141,11 @@ void* Sound::GetDerivedAddress(int index)
 const char** Sound::SoundMode::GetStrArray(void)
 {
     //const char** name = nullptr;
-    static const char* name[3] = { 
+    static const char* name_list[3] = { 
     "setting_p_sound_mode", 
     "setting_p_sound_mode_treble", 
     "setting_p_sound_mode_bass" };
-    return name;
+    return name_list;
 }
 
 int Sound::SoundMode::GetUserValue(int index)
@@ -200,23 +200,23 @@ void Sound::SoundMode::DecreaseUserValue(int index)
 
 const char* Sound::SoundMode::GetStr(int index)
 {
-    const char* name = nullptr;
+    const char* name_list = nullptr;
     switch (index)
     {
     case static_cast<int>(ModeType::Content_Treble):
         sprintf(user.TrebleName, "%d", user.treble);
-        name = user.TrebleName;
+        name_list = user.TrebleName;
         break;
 
     case static_cast<int>(ModeType::Content_Bass):
         sprintf(user.BassName, "%d", user.bass);
-        name = user.BassName;
+        name_list = user.BassName;
         break;
     
     default:
         break;
     }
-    return name;
+    return name_list;
 }
 
 }

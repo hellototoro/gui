@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-01 14:09:33
+ * @LastEditTime: 2022-09-02 21:26:14
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -230,6 +230,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
 
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
+    lv_group_set_wrap(MainGroup, false);
 
     WiFiControlPanel = lv_obj_create(WiFiPanel);
     lv_obj_set_width(WiFiControlPanel, 1020);
@@ -645,6 +646,7 @@ static void WiFiRefreshAvailableList(void)
     #ifdef HCCHIP_GCC
     wifi_ap_info_t *wifi_list = WiFi_GetAPList();
     ap_count = WiFi_GetAPCount();
+    if (wifi_list == nullptr) return;
     #else
     ap_count = 10;
     #endif

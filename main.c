@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-01 23:06:14
+ * @LastEditTime: 2022-09-02 21:24:11
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     //network_init();
     api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();
-    //NetWorkInit();
+    NetWorkInit();
     #endif
 
     #ifdef HOST_GCC

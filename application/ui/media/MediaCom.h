@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-11 08:58:05
+ * @LastEditTime: 2022-09-02 21:15:24
  * @FilePath: /gui/application/ui/media/MediaCom.h
  * @Description: None
  * @other: None
@@ -60,25 +60,14 @@ extern char current_path[];
 extern int current_path_size;
 extern void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl);
 extern void MediaComDeinit(void);
-extern MediaList* CreateMediaList(MediaType media_type);
-extern bool MediaListIsEmpty(MediaType media_type);
 extern void AddToMediaList(MediaType media_type, char * media_name);
 extern uint16_t GetMediaListSize(MediaType media_type);
-extern void DestroyMediaList(MediaType media_type);
 extern void DestroyAllMediaList(void);
-extern void CreateMediaArray(MediaType media_type);
-extern uint16_t GetMediaArraySize(MediaType media_type);
-extern uint16_t LocateMediaIndex(MediaType media_type, char * file_name);
-extern void SetMediaIndex(int index);
-extern int GetMediaIndex(void);
+extern void CreateMediaArray(void);
+extern uint16_t LocateMediaIndex(char * file_name);
 extern char* GetCurrentMediaName(void);
-extern char* GetPreMediaName(MediaType media_type, PlayListMode mode);
-extern char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode);
-extern file_name_t* GetMediaArray(void);
 extern void DestroyMediaArray(void);
-extern void PlayMedia(MediaHandle* media_hal, char * file_name);
-extern void LoadingMediaFileScreen(lv_obj_t* parent);
-extern void CloseLoadingMediaFileScreen(void);
+extern void PlayMedia(char * file_name);
 
 //公共ui部分
 extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 12:41:07
+ * @LastEditTime: 2022-09-02 21:03:13
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -31,85 +31,61 @@
 
 MediaFileCategoryList FileFilter;
 
-static const uint16_t FileListPanelRowNumber = FileListPanelWidth/FileWidth;
+static constexpr uint16_t FileListPanelRowNumber = FileListPanelWidth/FileWidth;
 static lv_obj_t* MediaRootScreen;
-lv_obj_t* ui_Category_Panel;
-lv_obj_t* ui_File_List_Panel;
-lv_obj_t* ui_LAB_Real_Path;
+static lv_obj_t* CategoryPanel;
+static lv_obj_t* FileListPanel;
+static lv_obj_t* RealPath;
 static lv_group_t* CategoryGroup;
 static lv_group_t* FileListGroup;
-lv_obj_t* CurrentMediaWindow;
+static lv_obj_t* CurrentMediaWindow;
+static MediaFileCategoryList last_filter_type;
 std::stack<lv_obj_t*, std::list<lv_obj_t*>> FileListPanelStack;
 
-static void CreateFilePanel(lv_obj_t* parent);
-static void ShowDisk(void);
+static void CreateFilePanel(lv_obj_t* parent, const char *path);
 static void ShowFileList(FileList *file_list);
 static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* pic, const char* str);
 static void ReturnUpper(void);
-static void RefreshFileWithFile(MediaFileCategoryList filter);
-static void return_handler(lv_event_t* event);
 static void FilterFile(MediaFileCategoryList file_type);
 static void ExitMedia(ActiveScreen screen);
 
-static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
+static void key_base_event_handler(lv_obj_t* target)
 {
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+    int index = lv_obj_get_index(target);
     switch (value)
     {
     case LV_KEY_UP:
-        if (ui_Category_Panel == parents) {
-            lv_group_focus_prev(group);
-        }
-        else if (ui_File_List_Panel == parents) {
-            int index = lv_obj_get_index(target);
-            if (index - FileListPanelRowNumber >= 0)
-                lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, index - FileListPanelRowNumber));
-        }
+        if (index > (FileListPanelRowNumber - 1))
+            lv_group_focus_obj(lv_obj_get_child(FileListPanel, index - FileListPanelRowNumber));
         break;
     case LV_KEY_DOWN:
-        if (ui_Category_Panel == parents) {
-            lv_group_focus_next(group);
-        }
-        else if (ui_File_List_Panel == parents) {
-            int index = lv_obj_get_index(target);
-            if ((uint32_t)(index + FileListPanelRowNumber) < lv_obj_get_child_cnt(ui_File_List_Panel))
-                lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, index + FileListPanelRowNumber));
-            else if ( ((uint32_t)index/FileListPanelRowNumber)*FileListPanelRowNumber + FileListPanelRowNumber < lv_obj_get_child_cnt(ui_File_List_Panel)) {
-                lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, lv_obj_get_child_cnt(ui_File_List_Panel) - 1));
-            }
+        if ((uint32_t)(index + FileListPanelRowNumber) < lv_obj_get_child_cnt(FileListPanel))
+            lv_group_focus_obj(lv_obj_get_child(FileListPanel, index + FileListPanelRowNumber));
+        else if ( ((uint32_t)index/FileListPanelRowNumber)*FileListPanelRowNumber + FileListPanelRowNumber < lv_obj_get_child_cnt(FileListPanel)) {
+            lv_group_focus_obj(lv_obj_get_child(FileListPanel, lv_obj_get_child_cnt(FileListPanel) - 1));
         }
         break;
     case LV_KEY_LEFT:
-        if (ui_File_List_Panel == parents) {
-            if (lv_obj_get_child(ui_File_List_Panel, 0) != target) {
-                lv_group_focus_prev(group);
-            }
-            else {
-                lv_group_focus_obj(ui_File_List_Panel);//隐藏file list panel 的聚焦状态
-                set_group_activity(CategoryGroup);
-            }
+        if(index == 0) {
+            lv_event_send(target, LV_EVENT_DEFOCUSED, nullptr);
+            set_group_activity(CategoryGroup);
         }
-    break;
+        else
+            lv_group_focus_prev(group);
+        break;
     case LV_KEY_RIGHT:
-        if (ui_Category_Panel == parents) {
-            set_group_activity(FileListGroup);
-            lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
-        }
-        else if (ui_File_List_Panel == parents) {
-            if (lv_obj_get_child(ui_File_List_Panel, lv_obj_get_child_cnt(ui_File_List_Panel) - 1) != target)
-                lv_group_focus_next(group);
-            else
-                lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
-        }
-    break;
+        if (lv_obj_get_child(FileListPanel, lv_obj_get_child_cnt(FileListPanel) - 1) != target)
+            lv_group_focus_next(group);
+        else
+            lv_group_focus_obj(lv_obj_get_child(FileListPanel, 0));
+        break;
     case LV_KEY_ESC:
-        if(IsRootPath(current_path)) {
+        if(IsRootPath(current_path))
             ExitMedia(HomeScreen);
-        }
-        else if (!lv_obj_is_valid(CurrentMediaWindow)) {
+        else /* if (!lv_obj_is_valid(CurrentMediaWindow)) */
             ReturnUpper();
-        }
         break;
     case LV_KEY_VOLUME_UP:
     case LV_KEY_VOLUME_DOWN:
@@ -121,219 +97,40 @@ static void key_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
     }
 }
 
-static void focused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
-{
-     if (parents == ui_File_List_Panel) {
-        if (lv_obj_get_child(parents, 0) != target) {
-            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
-        }
-    }
-    else if (parents == ui_Category_Panel) {
-        FileFilter = static_cast<MediaFileCategoryList>(lv_obj_get_index(target));
-        FilterFile(FileFilter);
-    }
-}
-
-static void defocused_base_event_handler(lv_obj_t* target, lv_obj_t* parents)
-{
-     if (parents == ui_File_List_Panel) {
-        if (lv_obj_get_child(parents, 0) != target) {
-            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
-        }
-    }
-}
-
-static void category_list_handler(lv_event_t* event)
-{
-    lv_event_code_t code = lv_event_get_code(event);
-    lv_obj_t* target = lv_event_get_target(event);
-    lv_obj_t* parents = lv_obj_get_parent(target);
-    if (LV_EVENT_KEY == code) {
-        key_base_event_handler(target, parents);
-    }
-    else if (LV_EVENT_FOCUSED == code) {
-        focused_base_event_handler(target, parents);
-    }
-}
-
 static void file_list_handler(lv_event_t* event)
 {
-    lv_event_code_t code = lv_event_get_code(event);
     lv_obj_t* target = lv_event_get_target(event);
-    lv_obj_t* parents = lv_obj_get_parent(target);
-    if (LV_EVENT_KEY == code) {
-        uint32_t value = lv_indev_get_key(lv_indev_get_act());
-        //lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
-        if (LV_KEY_ENTER == value) {
-            if (target->user_data != NULL) {
-                switch (((FileStr *)(target->user_data))->type)
-                {
-                case FILE_DIR:
-                    FileListPanelStack.push(ui_File_List_Panel);
-                    CreateFilePanel(MediaRootScreen);
-                    set_group_activity(FileListGroup);
-                    strcat(current_path, "/");
-                    strcat(current_path, ((FileStr *)(target->user_data))->name);
-                    ShowFileList(GetFileList(current_path));
-                    lv_group_focus_obj(lv_obj_get_child(ui_File_List_Panel, 0));
-                    break;
-                case FILE_VIDEO:
-                    CurrentMediaWindow = creat_video_window(((FileStr *)(target->user_data))->name);
-                    break;
-                        
-                case FILE_MUSIC:
-                    CurrentMediaWindow = creat_music_window(((FileStr *)(target->user_data))->name);
-                    break;
-                case FILE_PHOTO:
-                    CurrentMediaWindow = creat_photo_window(((FileStr *)(target->user_data))->name);
-                    break;
-                case FILE_TEXT:
-                    CurrentMediaWindow = creat_text_window(((FileStr *)(target->user_data))->name);
-                    break;
-                
-                default:
-                    break;
-                }
+    uint32_t value = lv_indev_get_key(lv_indev_get_act());
+    if (LV_KEY_ENTER == value) {
+        if (target->user_data != nullptr) {
+            switch (((FileStr *)(target->user_data))->type)
+            {
+            case FILE_DIR:
+                FileListPanelStack.push(FileListPanel);
+                CreateFilePanel(MediaRootScreen, ((FileStr *)(target->user_data))->name);
+                lv_group_focus_obj(lv_obj_get_child(FileListPanel, 0));
+                break;
+            case FILE_VIDEO:
+                CurrentMediaWindow = creat_video_window(((FileStr *)(target->user_data))->name);
+                break;
+            case FILE_MUSIC:
+                CurrentMediaWindow = creat_music_window(((FileStr *)(target->user_data))->name);
+                break;
+            case FILE_PHOTO:
+                CurrentMediaWindow = creat_photo_window(((FileStr *)(target->user_data))->name);
+                break;
+            case FILE_TEXT:
+                CurrentMediaWindow = creat_text_window(((FileStr *)(target->user_data))->name);
+                break;
+            
+            default:
+                break;
             }
         }
-        else {
-            key_base_event_handler(target, parents);
-        }
     }
-    else if (LV_EVENT_FOCUSED == code) {
-        focused_base_event_handler(target,parents);
+    else {
+        key_base_event_handler(target);
     }
-    else if (LV_EVENT_DEFOCUSED == code) {
-        defocused_base_event_handler(target,parents);
-    }
-}
-
-static void return_handler(lv_event_t* event)
-{
-    lv_event_code_t code = lv_event_get_code(event);
-    lv_obj_t* target = lv_event_get_target(event);
-    lv_obj_t* parents = lv_obj_get_parent(target);
-    if (LV_EVENT_KEY == code) {
-        uint32_t value = lv_indev_get_key(lv_indev_get_act());
-        if (LV_KEY_ENTER == value) {
-            if ( !IsRootPath(current_path)) {
-                ReturnUpper();
-            }
-        }
-        else {
-            key_base_event_handler(target, parents);
-        }
-    }
-    else if (LV_EVENT_FOCUSED == code) {
-        focused_base_event_handler(target,parents);
-    }
-}
-
-static void FilterFile(MediaFileCategoryList filter_type)
-{
-    static const lv_img_dsc_t* image_src[] = {
-        NULL,
-        &ui_img_movie_png,
-        &ui_img_music_png,
-        &ui_img_image_png,
-        &ui_img_text_png,
-        &ui_img_other_png };
-    static MediaFileCategoryList last_filter_type = MediaFile_All;
-    
-    if (last_filter_type != filter_type) {
-        FileStr* file = NULL;
-        lv_obj_t* child = NULL;
-        uint16_t dir_number = GetDirNumber(current_list);
-        uint16_t non_dir_number = GetNonDirNumber(current_list);
-        uint16_t media_number = GetMediaListSize(static_cast<MediaType>(filter_type));
-        int first_file_index = dir_number + 1;//第一个非文件夹对象
-        int end_index = first_file_index + ((filter_type == MediaFile_All) ? non_dir_number : media_number);
-        GetNextFile(NULL);
-        for (int i = first_file_index; i < end_index; i++) {
-            do {
-                file = GetNextFile(current_list->NonDirList);
-            } while ((file != NULL) && (filter_type != MediaFile_All) && (file->type != (FileType)filter_type));
-            if (file == NULL) break;
-            child = lv_obj_get_child(ui_File_List_Panel, i);
-            if (child != NULL) {
-                child->user_data = file;
-                lv_img_set_src(child->spec_attr->children[0], image_src[file->type]);
-                lv_label_set_text(child->spec_attr->children[1], file->name);
-            }
-            else {
-                child = lv_btn_create(ui_File_List_Panel);
-                child->user_data = file;
-                DrawCell(child, FileWidth, FileHeight, image_src[file->type], file->name);
-                lv_group_add_obj(FileListGroup, child);
-                lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_ALL, NULL);
-            }
-        }
-        if (filter_type != MediaFile_All) {
-            uint16_t obj_number = lv_obj_get_child_cnt(ui_File_List_Panel);
-            for (int i = end_index; i < obj_number; i++) {
-                lv_obj_del_async(lv_obj_get_child(ui_File_List_Panel, i));
-            }
-        }
-        last_filter_type = filter_type;
-    }
-}
-
-static void CreateCategoryPanel(lv_obj_t* parent)
-{
-    static const char* lab_text[] = {
-        "media_category_p_all",
-        "media_category_p_video",
-        "media_category_p_music",
-        "media_category_p_photo",
-        "media_category_p_text" };
-    ui_Category_Panel = lv_obj_create(parent);
-    lv_obj_set_size(ui_Category_Panel, 252, 420);
-    lv_obj_set_pos(ui_Category_Panel, -515, 0);
-    lv_obj_set_align(ui_Category_Panel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(ui_Category_Panel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_Category_Panel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    CategoryGroup = create_new_group();
-    set_group_activity(CategoryGroup);
-    for (int i = 0; i < MediaFile_CategoryNumber; i++) {
-        lv_obj_t* ui_BTN = lv_btn_create(ui_Category_Panel);
-        lv_obj_set_size(ui_BTN, 265, 50);
-        lv_obj_set_pos(ui_BTN, -30, -160 + i * 80);
-        lv_obj_set_align(ui_BTN, LV_ALIGN_CENTER);
-        lv_obj_clear_flag(ui_BTN, LV_OBJ_FLAG_SCROLLABLE);
-        lv_obj_set_style_radius(ui_BTN, 25, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_bg_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_shadow_color(ui_BTN, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_shadow_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_radius(ui_BTN, 25, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_bg_color(ui_BTN, lv_color_hex(0xFF3700), LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_bg_opa(ui_BTN, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_shadow_color(ui_BTN, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_set_style_shadow_opa(ui_BTN, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_group_add_obj(CategoryGroup, ui_BTN);
-        lv_obj_add_event_cb(ui_BTN, category_list_handler, LV_EVENT_ALL, NULL);
-
-        lv_obj_t* ui_LAB = lv_label_create(ui_BTN);
-        lv_obj_set_size(ui_LAB, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-        lv_obj_set_pos(ui_LAB, 10, 0);
-        lv_obj_set_align(ui_LAB, LV_ALIGN_CENTER);
-        ui_LAB->user_data = const_cast<char*>(lab_text[i]);
-        lv_label_set_text(ui_LAB, _(lab_text[i]));
-        lv_obj_set_style_text_color(ui_LAB, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_opa(ui_LAB, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(ui_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-        lv_obj_t* ui_IMG = lv_img_create(ui_BTN);
-        lv_img_set_src(ui_IMG, &ui_img_arrow_right_png);
-        lv_obj_set_size(ui_IMG, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-        lv_obj_set_pos(ui_IMG, 104, 0);
-        lv_obj_set_align(ui_IMG, LV_ALIGN_CENTER);
-        lv_obj_set_style_img_recolor(ui_IMG, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_img_recolor_opa(ui_IMG, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    }
-    //FileFilter = MediaFile_All;
-    lv_group_focus_obj(lv_obj_get_child(ui_Category_Panel, FileFilter));
 }
 
 static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* pic, const char* str)
@@ -369,14 +166,27 @@ static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* p
 
 static void ShowFileList(FileList *file_list)
 {
-    lv_obj_t* ui_back = lv_btn_create(ui_File_List_Panel);
-    ui_back->user_data = const_cast<char*>("media_file_p_return");
-    DrawCell(ui_back, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
-    lv_group_add_obj(FileListGroup, ui_back);
-    lv_obj_add_event_cb(ui_back, return_handler, LV_EVENT_ALL, NULL);
+    lv_obj_t* ReturnButton = lv_btn_create(FileListPanel);
+    ReturnButton->user_data = const_cast<char*>("media_file_p_return");
+    DrawCell(ReturnButton, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
+    lv_group_add_obj(FileListGroup, ReturnButton);
+    lv_obj_add_event_cb(ReturnButton, [] (lv_event_t* event) {
+        lv_obj_t* target = lv_event_get_target(event);
+        lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+        uint32_t value = lv_indev_get_key(lv_indev_get_act());
+        switch (value)
+        {
+        case LV_KEY_ENTER:
+            if ( !IsRootPath(current_path)) ReturnUpper();
+            break;
+        default:
+            key_base_event_handler(target);
+            break;
+        }
+    }, LV_EVENT_KEY, nullptr);
     int FileCnt = GetFileNumber(file_list);
     DestroyAllMediaList();
-    GetNextFileFromFileList(NULL);//清理前一次使用痕迹
+    GetNextFileFromFileList(nullptr);//清理前一次使用痕迹
     for (int i = 0; i < FileCnt; i++) {
         lv_img_dsc_t* image;
         FileStr* file = GetNextFileFromFileList(file_list);
@@ -413,31 +223,146 @@ static void ShowFileList(FileList *file_list)
                 continue;
             }
         }
-        lv_obj_t* ui_BTN = lv_btn_create(ui_File_List_Panel);
-        ui_BTN->user_data = file;
-        DrawCell(ui_BTN, FileWidth, FileHeight, image, file->name);
-        lv_group_add_obj(FileListGroup, ui_BTN);
-        lv_obj_add_event_cb(ui_BTN, file_list_handler, LV_EVENT_ALL, NULL);
+        lv_obj_t* btn = lv_btn_create(FileListPanel);
+        btn->user_data = file;
+        DrawCell(btn, FileWidth, FileHeight, image, file->name);
+        lv_group_add_obj(FileListGroup, btn);
+        lv_obj_add_event_cb(btn, file_list_handler, LV_EVENT_KEY, nullptr);
+        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
+            lv_obj_t* target = lv_event_get_target(event);
+            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
+        }, LV_EVENT_FOCUSED, nullptr);
+        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
+            lv_obj_t* target = lv_event_get_target(event);
+            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
+        }, LV_EVENT_DEFOCUSED, nullptr);
     }
-    lv_label_set_text(ui_LAB_Real_Path, current_path);
+    lv_label_set_text(RealPath, current_path);
+}
+
+static void CreateFilePanel(lv_obj_t* parent, const char *path)
+{
+    FileListPanel = lv_obj_create(parent);
+    lv_obj_set_size(FileListPanel, 1010, 600);
+    lv_obj_set_pos(FileListPanel, 110, 25);
+    lv_obj_set_align(FileListPanel, LV_ALIGN_CENTER);
+    lv_obj_set_flex_flow(FileListPanel, LV_FLEX_FLOW_ROW_WRAP);
+    lv_obj_set_style_bg_color(FileListPanel, lv_color_hex(0x0D6D96), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(FileListPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(FileListPanel, lv_color_hex(0x009DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(FileListPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_width(FileListPanel, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    FileListGroup = create_new_group();
+    set_group_activity(FileListGroup);
+    strcat(current_path, "/");
+    strcat(current_path, path);
+    ShowFileList(GetFileList(current_path));
+}
+
+static void CreateCategoryPanel(lv_obj_t* parent)
+{
+    static const char* lab_text[] = {
+        "media_category_p_all",
+        "media_category_p_video",
+        "media_category_p_music",
+        "media_category_p_photo",
+        "media_category_p_text" };
+    CategoryPanel = lv_obj_create(parent);
+    lv_obj_set_size(CategoryPanel, 252, 420);
+    lv_obj_set_pos(CategoryPanel, -515, 0);
+    lv_obj_set_align(CategoryPanel, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(CategoryPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_opa(CategoryPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(CategoryPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    //CategoryGroup = create_new_group();
+    CategoryGroup = lv_group_create();//对于类别组做一般处理
+    set_group_activity(CategoryGroup);
+    for (int i = 0; i < MediaFile_CategoryNumber; i++) {
+        lv_obj_t* btn = lv_btn_create(CategoryPanel);
+        lv_obj_set_size(btn, 265, 50);
+        lv_obj_set_pos(btn, -30, -160 + i * 80);
+        lv_obj_set_align(btn, LV_ALIGN_CENTER);
+        lv_obj_clear_flag(btn, LV_OBJ_FLAG_SCROLLABLE);
+        lv_obj_set_style_radius(btn, 25, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_shadow_color(btn, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_shadow_opa(btn, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_radius(btn, 25, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_color(btn, lv_color_hex(0xFF3700), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_bg_opa(btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_color(btn, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_opa(btn, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_group_add_obj(CategoryGroup, btn);
+        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
+            lv_obj_t* target = lv_event_get_target(event);
+            lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+            uint32_t value = lv_indev_get_key(lv_indev_get_act());
+            switch (value)
+            {
+            case LV_KEY_UP:
+                lv_group_focus_prev(group);
+                break;
+            case LV_KEY_DOWN:
+                lv_group_focus_next(group);
+                break;
+            case LV_KEY_RIGHT:
+                set_group_activity(FileListGroup);
+                lv_group_focus_obj(lv_obj_get_child(FileListPanel, 0));
+                break;
+            case LV_KEY_ESC:
+                ExitMedia(HomeScreen);
+                break;
+            default:
+                break;
+            }
+        }, LV_EVENT_KEY, nullptr);
+        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
+            lv_obj_t* target = lv_event_get_target(event);
+            FileFilter = static_cast<MediaFileCategoryList>(lv_obj_get_index(target));
+            FilterFile(FileFilter);
+        }, LV_EVENT_FOCUSED, nullptr);
+
+        lv_obj_t* ui_LAB = lv_label_create(btn);
+        lv_obj_set_size(ui_LAB, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_pos(ui_LAB, 10, 0);
+        lv_obj_set_align(ui_LAB, LV_ALIGN_CENTER);
+        ui_LAB->user_data = const_cast<char*>(lab_text[i]);
+        lv_label_set_text(ui_LAB, _(lab_text[i]));
+        lv_obj_set_style_text_color(ui_LAB, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(ui_LAB, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(ui_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+        lv_obj_t* ui_IMG = lv_img_create(btn);
+        lv_img_set_src(ui_IMG, &ui_img_arrow_right_png);
+        lv_obj_set_size(ui_IMG, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_pos(ui_IMG, 104, 0);
+        lv_obj_set_align(ui_IMG, LV_ALIGN_CENTER);
+        lv_obj_set_style_img_recolor(ui_IMG, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_img_recolor_opa(ui_IMG, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    }
+    //FileFilter = MediaFile_All;
+    lv_group_focus_obj(lv_obj_get_child(CategoryPanel, FileFilter));
 }
 
 static void ReturnUpper(void)
 {
-    FileListGroup = delete_group(FileListGroup);
-    lv_obj_del_async(ui_File_List_Panel);
-    ui_File_List_Panel = FileListPanelStack.top();
+    lv_obj_t* CurrentFileListPanel = FileListPanel;
+    FileListPanel = FileListPanelStack.top();
     FileListPanelStack.pop();
+    lv_obj_del_async(CurrentFileListPanel);
+    FileListGroup = delete_group(FileListGroup);
     char *file_extension = strrchr(current_path, '/');
     while(*file_extension != 0) {
         *file_extension = 0;
         file_extension++;
     }
-    lv_label_set_text(ui_LAB_Real_Path, current_path);
+    lv_label_set_text(RealPath, current_path);
     FileList* file_list = GetPreviousFileList();
     int FileCnt = GetFileNumber(file_list);
     DestroyAllMediaList();
-    GetNextFileFromFileList(NULL);//清理前一次使用痕迹
+    GetNextFileFromFileList(nullptr);//清理前一次使用痕迹
     for (int i = 0; i < FileCnt; i++) {
         FileStr* file = GetNextFileFromFileList(file_list);
         switch (file->type)
@@ -454,21 +379,61 @@ static void ReturnUpper(void)
     }
 }
 
-static void CreateFilePanel(lv_obj_t* parent)
+static void FilterFile(MediaFileCategoryList filter_type)
 {
-    ui_File_List_Panel = lv_obj_create(parent);
-    lv_obj_set_size(ui_File_List_Panel, 1010, 600);
-    lv_obj_set_pos(ui_File_List_Panel, 110, 25);
-    lv_obj_set_align(ui_File_List_Panel, LV_ALIGN_CENTER);
-    lv_obj_set_flex_flow(ui_File_List_Panel, LV_FLEX_FLOW_ROW_WRAP);
-    lv_obj_set_style_bg_color(ui_File_List_Panel, lv_color_hex(0x0D6D96), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(ui_File_List_Panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(ui_File_List_Panel, lv_color_hex(0x009DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(ui_File_List_Panel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_width(ui_File_List_Panel, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    FileListGroup = create_new_group();
-    lv_group_add_obj(FileListGroup, ui_File_List_Panel);
+    static const lv_img_dsc_t* image_src[] = {
+        nullptr,
+        &ui_img_movie_png,
+        &ui_img_music_png,
+        &ui_img_image_png,
+        &ui_img_text_png,
+        &ui_img_other_png };
+    if (FileListPanel == nullptr) return;
+    if (last_filter_type != filter_type) {
+        FileStr* file = nullptr;
+        lv_obj_t* child = nullptr;
+        uint16_t dir_number = GetDirNumber(current_list);
+        uint16_t non_dir_number = GetNonDirNumber(current_list);
+        uint16_t media_number = GetMediaListSize(static_cast<MediaType>(filter_type));
+        int first_file_index = dir_number + 1;//第一个非文件夹对象
+        int end_index = first_file_index + ((filter_type == MediaFile_All) ? non_dir_number : media_number);
+        GetNextFile(nullptr);
+        for (int i = first_file_index; i < end_index; i++) {
+            do {
+                file = GetNextFile(current_list->NonDirList);
+            } while ((file != nullptr) && (filter_type != MediaFile_All) && (file->type != (FileType)filter_type));
+            if (file == nullptr) break;
+            child = lv_obj_get_child(FileListPanel, i);
+            if (child != nullptr) {
+                child->user_data = file;
+                lv_img_set_src(child->spec_attr->children[0], image_src[file->type]);
+                lv_label_set_text(child->spec_attr->children[1], file->name);
+            }
+            else {
+                child = lv_btn_create(FileListPanel);
+                child->user_data = file;
+                DrawCell(child, FileWidth, FileHeight, image_src[file->type], file->name);
+                lv_group_add_obj(FileListGroup, child);
+                //lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_ALL, nullptr);
+                lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_KEY, nullptr);
+                lv_obj_add_event_cb(child, [] (lv_event_t* event) {
+                    lv_obj_t* target = lv_event_get_target(event);
+                    lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
+                }, LV_EVENT_FOCUSED, nullptr);
+                lv_obj_add_event_cb(child, [] (lv_event_t* event) {
+                    lv_obj_t* target = lv_event_get_target(event);
+                    lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
+                }, LV_EVENT_DEFOCUSED, nullptr);
+            }
+        }
+        if (filter_type != MediaFile_All) {
+            uint16_t obj_number = lv_obj_get_child_cnt(FileListPanel);
+            for (int i = end_index; i < obj_number; i++) {
+                lv_obj_del_async(lv_obj_get_child(FileListPanel, i));
+            }
+        }
+        last_filter_type = filter_type;
+    }
 }
 
 static void MediaInit(void)
@@ -491,21 +456,22 @@ static void MediaInit(void)
     lv_obj_set_style_text_opa(ui_LAB_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(ui_LAB_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    ui_LAB_Real_Path = lv_label_create(MediaRootScreen);
-    lv_obj_set_size(ui_LAB_Real_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(ui_LAB_Real_Path, 360, -300);
-    lv_obj_set_align(ui_LAB_Real_Path, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(ui_LAB_Real_Path, "");
-    lv_obj_set_style_text_color(ui_LAB_Real_Path, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_opa(ui_LAB_Real_Path, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_align(ui_LAB_Real_Path, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_text_font(ui_LAB_Real_Path, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+    RealPath = lv_label_create(MediaRootScreen);
+    lv_obj_set_size(RealPath, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(RealPath, 360, -300);
+    lv_obj_set_align(RealPath, LV_ALIGN_LEFT_MID);
+    lv_label_set_text(RealPath, "");
+    lv_obj_set_style_text_color(RealPath, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_opa(RealPath, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_align(RealPath, LV_TEXT_ALIGN_LEFT, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_text_font(RealPath, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    CreateFilePanel(MediaRootScreen);
-    CreateCategoryPanel(MediaRootScreen);
     MediaFileInit();
-    strcat(current_path, media_dir);
-    ShowFileList(GetFileList(current_path));
+    CreateFilePanel(MediaRootScreen, media_dir);
+    CreateCategoryPanel(MediaRootScreen);
+    if (lv_obj_get_child_cnt(FileListPanel) > 0)
+        lv_event_send(lv_obj_get_child(FileListPanel, 0), LV_EVENT_DEFOCUSED, nullptr);
+    last_filter_type = MediaFile_All;
 }
 
 static void LoadMedia(void)
@@ -516,13 +482,14 @@ static void LoadMedia(void)
 
 static void ExitMedia(ActiveScreen screen)
 {
+    while (!FileListPanelStack.empty()) {
+        ReturnUpper();
+        //FileListGroup = delete_group(FileListGroup);
+        //FileListPanelStack.pop();
+    }
     DestroyAllMediaList();
     MediaFileDeInit();
     memset(current_path, 0, current_path_size );
-    if (!FileListPanelStack.empty()) {
-        FileListGroup = delete_group(FileListGroup);
-        FileListPanelStack.pop();
-    }
     delete_all_group();
     //lv_obj_del(MediaRootScreen);
     CurrentScreen = screen;
