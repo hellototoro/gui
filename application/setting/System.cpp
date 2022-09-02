@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 14:54:18
+ * @LastEditTime: 2022-09-02 02:01:50
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -20,10 +20,26 @@ namespace Setting {
 
 System::System(/* args */)
 {
+    boost::property_tree::ptree config;
+    ReadConfigFile(config, "system_setting");
+    language = DefaultLanguageIndex;
+    OsdTime = config.get<int>("OsdTime", 0);
 }
 
 System::~System()
 {
+    boost::property_tree::ptree pt;
+    boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
+    boost::property_tree::ptree config;
+    config = pt.get_child("system_setting");
+    config.put<int>("OsdTime", OsdTime);
+    pt.put_child("system_setting",config);
+
+    config = pt.get_child("default_language");
+    config.put<int>("language", language);
+    config.put<int>("index", DefaultLanguageIndex);
+    pt.put_child("default_language",config);
+    boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
 }
 
 const char** System::GetStrArray(void)
@@ -51,7 +67,7 @@ void System::SelectedValue(int index)
     case static_cast<int>(Setting_SystemRestoreFactory):
     {
         CreateMsgBox(lv_scr_act(), "Are you sure!", [] () { 
-            WriteConfigFile_I("guide_flag.flag", 1);//test
+            WriteConfigFile_I("guide_flag.flag", 1);
             WriteConfigFile_S("default_language.language", "en-GB");
             #ifdef HCCHIP_GCC
             CreateSpinBox(lv_scr_act(), _("请稍等..."), 3, api_system_reboot);
@@ -67,7 +83,6 @@ void System::SelectedValue(int index)
         break;
     }
 }
-
 
 void System::IncreaseUserValue(int index)
 {

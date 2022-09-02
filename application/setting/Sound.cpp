@@ -2,22 +2,42 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 13:38:33
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-15 01:19:50
+ * @LastEditTime: 2022-09-02 02:17:31
  * @FilePath: /gui/application/setting/Sound.cpp
  * @Description: None
  * @other: None
  */
 #include <stdio.h>
 #include "Sound.h"
+#include "application/ConfigParam.h"
 
 namespace Setting {
 
 Sound::Sound(/* args */)
 {
+    boost::property_tree::ptree config;
+    ReadConfigFile(config, "sound_setting");
+    mode.type = config.get<int>("mode_type", 0);
+    mode.user.treble = config.get<int>("mode_user_treble", 50);
+    mode.user.bass = config.get<int>("mode_user_bass", 50);
+    surround = config.get<int>("surround", 0);
+    AutoVolume = config.get<int>("AutoVolume", 0);
 }
 
 Sound::~Sound()
 {
+    boost::property_tree::ptree pt;
+    boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
+    boost::property_tree::ptree config;
+    config = pt.get_child("sound_setting");
+
+    config.put<int>("mode_type", mode.type);
+    config.put<int>("mode_user_treble", mode.user.treble);
+    config.put<int>("mode_user_bass", mode.user.bass);
+    config.put<int>("surround", surround);
+    config.put<int>("AutoVolume", AutoVolume);
+    pt.put_child("sound_setting",config);
+    boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
 }
 
 const char** Sound::GetStrArray(void)
@@ -108,11 +128,14 @@ void* Sound::GetDerivedAddress(int index)
     switch (index)
     {
     case static_cast<int>(Setting_SoundMode):
-        return &mode;
+        if(mode.type == static_cast<int>(SoundMode::SoundMode_User))
+            return mode.GetDerivedAddress(0);
+        break;
 
     default:
-        return nullptr;
+        break;
     }
+    return nullptr;
 }
 
 const char** Sound::SoundMode::GetStrArray(void)

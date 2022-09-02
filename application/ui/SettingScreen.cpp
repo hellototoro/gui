@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 22:45:57
+ * @LastEditTime: 2022-09-02 01:56:57
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -83,15 +83,15 @@ static void event_handler(lv_event_t* event)
             break;
 
         case Picture:
-            CreateSettingPanel(Setting::CreateSettingObj<Setting::Picture>(Setting::ReadPictureSettingParam), false);
+            CreateSettingPanel(new Setting::Picture, false);
             break;
 
         case Sound:
-            CreateSettingPanel(Setting::CreateSettingObj<Setting::Sound>(Setting::ReadSoundSettingParam), false);
+            CreateSettingPanel(new Setting::Sound, false);
             break;
 
         case System:
-            CreateSettingPanel(Setting::CreateSettingObj<Setting::System>(Setting::ReadSystemSettingParam), false);
+            CreateSettingPanel(new Setting::System, false);
             break;
 
         case Update:

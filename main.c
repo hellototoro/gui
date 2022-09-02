@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-01 01:23:27
+ * @LastEditTime: 2022-09-01 23:06:14
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -75,8 +75,7 @@ int main(int argc, char *argv[])
     app_ffplay_init();
     //api_logo_show(NULL);
 
-    //lv_fb_hotplug_support_set(false);
-    //hotplug_init();
+    hotplug_init();
     //network_init();
     api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:25:46
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-14 23:04:35
+ * @LastEditTime: 2022-09-02 01:57:59
  * @FilePath: /gui/application/setting/Setting.cpp
  * @Description: None
  * @other: None
@@ -18,7 +18,6 @@ namespace Setting {
 
 void ReadPictureSettingParam(Picture& setting)
 {
-    //boost::property_tree::ptree* pt = ReadConfigFile();
     boost::property_tree::ptree config;// = pt->get_child("picture_setting");
     ReadConfigFile(config, "picture_setting");
     setting.mode.type = config.get<int>("mode_type", 0);
@@ -38,9 +37,7 @@ void ReadPictureSettingParam(Picture& setting)
 
 void ReadSoundSettingParam(Sound& setting)
 {
-    //boost::property_tree::ptree* pt = ReadConfigFile();
-    //boost::property_tree::ptree config = pt->get_child("sound_setting");
-    boost::property_tree::ptree config;// = pt->get_child("picture_setting");
+    boost::property_tree::ptree config;
     ReadConfigFile(config, "sound_setting");
     setting.mode.type = config.get<int>("mode_type", 0);
     setting.mode.user.treble = config.get<int>("mode_user_treble", 50);
@@ -52,9 +49,7 @@ void ReadSoundSettingParam(Sound& setting)
 
 void ReadSystemSettingParam(System& setting)
 {
-    //boost::property_tree::ptree* pt = ReadConfigFile();
-    //boost::property_tree::ptree config = pt->get_child("system_setting");
-    boost::property_tree::ptree config;// = pt->get_child("picture_setting");
+    boost::property_tree::ptree config;
     ReadConfigFile(config, "system_setting");
     setting.language = DefaultLanguageIndex;
     setting.OsdTime = config.get<int>("OsdTime", 0);
@@ -62,26 +57,27 @@ void ReadSystemSettingParam(System& setting)
 }
 
 template <typename T>
-T* CreateSettingObj( void (*SettingInit)(T&) )
+T* CreateSettingObj( void (*ReadSettingParam)(T&) )
 {
     T* SettingData = new T;
-    SettingInit(*SettingData);
+    ReadSettingParam(*SettingData);
     return SettingData;
 }
 //显式声明模板函数
-template Picture* CreateSettingObj<Picture>(void (*SettingInit)(Picture&));
-template Sound* CreateSettingObj<Sound>(void (*SettingInit)(Sound&));
-template System* CreateSettingObj<System>(void (*SettingInit)(System&));
+template Picture* CreateSettingObj<Picture>(void (*ReadSettingParam)(Picture&));
+template Sound* CreateSettingObj<Sound>(void (*ReadSettingParam)(Sound&));
+template System* CreateSettingObj<System>(void (*ReadSettingParam)(System&));
 
 template <typename T>
-void DeleteSettingObj(T& SettingData)
+void DeleteSettingObj(T* SettingData, void (*WriteSettingParam)(T&) )
 {
+    WriteSettingParam(*SettingData);
     delete SettingData;
 }
 //显式声明模板函数
-//template void DeleteSettingObj<Picture>(Picture*);
-//template void DeleteSettingObj<Sound>(Sound*);
-//template void DeleteSettingObj<System>(System*);
+template void DeleteSettingObj<Picture>(Picture*, void (*WriteSettingParam)(Picture&) );
+template void DeleteSettingObj<Sound>(Sound*, void (*WriteSettingParam)(Sound&) );
+template void DeleteSettingObj<System>(System*, void (*WriteSettingParam)(System&) );
 
 void LoadSettingParameter(void)
 {

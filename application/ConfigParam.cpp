@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-04 19:18:32
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 22:57:26
+ * @LastEditTime: 2022-09-02 01:38:16
  * @FilePath: /gui/application/ConfigParam.cpp
  * @Description: None
  * @other: None
@@ -10,9 +10,9 @@
 #include "ConfigParam.h"
 
 #ifdef HCCHIP_GCC
-static constexpr char ConfigFileName[] = {"/mnt/data/gui_setting/gui_setting.ini"};
+constexpr char ConfigFileName[] = {"/mnt/data/gui_setting/gui_setting.ini"};
 #else
-static constexpr char ConfigFileName[] = {"/home/totoro/workspace/HiChip/hclinux/SOURCE/gui/application/setting/gui_setting.ini"};
+constexpr char ConfigFileName[] = {"/home/totoro/workspace/HiChip/hclinux/SOURCE/gui/application/setting/gui_setting.ini"};
 #endif
 
 void ReadConfigFile(boost::property_tree::ptree& config, std::string ConfigName)
