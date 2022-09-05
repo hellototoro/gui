@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:03:13
+ * @LastEditTime: 2022-09-05 00:33:44
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -42,6 +42,7 @@ static lv_obj_t* CurrentMediaWindow;
 static MediaFileCategoryList last_filter_type;
 std::stack<lv_obj_t*, std::list<lv_obj_t*>> FileListPanelStack;
 
+static void CreateCategoryPanel(lv_obj_t* parent);
 static void CreateFilePanel(lv_obj_t* parent, const char *path);
 static void ShowFileList(FileList *file_list);
 static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* pic, const char* str);
@@ -82,10 +83,8 @@ static void key_base_event_handler(lv_obj_t* target)
             lv_group_focus_obj(lv_obj_get_child(FileListPanel, 0));
         break;
     case LV_KEY_ESC:
-        if(IsRootPath(current_path))
-            ExitMedia(HomeScreen);
-        else /* if (!lv_obj_is_valid(CurrentMediaWindow)) */
-            ReturnUpper();
+        if(!IsRootPath(current_path)) ReturnUpper();
+        else                          ExitMedia(HomeScreen);
         break;
     case LV_KEY_VOLUME_UP:
     case LV_KEY_VOLUME_DOWN:
@@ -172,7 +171,6 @@ static void ShowFileList(FileList *file_list)
     lv_group_add_obj(FileListGroup, ReturnButton);
     lv_obj_add_event_cb(ReturnButton, [] (lv_event_t* event) {
         lv_obj_t* target = lv_event_get_target(event);
-        lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         switch (value)
         {
@@ -445,6 +443,30 @@ static void MediaInit(void)
     lv_obj_set_style_bg_opa(MediaRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(MediaRootScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MediaRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    #ifdef HCCHIP_GCC
+    lv_msg_subsribe_obj(MSG_HOTPLUG, MediaRootScreen, NULL);
+    #else
+    lv_msg_subscribe_obj(MSG_HOTPLUG, MediaRootScreen, NULL);
+    #endif
+    lv_obj_add_event_cb(MediaRootScreen, [] (lv_event_t* event) {
+        lv_msg_t* msg = lv_event_get_msg(event);
+        const int* UdiskStatus = static_cast<const int*>(lv_msg_get_payload(msg));
+        if (lv_obj_is_valid(FileListPanel)) 
+            lv_obj_del_async(FileListPanel);
+        if (*UdiskStatus) {//拔出
+            while (!FileListPanelStack.empty()) {
+                FileListPanel = FileListPanelStack.top();
+                lv_obj_del_async(FileListPanel);
+                FileListPanelStack.pop();
+            }
+        }
+        delete_all_group();
+        memset(current_path, 0, current_path_size );
+        CreateFilePanel(MediaRootScreen, media_dir);
+    }, LV_EVENT_MSG_RECEIVED, NULL);
+    #ifdef USB_PLUG_TEST
+    USB_PlugTest(MediaRootScreen);
+    #endif
 
     lv_obj_t* ui_LAB_Path = lv_label_create(MediaRootScreen);
     lv_obj_set_size(ui_LAB_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
@@ -483,14 +505,13 @@ static void LoadMedia(void)
 static void ExitMedia(ActiveScreen screen)
 {
     while (!FileListPanelStack.empty()) {
-        ReturnUpper();
-        //FileListGroup = delete_group(FileListGroup);
-        //FileListPanelStack.pop();
+        FileListPanelStack.pop();
     }
     DestroyAllMediaList();
     MediaFileDeInit();
     memset(current_path, 0, current_path_size );
     delete_all_group();
+    lv_group_del(CategoryGroup);//单独删除
     //lv_obj_del(MediaRootScreen);
     CurrentScreen = screen;
 }

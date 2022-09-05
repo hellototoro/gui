@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 18:06:43
+ * @LastEditTime: 2022-09-05 09:05:16
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -18,6 +18,7 @@ lv_obj_t* PreScreen;
 
 static void event_handler(lv_event_t* event);
 static void SetStyleForPlayBar(lv_obj_t* bar);
+static void UdiskStatus_event_handler(lv_event_t * event);
 
 lv_obj_t* creat_video_window(char* file_name)
 {
@@ -34,6 +35,12 @@ lv_obj_t* creat_video_window(char* file_name)
     #endif
     lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
+    #ifdef HCCHIP_GCC
+    lv_msg_subsribe_obj(MSG_HOTPLUG, VideoScreen, NULL);
+    #else
+    lv_msg_subscribe_obj(MSG_HOTPLUG, VideoScreen, NULL);
+    #endif
+    lv_obj_add_event_cb(VideoScreen, UdiskStatus_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     MediaComInit(VideoScreen, MEDIA_VIDEO, VideoHandler);
     CreateMediaArray();
@@ -73,6 +80,21 @@ static void event_handler(lv_event_t* event)
     close_video_window();
 }
 
+static void UdiskStatus_event_handler(lv_event_t * event)
+{
+    lv_obj_t* target = lv_event_get_target(event);
+    lv_msg_t* msg = lv_event_get_msg(event);
+    const int* UdiskStatus = lv_msg_get_payload(msg);
+
+    if (*UdiskStatus) {//plug out
+        /*static const char * btns[] = {"ok", ""};
+        lv_obj_t * mbox = lv_msgbox_create(NULL, "警告", "U盘已拔出", btns, false);
+        lv_obj_set_size(mbox, 100, 50);
+        lv_obj_set_style_text_font(mbox, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_center(mbox);*/
+    }
+}
+
 static void SetStyleForPlayBar(lv_obj_t* bar)
 {
     lv_obj_set_style_bg_color(bar, lv_color_hex(0x303030), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -80,6 +102,9 @@ static void SetStyleForPlayBar(lv_obj_t* bar)
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(lv_obj_get_child(bar, PlayedTime), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(lv_obj_get_child(bar, TotalTime), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
+    #ifdef USB_PLUG_TEST
+    USB_PlugTest(bar);
+    #endif
 }
 
 

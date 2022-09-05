@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:26:14
+ * @LastEditTime: 2022-09-05 21:02:55
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -13,9 +13,6 @@
 #include <pthread.h>
 #include "NetWork.h"
 #include "application/NetWorkApi.h"
-
-/*Define a message ID*/
-#define MSG_SHOW_WIFI_LIST      1
 
 static lv_obj_t* NetWorkPanel;
 static lv_obj_t* WiFiPanel;
@@ -138,7 +135,7 @@ void CreateNetWorkPanel(lv_obj_t* parent)
     lv_obj_set_x(lab, 250);
     lv_obj_set_y(lab, 0);
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(lab, "WiFi Setting");
+    lv_label_set_text(lab, _("setting_p_wifi"));
     lv_obj_set_style_text_font(lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     obj = lv_obj_create(NetWorkPanel);
@@ -170,7 +167,7 @@ void CreateNetWorkPanel(lv_obj_t* parent)
     lv_obj_set_x(lab, 250);
     lv_obj_set_y(lab, 0);
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
-    lv_label_set_text(lab, "Bluetooth Setting");
+    lv_label_set_text(lab, _("setting_p_bluetooth"));
     lv_obj_set_style_text_align(lab, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
@@ -302,7 +299,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_set_x(lab, -170);
     lv_obj_set_y(lab, 0);
     lv_obj_set_align(lab, LV_ALIGN_CENTER);
-    lv_label_set_text(lab, "刷新");
+    lv_label_set_text(lab, _("setting_p_refresh"));
     lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     if (WiFi_IsConnected()) {
@@ -323,7 +320,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
         lv_obj_set_x(lab, -370);
         lv_obj_set_y(lab, -20);
         lv_obj_set_align(lab, LV_ALIGN_TOP_MID);
-        lv_label_set_text(lab, "已连接WLAN");
+        lv_label_set_text(lab, _("setting_p_wifi_connected"));
         lv_obj_set_style_text_font(lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         panel = lv_obj_create(WiFiConnectedPanel);
@@ -381,7 +378,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_set_x(lab, -370);
     lv_obj_set_y(lab, -20);
     lv_obj_set_align(lab, LV_ALIGN_TOP_MID);
-    lv_label_set_text(lab, "可用WLAN");
+    lv_label_set_text(lab, _("setting_p_wifi_available"));
     lv_obj_set_style_text_font(lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     WiFiRefreshObj = lv_img_create(WiFiAvailablePanel);
@@ -554,13 +551,13 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     //if("" == "") lv_textarea_set_accepted_chars(PwdArea, NULL);
     //else lv_textarea_set_accepted_chars(PwdArea, "");
     //lv_textarea_set_text(PwdArea, "");
-    lv_textarea_set_placeholder_text(PwdArea, "code");
+    lv_textarea_set_placeholder_text(PwdArea, _("setting_p_code"));
     lv_obj_set_style_text_font(PwdArea, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_add_obj(MainGroup, PwdArea);
     lv_obj_add_event_cb(PwdArea, event_cb, LV_EVENT_ALL, nullptr);
 
     Checkbox = lv_checkbox_create(ConnectPanel);
-    lv_checkbox_set_text(Checkbox, "show code");
+    lv_checkbox_set_text(Checkbox, _("setting_p_show_code"));
     lv_obj_set_width(Checkbox, LV_SIZE_CONTENT);
     lv_obj_set_height(Checkbox, LV_SIZE_CONTENT);
     lv_obj_set_x(Checkbox, -220);
@@ -588,7 +585,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_set_x(ConnectLab, 0);
     lv_obj_set_y(ConnectLab, 0);
     lv_obj_set_align(ConnectLab, LV_ALIGN_CENTER);
-    lv_label_set_text(ConnectLab, "连接");
+    lv_label_set_text(ConnectLab, _("setting_p_connect"));
     lv_obj_set_style_text_font(ConnectLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* CancelButton = lv_btn_create(ConnectPanel);
@@ -608,7 +605,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_set_x(CancelLab, 0);
     lv_obj_set_y(CancelLab, 0);
     lv_obj_set_align(CancelLab, LV_ALIGN_CENTER);
-    lv_label_set_text(CancelLab, "取消");
+    lv_label_set_text(CancelLab, _("setting_p_cancel"));
     lv_obj_set_style_text_font(CancelLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 

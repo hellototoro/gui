@@ -49,7 +49,7 @@ void music_lyric::load(const char* file_name)
     }
     if (size() == 0) {
         start_time_list.push_back(0);
-        lic_list.push_back("no_lyric");
+        lic_list.push_back("media_no_lyric");
     }
     if(lic_file->is_open())
         lic_file->close();

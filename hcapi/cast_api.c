@@ -194,7 +194,7 @@ int hccast_dlna_callback_func(hccast_dlna_event_e event, void* in, void* out)
                 str_tmp = data_mgr_get_device_name();
                 if (str_tmp)
                 {
-                    sprintf((char *)in, "%s_dlna", str_tmp);
+                    sprintf((char *)in, "%s", str_tmp);
                     printf("[%s]HCCAST_DLNA_GET_DEVICE_NAME:%s\n",__func__, str_tmp);
                 }
             }
@@ -227,8 +227,8 @@ int hccast_mira_callback_func(hccast_mira_event_e event, void* in, void* out)
                 str_tmp = data_mgr_get_device_name();
                 if (str_tmp)
                 {
-                    sprintf((char *)in, "%s_mira", str_tmp);
-                    _log(DEMO, INFO, "HCCAST_MIRA_GET_DEVICE_NAME:%s\n", str_tmp);
+                    sprintf((char *)in, "%s", str_tmp);
+                    printf("HCCAST_MIRA_GET_DEVICE_NAME:%s\n", str_tmp);
                 }
             }
             break;
@@ -328,7 +328,7 @@ int hccast_air_callback_event(hccast_air_event_e event, void* in, void* out)
     {
         case HCCAST_AIR_GET_SERVICE_NAME:
             printf("[%s]HCCAST_AIR_GET_SERVICE_NAME\n",__func__);
-            sprintf((char *)in, "%s_itv", data_mgr_get_device_name());
+            sprintf((char *)in, "%s", data_mgr_get_device_name());
 
             break;
 

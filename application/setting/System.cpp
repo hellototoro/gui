@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 02:01:50
+ * @LastEditTime: 2022-09-05 21:07:08
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -66,13 +66,13 @@ void System::SelectedValue(int index)
     {
     case static_cast<int>(Setting_SystemRestoreFactory):
     {
-        CreateMsgBox(lv_scr_act(), "Are you sure!", [] () { 
+        CreateMsgBox(lv_scr_act(), _("setting_p_be_sure"), [] () { 
             WriteConfigFile_I("guide_flag.flag", 1);
             WriteConfigFile_S("default_language.language", "en-GB");
             #ifdef HCCHIP_GCC
-            CreateSpinBox(lv_scr_act(), _("请稍等..."), 3, api_system_reboot);
+            CreateSpinBox(lv_scr_act(), _("setting_p_waiting"), 3, api_system_reboot);
             #else
-            CreateSpinBox(lv_scr_act(), _("请稍等..."), 3, nullptr);
+            CreateSpinBox(lv_scr_act(), _("setting_p_waiting"), 3, nullptr);
             #endif
         });
         

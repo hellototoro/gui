@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-31 14:45:49
+ * @LastEditTime: 2022-09-05 09:37:35
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -16,6 +16,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#define USB_PLUG_TEST
+#ifdef HCCHIP_GCC
+#undef USB_PLUG_TEST
+#endif
+#ifdef USB_PLUG_TEST
+extern int hotplug_usb_plugout(void);
+extern void USB_PlugTest(lv_obj_t* parent);
+#endif
+/*Define a message ID*/
+#define MSG_SHOW_WIFI_LIST      1
+#define MSG_HOTPLUG             2
 
 typedef struct ObjNavigation
 {
@@ -36,6 +48,7 @@ extern void delete_all_group(void);
 extern lv_indev_t* get_keypad_indev(void);
 extern void refresh_all_lable_text(lv_obj_t* parent);
 extern lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func);
+extern lv_obj_t* CreateMsgBox2(lv_obj_t* parent, const char* title, const char* text, MsgBoxFunc_t func);
 extern lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func);
 extern void anim_callback_set_x(lv_anim_t * a, int32_t v);
 extern int32_t anim_callback_get_x(lv_anim_t * a);

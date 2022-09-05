@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-01 01:16:30
+ * @LastEditTime: 2022-09-05 21:19:12
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -152,7 +152,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
     lv_obj_set_pos(btn_ok, -100, 60);
     lv_obj_set_align(btn_ok, LV_ALIGN_CENTER);
     lv_obj_t * ok_lab = lv_label_create(btn_ok);
-    lv_label_set_text(ok_lab, _("Ok"));
+    lv_label_set_text(ok_lab, _("setting_p_ok"));
     lv_obj_set_style_text_font(ok_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_center(ok_lab);
     lv_group_add_obj(MainGroup, btn_ok);
@@ -163,7 +163,87 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
     lv_obj_set_pos(btn_cancel, 100, 60);
     lv_obj_set_align(btn_cancel, LV_ALIGN_CENTER);
     lv_obj_t * cancel_lab = lv_label_create(btn_cancel);
-    lv_label_set_text(cancel_lab, _("Cancel"));
+    lv_label_set_text(cancel_lab, _("setting_p_cancel"));
+    lv_obj_set_style_text_font(cancel_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_center(cancel_lab);
+    lv_group_add_obj(MainGroup, btn_cancel);
+    lv_obj_add_event_cb(btn_cancel, event_cb, LV_EVENT_KEY, nullptr);
+    lv_group_focus_obj(lv_obj_get_child(MsgBoxPanel, 2));
+
+    return MsgBoxPanel;
+}
+
+lv_obj_t* CreateMsgBox2(lv_obj_t* parent, const char* title, const char* text, MsgBoxFunc_t func)
+{
+    auto event_cb = [] (lv_event_t* event) {
+        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* _parent = lv_obj_get_parent(target);
+        uint32_t value = lv_indev_get_key(lv_indev_get_act());
+        lv_group_t* group = get_activity_group();
+        int index = lv_obj_get_index(target);
+        switch (value)
+        {
+            case LV_KEY_LEFT:
+                lv_group_focus_prev(group);
+                break;
+            case LV_KEY_RIGHT:
+                lv_group_focus_next(group);
+                break;
+            case LV_KEY_ENTER:
+                if (index == 1) { //ok
+                    MsgBoxFunc_t SelectedFunc = MsgBoxFunc_t(_parent->user_data);
+                    if (SelectedFunc) SelectedFunc();
+                }
+                delete_group(group);
+                lv_obj_del_async(_parent);
+                break;
+            case LV_KEY_ESC:
+                delete_group(group);
+                lv_obj_del_async(_parent);
+                break;
+            default:
+                break;
+        }
+    };
+
+    lv_obj_t* MsgBoxPanel = lv_obj_create(parent);
+    lv_obj_set_size(MsgBoxPanel, 550, 350);
+    lv_obj_center(MsgBoxPanel);
+    MsgBoxPanel->user_data = reinterpret_cast<void*>(func);
+
+    lv_obj_t* title_lab = lv_label_create(MsgBoxPanel);
+    lv_obj_set_size(title_lab,LV_SIZE_CONTENT,LV_SIZE_CONTENT);
+    lv_obj_set_pos(title_lab, 0, 0);
+    lv_obj_set_align(title_lab, LV_ALIGN_TOP_MID);
+    lv_label_set_text(title_lab, _(title));
+    lv_obj_set_style_text_font(title_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_t* text_lab = lv_label_create(MsgBoxPanel);
+    lv_obj_set_size(text_lab,LV_SIZE_CONTENT,LV_SIZE_CONTENT);
+    lv_obj_set_pos(text_lab, 0, 50);
+    lv_obj_set_align(text_lab, LV_ALIGN_TOP_MID);
+    lv_label_set_text(text_lab, _(text));
+    lv_obj_set_style_text_font(text_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_group_t* MainGroup = create_new_group();
+    set_group_activity(MainGroup);
+    lv_obj_t* btn_ok = lv_btn_create(MsgBoxPanel);
+    lv_obj_set_size(btn_ok, 110, 60);
+    lv_obj_set_pos(btn_ok, -100, 60);
+    lv_obj_set_align(btn_ok, LV_ALIGN_CENTER);
+    lv_obj_t * ok_lab = lv_label_create(btn_ok);
+    lv_label_set_text(ok_lab, _("setting_p_ok"));
+    lv_obj_set_style_text_font(ok_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_center(ok_lab);
+    lv_group_add_obj(MainGroup, btn_ok);
+    lv_obj_add_event_cb(btn_ok, event_cb, LV_EVENT_KEY, nullptr);
+
+    lv_obj_t* btn_cancel = lv_btn_create(MsgBoxPanel);
+    lv_obj_set_size(btn_cancel, 110, 60);
+    lv_obj_set_pos(btn_cancel, 100, 60);
+    lv_obj_set_align(btn_cancel, LV_ALIGN_CENTER);
+    lv_obj_t * cancel_lab = lv_label_create(btn_cancel);
+    lv_label_set_text(cancel_lab, _("setting_p_cancel"));
     lv_obj_set_style_text_font(cancel_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_center(cancel_lab);
     lv_group_add_obj(MainGroup, btn_cancel);

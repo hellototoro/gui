@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-01 16:09:45
+ * @LastEditTime: 2022-09-05 21:14:37
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -28,9 +28,6 @@ static lv_obj_t* MainPanel;
 static lv_obj_t* UdiskDetectPanel;
 static lv_group_t* MainGroup;
 static int LastFocusedObjIndex;
-static bool LastUdiskStatus_PlugOut;
-
-extern pthread_mutex_t lvgl_task_mutex;
 
 enum HomeCategoryList {
     HOME_MOVIE,
@@ -43,109 +40,116 @@ enum HomeCategoryList {
     HOME_CategoryNumber
 };
 
-#ifdef HOST_GCC
-int hotplug_usb_plugout(void)
-{
-    return 0;
-}
-#endif
-
 static void CreateMainPanel(lv_obj_t* parent);
 static void ExitHome(ActiveScreen screen);
-static void CreateDetectUdiskTask(void);
 
 static void event_handler(lv_event_t* event)
 {
-    lv_event_code_t code = lv_event_get_code(event);
     lv_obj_t* target = lv_event_get_target(event);
     lv_obj_t* parent = lv_obj_get_parent(target);
-    if (LV_EVENT_KEY == code) {
-        uint32_t value = lv_indev_get_key(lv_indev_get_act());
-        lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
-        switch (value)
+    uint32_t value = lv_indev_get_key(lv_indev_get_act());
+    lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
+    switch (value)
+    {
+    case LV_KEY_LEFT:
+        lv_group_focus_prev(group);
+        break;
+    case LV_KEY_RIGHT:
+        lv_group_focus_next(group);
+        break;
+    case LV_KEY_UP:
+        switch (lv_obj_get_index(target))
         {
-        case LV_KEY_LEFT:
-            lv_group_focus_prev(group);
+        case HOME_UDISK:
+        case HOME_HDMI:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_PICTURE));
             break;
-        case LV_KEY_RIGHT:
-            lv_group_focus_next(group);
+        case HOME_PICTURE:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_MOVIE));
             break;
-        case LV_KEY_UP:
-            switch (lv_obj_get_index(target))
-            {
-            case HOME_UDISK:
-            case HOME_HDMI:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_PICTURE));
-                break;
-            case HOME_PICTURE:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_MOVIE));
-                break;
-            case HOME_SETTING:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_MIRRORING));
-                break;
-            case HOME_MIRRORING:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_MUSIC));
-                break;
-            default:
-                break;
-            }
+        case HOME_SETTING:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_MIRRORING));
             break;
-        case LV_KEY_DOWN:
-            switch (lv_obj_get_index(target))
-            {
-            case HOME_MOVIE:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_PICTURE));
-                break;
-            case HOME_PICTURE:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_UDISK));
-                break;
-            case HOME_MUSIC:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_MIRRORING));
-                break;
-            case HOME_MIRRORING:
-                lv_group_focus_obj(lv_obj_get_child(parent, HOME_SETTING));
-                break;
-            default:
-                break;
-            }
+        case HOME_MIRRORING:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_MUSIC));
             break;
-        case LV_KEY_ENTER:
-            switch (lv_obj_get_index(target))
-            {
-            case HOME_MOVIE:
-                FileFilter = MediaFile_Vedio;
-                ExitHome(MediaScreen);
-                break;
-            case HOME_MUSIC:
-                FileFilter = MediaFile_Music;
-                ExitHome(MediaScreen);
-                break;
-            case HOME_PICTURE:
-                FileFilter = MediaFile_Photo;
-                ExitHome(MediaScreen);
-                break;
-            case HOME_UDISK:
-                FileFilter = MediaFile_All;
-                ExitHome(MediaScreen);
-                break;
-            case HOME_SETTING:
-                CreateSettingScreen(HomeRootScreen);
-                break;
-            case HOME_MIRRORING:
-                CreateSyncScreen(HomeRootScreen);
-                break;
-            default:
-                break;
-            }
-            break;
-        case LV_KEY_VOLUME_UP:
-        case LV_KEY_VOLUME_DOWN:
-            SetVolume(value);
-            break;
-
         default:
             break;
         }
+        break;
+    case LV_KEY_DOWN:
+        switch (lv_obj_get_index(target))
+        {
+        case HOME_MOVIE:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_PICTURE));
+            break;
+        case HOME_PICTURE:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_UDISK));
+            break;
+        case HOME_MUSIC:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_MIRRORING));
+            break;
+        case HOME_MIRRORING:
+            lv_group_focus_obj(lv_obj_get_child(parent, HOME_SETTING));
+            break;
+        default:
+            break;
+        }
+        break;
+    case LV_KEY_ENTER:
+        switch (lv_obj_get_index(target))
+        {
+        case HOME_MOVIE:
+            FileFilter = MediaFile_Vedio;
+            ExitHome(MediaScreen);
+            break;
+        case HOME_MUSIC:
+            FileFilter = MediaFile_Music;
+            ExitHome(MediaScreen);
+            break;
+        case HOME_PICTURE:
+            FileFilter = MediaFile_Photo;
+            ExitHome(MediaScreen);
+            break;
+        case HOME_UDISK:
+            FileFilter = MediaFile_All;
+            ExitHome(MediaScreen);
+            break;
+        case HOME_SETTING:
+            CreateSettingScreen(HomeRootScreen);
+            break;
+        case HOME_MIRRORING:
+            CreateSyncScreen(HomeRootScreen);
+            break;
+        default:
+            break;
+        }
+        break;
+    case LV_KEY_VOLUME_UP:
+    case LV_KEY_VOLUME_DOWN:
+        SetVolume(value);
+        break;
+
+    default:
+        break;
+    }
+}
+
+static void UdiskStatus_event_handler(lv_event_t * event)
+{
+    lv_obj_t* target = lv_event_get_target(event);
+    lv_msg_t* msg = lv_event_get_msg(event);
+    const int* UdiskStatus = lv_msg_get_payload(msg);
+
+    lv_obj_t* img = lv_obj_get_child(target, 0);
+    lv_obj_t* lab = lv_obj_get_child(target, 1);
+    if (*UdiskStatus) {//plug out
+        lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(lab, LV_OBJ_FLAG_HIDDEN);
+    }
+    else {
+        lv_obj_add_flag(lab, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(img, LV_OBJ_FLAG_HIDDEN);
     }
 }
 
@@ -197,36 +201,41 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_x(UdiskDetectPanel, 520);
     lv_obj_set_y(UdiskDetectPanel, -310);
     lv_obj_set_align(UdiskDetectPanel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(UdiskDetectPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_clear_flag(UdiskDetectPanel, LV_OBJ_FLAG_SCROLLABLE); 
     lv_obj_set_style_bg_color(UdiskDetectPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(UdiskDetectPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(UdiskDetectPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(UdiskDetectPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    LastUdiskStatus_PlugOut = hotplug_usb_plugout();
+    #ifdef HCCHIP_GCC
+    lv_msg_subsribe_obj(MSG_HOTPLUG, UdiskDetectPanel, NULL);
+    #else
+    lv_msg_subscribe_obj(MSG_HOTPLUG, UdiskDetectPanel, NULL);
+    #endif
+    lv_obj_add_event_cb(UdiskDetectPanel, UdiskStatus_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     lv_obj_t* img = lv_img_create(UdiskDetectPanel);
     lv_img_set_src(img, &ui_img_usb_png);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);   /// 50
-    lv_obj_set_height(img, LV_SIZE_CONTENT);    /// 50
+    lv_obj_set_width(img, LV_SIZE_CONTENT);
+    lv_obj_set_height(img, LV_SIZE_CONTENT); 
     lv_obj_set_x(img, 0);
     lv_obj_set_y(img, 0);
     lv_obj_set_align(img, LV_ALIGN_LEFT_MID);
-    lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
-    lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
+    if (hotplug_usb_plugout() != 0)
+        lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE); 
     lv_img_set_angle(img, 900);
 
     lv_obj_t* lab = lv_label_create(UdiskDetectPanel);
-    lv_obj_set_width(lab, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_width(lab, LV_SIZE_CONTENT);
+    lv_obj_set_height(lab, LV_SIZE_CONTENT); 
     lv_obj_set_x(lab, 0);
     lv_obj_set_y(lab, 0);
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
-    lab->user_data = (void*)"no_device";
+    lab->user_data = (void*)"media_no_device";
     lv_label_set_text(lab, _(lab->user_data));
-    if (LastUdiskStatus_PlugOut) 
-        lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);     /// Flags
-    else
-        lv_obj_add_flag(lab, LV_OBJ_FLAG_HIDDEN);     /// Flags
+    if (hotplug_usb_plugout() != 1)
+        lv_obj_add_flag(lab, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_style_text_color(lab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(lab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -271,53 +280,10 @@ static void HomeInit(void)
     lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     CreateMainPanel(HomeRootScreen);
-    CreateDetectUdiskTask();
-}
-
-static void* DetectHotPlugTask(void* arg)
-{
-    (void)arg;
-    while (CurrentScreen == HomeScreen) {
-        if (LastUdiskStatus_PlugOut != hotplug_usb_plugout()) {
-            LastUdiskStatus_PlugOut = hotplug_usb_plugout();
-            pthread_mutex_lock(&lvgl_task_mutex);
-            lv_obj_t* img = lv_obj_get_child(UdiskDetectPanel, 0);
-            lv_obj_t* lab = lv_obj_get_child(UdiskDetectPanel, 1);
-            if (LastUdiskStatus_PlugOut) {
-                lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);     /// Flags
-                lv_obj_clear_flag(lab, LV_OBJ_FLAG_HIDDEN);     /// Flags
-            }
-            else {
-                lv_obj_add_flag(lab, LV_OBJ_FLAG_HIDDEN);     /// Flags
-                lv_obj_clear_flag(img, LV_OBJ_FLAG_HIDDEN);     /// Flags
-            }
-            pthread_mutex_unlock(&lvgl_task_mutex);
-        }
-        usleep(1000 * 500);
-    }
-    pthread_exit(NULL);
-}
-
-void CreateDetectUdiskTask(void)
-{
-    int res;
-    pthread_t thread_id = 0;
-    pthread_attr_t attr;
-    res = pthread_attr_init(&attr);
-    if (res != 0) {
-        perror("Attribute creation failed");
-        exit(EXIT_FAILURE);
-    }
-    res = pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED);
-    if (res != 0) {
-        perror("Setting detached attribute failed");
-        exit(EXIT_FAILURE);
-    }
-    res = pthread_create(&thread_id, &attr, DetectHotPlugTask, NULL);
-    if (res != 0) {
-        perror("Thread creation failed");
-        exit(EXIT_FAILURE);
-    }
+    #ifdef USB_PLUG_TEST
+    USB_PlugTest(MainPanel);
+    #endif
+    //CreateMsgBox2(HomeRootScreen, "test title", "test text", NULL);
 }
 
 static void LoadHome(void)

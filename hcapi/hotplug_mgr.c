@@ -36,7 +36,7 @@ hotplug_mgr.c: to manage the hotplug device, such as usb wifi, usb disk etc
 
 static int m_hdmi_tx_plugin = 0;
 static int m_hdmi_rx_plugin = 0;
-static int m_usb_plugout = 0;
+static int m_usb_plugout = -1;
 static int m_wifi_plugin = 0;
 
 enum EPOLL_EVENT_TYPE

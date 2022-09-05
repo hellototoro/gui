@@ -233,6 +233,10 @@ static int media_monitor_deinit(media_handle_t *media_hld)
     HCPlayerMsg msg;
     msg.type = HCPLAYER_MSG_ERR_UNDEFINED;
     xQueueSend((QueueHandle_t)media_hld->msg_id, ( void * ) &msg, ( TickType_t ) 0 );
+#else
+    HCPlayerMsg msg;
+    msg.type = HCPLAYER_MSG_ERR_UNDEFINED;
+    msgsnd(media_hld->msg_id, &msg, sizeof(msg), 0);
 #endif
     media_hld->exit = 1; 
     pthread_cond_wait(&media_hld->msg_task_cond, &media_hld->msg_task_mutex);

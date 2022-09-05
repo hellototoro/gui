@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:24:11
+ * @LastEditTime: 2022-09-05 18:45:08
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -44,6 +44,7 @@ extern void lv_fb_hotplug_support_set(bool enable);
 static char m_wifi_module_name[32];
 #endif
 
+static void HotPlugDetect(void);
 static void exit_console(int signo);
 
 int main(int argc, char *argv[])
@@ -70,16 +71,17 @@ int main(int argc, char *argv[])
     api_system_init();
     api_video_init();
     api_audio_init();
-    //data_mgr_load();
-    //tv_sys_app_start_set(1); 
     app_ffplay_init();
     //api_logo_show(NULL);
 
+    data_mgr_load();
+    //tv_sys_app_start_set(1); 
     hotplug_init();
-    //network_init();
+    network_init();
     api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();
-    NetWorkInit();
+    //NetWorkInit();
+    network_connect();
     #endif
 
     #ifdef HOST_GCC
@@ -94,9 +96,47 @@ int main(int argc, char *argv[])
         pthread_mutex_lock(&lvgl_task_mutex);
         lv_task_handler();
         pthread_mutex_unlock(&lvgl_task_mutex);
+        HotPlugDetect();
         usleep(5000);
     }
     return 0;
+}
+
+#ifdef USB_PLUG_TEST
+int status = -1;
+void set_plug_status(void)
+{
+    status = status == 0 ? 1 : 0;
+}
+
+int hotplug_usb_plugout(void)
+{
+    return status;
+}
+
+static void plug_status_event_handler(lv_event_t* event)
+{
+    set_plug_status();
+}
+
+void USB_PlugTest(lv_obj_t* parent)
+{
+    lv_obj_t* plug_test = lv_btn_create(parent);
+    lv_obj_set_size(plug_test, 50, 50);
+    lv_obj_set_pos(plug_test, 0, 0);
+    lv_obj_set_align(plug_test, LV_ALIGN_TOP_LEFT);
+    lv_obj_add_event_cb(plug_test, plug_status_event_handler, LV_EVENT_CLICKED, NULL);
+}
+#endif
+
+static void HotPlugDetect(void)
+{
+    static int LastUdiskStatus_PlugOut = -1;
+    int Status = hotplug_usb_plugout();
+    if (LastUdiskStatus_PlugOut != Status) {
+        LastUdiskStatus_PlugOut = Status;
+        lv_msg_send(MSG_HOTPLUG, &LastUdiskStatus_PlugOut);
+    }
 }
 
 void exit_console(int signo)

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-21 20:34:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 22:33:34
+ * @LastEditTime: 2022-09-05 21:13:48
  * @FilePath: /gui/application/ui/HdmiRx.c
  * @Description: None
  * @other: None
@@ -157,7 +157,7 @@ void CreateHdmiRxScreen(void)
     lv_obj_set_x(lab, 0);
     lv_obj_set_y(lab, 0);
     lv_obj_set_align(lab, LV_ALIGN_CENTER);
-    lv_label_set_text(lab, "No single");
+    lv_label_set_text(lab, _("hdmi_no_single"));
     lv_obj_set_style_text_letter_space(lab, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_line_space(lab, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_align(lab, LV_TEXT_ALIGN_CENTER, LV_PART_MAIN | LV_STATE_DEFAULT);
