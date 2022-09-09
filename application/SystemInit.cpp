@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-04 19:12:38
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 01:40:56
+ * @LastEditTime: 2022-09-09 20:54:54
  * @FilePath: /gui/application/SystemInit.cpp
  * @Description: None
  * @other: None
@@ -22,10 +22,9 @@ void SystemInit(void)
     DefaultScreen = guide_flag ? LanguageScreen : HomeScreen;
     if(DefaultScreen == HomeScreen) {
         ReadConfigFile(config, "default_language");
-        DefaultLanguage = config.get<std::string>("language", DefaultLanguage).c_str();
-        DefaultLanguageIndex = config.get<int>("index", DefaultLanguageIndex);
+        DefaultLanguageIndex = config.get<int>("index", 2);
         lv_i18n_init(lv_i18n_language_pack);
-        lv_i18n_set_locale(DefaultLanguage);
+        lv_i18n_set_locale(config.get<std::string>("language", "en-GB").c_str());
     }
     CurrentScreen = DefaultScreen;
 }

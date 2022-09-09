@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 21:07:08
+ * @LastEditTime: 2022-09-09 21:28:02
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -35,8 +35,10 @@ System::~System()
     config.put<int>("OsdTime", OsdTime);
     pt.put_child("system_setting",config);
 
+    //SaveCurrentLanguageType(language);
+    DefaultLanguageIndex = language;
     config = pt.get_child("default_language");
-    config.put<int>("language", language);
+    config.put<std::string>("language", Language[language]);
     config.put<int>("index", DefaultLanguageIndex);
     pt.put_child("default_language",config);
     boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
@@ -68,6 +70,7 @@ void System::SelectedValue(int index)
     {
         CreateMsgBox(lv_scr_act(), _("setting_p_be_sure"), [] () { 
             WriteConfigFile_I("guide_flag.flag", 1);
+            WriteConfigFile_I("default_language.index", 2);
             WriteConfigFile_S("default_language.language", "en-GB");
             #ifdef HCCHIP_GCC
             CreateSpinBox(lv_scr_act(), _("setting_p_waiting"), 3, api_system_reboot);
@@ -90,7 +93,8 @@ void System::IncreaseUserValue(int index)
     {
     case static_cast<int>(Setting_SystemLanguage):
         IncreaseValueComm(language, 0, sizeof(LanguageName)/sizeof(LanguageName[0]));
-        SaveCurrentLanguageType(language);
+        lv_i18n_set_locale(Language[language]);
+        //SaveCurrentLanguageType(language);
         refresh_all_lable_text(lv_scr_act());
         break;
 
@@ -109,7 +113,8 @@ void System::DecreaseUserValue(int index)
     {
     case static_cast<int>(Setting_SystemLanguage):
         DecreaseValueComm(language, 0, sizeof(LanguageName)/sizeof(LanguageName[0]));
-        SaveCurrentLanguageType(language);
+        lv_i18n_set_locale(Language[language]);
+        //SaveCurrentLanguageType(language);
         refresh_all_lable_text(lv_scr_act());
         break;
 

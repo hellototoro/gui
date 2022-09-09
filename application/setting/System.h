@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:09:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-16 22:23:29
+ * @LastEditTime: 2022-09-09 20:00:46
  * @FilePath: /gui/application/setting/System.h
  * @Description: None
  * @other: None
@@ -30,12 +30,12 @@ public:
     uint8_t language;
     //constexpr static const char* LanguageName[] = { 
     const char* LanguageName[6] = { 
-    "setting_p_system_espaol",
-    "setting_p_system_deutsch",
-    "setting_p_system_english",
-    "setting_p_system_italiano",
-    "setting_p_system_france",
-    "setting_p_system_chinese"
+    "language_espaol",
+    "language_deutsch",
+    "language_english",
+    "language_italiano",
+    "language_france",
+    "language_chinese"
  };
 
 

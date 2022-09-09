@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 21:14:37
+ * @LastEditTime: 2022-09-09 21:09:08
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -214,7 +214,7 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_add_event_cb(UdiskDetectPanel, UdiskStatus_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     lv_obj_t* img = lv_img_create(UdiskDetectPanel);
-    lv_img_set_src(img, &ui_img_usb_png);
+    lv_img_set_src(img, &ui_img_usb_icon);
     lv_obj_set_width(img, LV_SIZE_CONTENT);
     lv_obj_set_height(img, LV_SIZE_CONTENT); 
     lv_obj_set_x(img, 0);

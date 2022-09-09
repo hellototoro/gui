@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-18 23:14:42
+ * @LastEditTime: 2022-09-09 21:24:17
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -20,8 +20,7 @@ const char* Language[] = {
 "fr",
 "zh-CN"
 };
-const char* DefaultLanguage = "zh-CN";
-int DefaultLanguageIndex = 5;
+int DefaultLanguageIndex = 2;
 
 extern void WriteConfigFile_I(const char* ConfigName, int value);
 extern void WriteConfigFile_S(const char* ConfigName, const char* value);
@@ -38,10 +37,9 @@ static void ExitLanguage(ActiveScreen screen);
 void SaveCurrentLanguageType(int index)
 {
     DefaultLanguageIndex = index;
-    DefaultLanguage = Language[DefaultLanguageIndex];
-    WriteConfigFile_S("default_language.language", DefaultLanguage);
-    WriteConfigFile_I("default_language.index", DefaultLanguageIndex);
-    lv_i18n_set_locale(DefaultLanguage);
+    WriteConfigFile_I("default_language.index", index);
+    WriteConfigFile_S("default_language.language", Language[index]);
+    lv_i18n_set_locale(Language[index]);
 }
 
 void event_handler(lv_event_t* event)
@@ -92,7 +90,8 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     "language_italiano", "language_france", "language_chinese" };
     
     lv_i18n_init(lv_i18n_language_pack);
-    lv_i18n_set_locale(DefaultLanguage);
+    //lv_i18n_set_locale(Language[DefaultLanguageIndex]);
+    //SaveCurrentLanguageType(DefaultLanguageIndex);
 
     MainPanel = lv_obj_create(LanguageRootScreen);
     lv_obj_set_width(MainPanel, 540);
