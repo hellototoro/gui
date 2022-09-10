@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-21 20:34:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 21:13:48
+ * @LastEditTime: 2022-09-10 17:25:20
  * @FilePath: /gui/application/ui/HdmiRx.c
  * @Description: None
  * @other: None
@@ -108,35 +108,40 @@ static struct mediaplayer g_mp;
 
 void AutoMoving_Animation(lv_obj_t * TargetObject, int delay)
 {
-    lv_anim_t PropertyAnimation_0;
-    lv_anim_init(&PropertyAnimation_0);
-    lv_anim_set_time(&PropertyAnimation_0, 1000);
-    lv_anim_set_user_data(&PropertyAnimation_0, TargetObject);
-    lv_anim_set_custom_exec_cb(&PropertyAnimation_0, anim_callback_set_x);
-    lv_anim_set_values(&PropertyAnimation_0, 0, 500);
-    lv_anim_set_path_cb(&PropertyAnimation_0, lv_anim_path_linear);
-    lv_anim_set_delay(&PropertyAnimation_0, delay + 0);
-    lv_anim_set_early_apply(&PropertyAnimation_0, false);
-    lv_anim_set_get_value_cb(&PropertyAnimation_0, &anim_callback_get_x);
-    lv_anim_start(&PropertyAnimation_0);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_time(&a, 1000);
+    //lv_anim_set_user_data(&a, TargetObject);
+    //lv_anim_set_custom_exec_cb(&a, anim_callback_set_x);
+    lv_anim_set_var(&a, TargetObject);
+    lv_anim_set_exec_cb(&a, anim_callback_set_x);
+    lv_anim_set_values(&a, 0, 500);
+    lv_anim_set_path_cb(&a, lv_anim_path_linear);
+    lv_anim_set_delay(&a, delay + 0);
+    lv_anim_set_early_apply(&a, false);
+    lv_anim_set_get_value_cb(&a, &anim_callback_get_x);
+    lv_anim_start(&a);
 
-    lv_anim_t PropertyAnimation_1;
-    lv_anim_init(&PropertyAnimation_1);
-    lv_anim_set_time(&PropertyAnimation_1, 1000);
-    lv_anim_set_user_data(&PropertyAnimation_1, TargetObject);
-    lv_anim_set_custom_exec_cb(&PropertyAnimation_1, anim_callback_set_y);
-    lv_anim_set_values(&PropertyAnimation_1, 0, 500);
-    lv_anim_set_path_cb(&PropertyAnimation_1, lv_anim_path_linear);
-    lv_anim_set_delay(&PropertyAnimation_1, delay + 0);
-    lv_anim_set_early_apply(&PropertyAnimation_1, false);
-    lv_anim_set_get_value_cb(&PropertyAnimation_1, &anim_callback_get_y);
-    lv_anim_start(&PropertyAnimation_1);
+    //lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_time(&a, 1000);
+    //lv_anim_set_user_data(&a, TargetObject);
+    //lv_anim_set_custom_exec_cb(&a, anim_callback_set_y);
+    lv_anim_set_var(&a, TargetObject);
+    lv_anim_set_exec_cb(&a, anim_callback_set_y);
+    lv_anim_set_values(&a, 0, 500);
+    lv_anim_set_path_cb(&a, lv_anim_path_linear);
+    lv_anim_set_delay(&a, delay + 0);
+    lv_anim_set_early_apply(&a, false);
+    lv_anim_set_get_value_cb(&a, &anim_callback_get_y);
+    lv_anim_start(&a);
 }
 
 void CreateHdmiRxScreen(void)
 {
     HdmiRxScreen = lv_obj_create(NULL);
     lv_obj_set_style_bg_opa(HdmiRxScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(HdmiRxScreen, base_event_handler, LV_EVENT_KEY, NULL);
 
     #ifdef HCCHIP_GCC
     hdmi_init();

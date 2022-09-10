@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 21:19:12
+ * @LastEditTime: 2022-09-10 21:26:17
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -10,12 +10,19 @@
 #include <stack>
 #include <list>
 #include "ui_com.h"
+#include "Volume.h"
+#include "Source.h"
+#include "SettingScreen.h"
+#ifdef HCCHIP_GCC
+#include "hcscreen/com_api.h"
+#endif
 
 /************全局变量*****************/
 std::stack<lv_group_t*, std::list<lv_group_t*>> group_stack;
 lv_indev_t* keypad_indev = nullptr;
 lv_group_t* activity_group = nullptr;
 
+/*************************** 组 ****************************/
 void group_init(void)
 {
     lv_group_t * group = lv_group_get_default();
@@ -87,6 +94,7 @@ void delete_all_group(void)
     activity_group = nullptr;
 }
 
+/*************************** 字符刷新 ****************************/
 lv_obj_tree_walk_res_t obj_tree_walk_cb(lv_obj_t* obj, void * user_data)
 {
     if (lv_obj_check_type(obj, &lv_label_class) && obj->user_data != nullptr) {
@@ -100,10 +108,11 @@ void refresh_all_lable_text(lv_obj_t* parent)
     lv_obj_tree_walk(parent, obj_tree_walk_cb, nullptr);
 }
 
+/*************************** 对话框 ****************************/
 lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
 {
     auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_t* _parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
@@ -176,7 +185,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
 lv_obj_t* CreateMsgBox2(lv_obj_t* parent, const char* title, const char* text, MsgBoxFunc_t func)
 {
     auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_t* _parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
@@ -290,34 +299,35 @@ lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxF
     return SpinBox;
 }
 
-void anim_callback_set_x(lv_anim_t * a, int32_t v)
+/*************************** 动画 ****************************/
+void anim_callback_set_x(void * var, int32_t v)
 {
-    lv_obj_set_x((lv_obj_t *)a->user_data, v);
+    lv_obj_set_x(static_cast<lv_obj_t *>(var), v);
 }
 
 int32_t anim_callback_get_x(lv_anim_t * a)
 {
-    return lv_obj_get_x_aligned((lv_obj_t *)a->user_data);
+    return lv_obj_get_x_aligned((lv_obj_t *)a->var);
 }
 
-void anim_callback_set_y(lv_anim_t * a, int32_t v)
+void anim_callback_set_y(void * var, int32_t v)
 {
-    lv_obj_set_y((lv_obj_t *)a->user_data, v);
+    lv_obj_set_y(static_cast<lv_obj_t *>(var), v);
 }
 
 int32_t anim_callback_get_y(lv_anim_t * a)
 {
-    return lv_obj_get_y_aligned((lv_obj_t *)a->user_data);
+    return lv_obj_get_y_aligned((lv_obj_t *)a->var);
 }
 
 int32_t anim_callback_get_opacity(lv_anim_t * a)
 {
-    return lv_obj_get_style_opa((lv_obj_t *)a->user_data, 0);
+    return lv_obj_get_style_opa((lv_obj_t *)a->var, 0);
 }
 
-void anim_callback_set_opacity(lv_anim_t * a, int32_t v)
+void anim_callback_set_opacity(void * var, int32_t v)
 {
-    lv_obj_set_style_opa((lv_obj_t *)a->user_data, v, 0);
+    lv_obj_set_style_opa(static_cast<lv_obj_t *>(var), v, 0);
 }
 
 void anim_callback_set_image_angle(void * var, int32_t v)
@@ -347,4 +357,55 @@ void SpinAnimation(lv_obj_t * TargetObject, int delay, int time)
     lv_anim_set_early_apply(&a, false);
     lv_anim_set_get_value_cb(&a, &anim_callback_get_image_angle);
     lv_anim_start(&a);
+}
+
+/*************************** 事件 ****************************/
+void base_event_handler(lv_event_t* event)
+{
+    //lv_obj_t* target = lv_event_get_current_target(event);
+    //lv_obj_t* parent = lv_obj_get_parent(target);
+    uint32_t value = lv_indev_get_key(lv_indev_get_act());
+    //lv_group_t* group = (lv_group_t*)lv_obj_get_group(lv_event_get_current_target(event));
+    switch (value)
+    {
+    case LV_KEY_VOLUME_UP:
+    case LV_KEY_VOLUME_DOWN:
+        SetVolume(value);
+        break;
+    case LV_KEY_MENU:
+        CreateSettingScreen(lv_scr_act());
+        break;
+    case LV_KEY_SOURCE:
+        CreateSourcePanel(lv_scr_act());
+        break;
+    default:
+        break;
+    }
+}
+
+void other_event_handler(lv_event_t* event)
+{
+    
+}
+
+/*************************** 系统消息 ****************************/
+void ProcessSysMsg(void)
+{
+    #ifdef HCCHIP_GCC
+    control_msg_t ctl_msg;
+    int ret = -1;
+    ret = api_control_receive_msg(&ctl_msg);
+    switch (ctl_msg.msg_type)
+    {
+    case MSG_TYPE_CAST_AIRCAST_START:
+        break;
+    case MSG_TYPE_CAST_MIRACAST_START:
+        break;
+    case MSG_TYPE_CAST_DLNA_START:
+        break;
+    
+    default:
+        break;
+    }
+    #endif
 }

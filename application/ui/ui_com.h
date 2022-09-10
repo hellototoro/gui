@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 09:37:35
+ * @LastEditTime: 2022-09-10 22:25:48
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -12,6 +12,7 @@
 
 #include "application/ui/resource/ui.h"
 #include "lv_i18n/src/lv_i18n.h"
+#include "application/key_map.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,6 +29,7 @@ extern void USB_PlugTest(lv_obj_t* parent);
 /*Define a message ID*/
 #define MSG_SHOW_WIFI_LIST      1
 #define MSG_HOTPLUG             2
+#define MSG_EXIT_SCREEN         3
 
 typedef struct ObjNavigation
 {
@@ -35,9 +37,16 @@ typedef struct ObjNavigation
     lv_obj_t* obj[4];
 }ObjNavigation_t;
 
+typedef enum {
+    SourceUDisk,
+    SourceHDMI,
+    SourceTypeNumber
+} SourceType_t;
+
 typedef void (*MsgBoxFunc_t)(void);
 
 extern lv_indev_t* keypad_indev;
+extern SourceType_t CureentSource;
 
 extern void group_init(void);
 extern lv_group_t* create_new_group(void);
@@ -50,16 +59,19 @@ extern void refresh_all_lable_text(lv_obj_t* parent);
 extern lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func);
 extern lv_obj_t* CreateMsgBox2(lv_obj_t* parent, const char* title, const char* text, MsgBoxFunc_t func);
 extern lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func);
-extern void anim_callback_set_x(lv_anim_t * a, int32_t v);
+extern void anim_callback_set_x(void * var, int32_t v);
 extern int32_t anim_callback_get_x(lv_anim_t * a);
-extern void anim_callback_set_y(lv_anim_t * a, int32_t v);
+extern void anim_callback_set_y(void * var, int32_t v);
 extern int32_t anim_callback_get_y(lv_anim_t * a);
 extern int32_t anim_callback_get_opacity(lv_anim_t * a);
-extern void anim_callback_set_opacity(lv_anim_t * a, int32_t v);
+extern void anim_callback_set_opacity(void * var, int32_t v);
 extern void anim_callback_set_image_angle(void * var, int32_t v);
 extern int32_t anim_callback_get_image_angle(lv_anim_t * a);
 extern void SpinAnimation(lv_obj_t * TargetObject, int delay, int time);
 extern void SpinAnimationStop(lv_obj_t * TargetObject);
+extern void base_event_handler(lv_event_t* event);
+extern void other_event_handler(lv_event_t* event);
+extern void ProcessSysMsg(void);
 
 
 #ifdef __cplusplus

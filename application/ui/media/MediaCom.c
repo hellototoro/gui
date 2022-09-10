@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:14:56
+ * @LastEditTime: 2022-09-10 17:50:44
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -391,7 +391,7 @@ static void CloseLoadingMediaFileScreen(void)
 static void key_event_handler(lv_event_t* event)
 {
     lv_event_code_t code = lv_event_get_code(event);
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     if (LV_EVENT_KEY == code) {
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
@@ -483,11 +483,6 @@ static void key_event_handler(lv_event_t* event)
                 }
                 break;
 
-            case LV_KEY_VOLUME_UP:
-            case LV_KEY_VOLUME_DOWN:
-                SetVolume(value);
-                return;
-
             default:
                 break;
         }
@@ -501,7 +496,7 @@ static void key_event_handler(lv_event_t* event)
 
 static void play_list_event_handler(lv_event_t* event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     switch (value)
@@ -787,33 +782,37 @@ static void anim_callback_delete_obj(struct _lv_anim_t *a)
 
 static void ShowUpAnimation(lv_obj_t * TargetObject, int delay)
 {
-    lv_anim_t PropertyAnimation;
-    lv_anim_init(&PropertyAnimation);
-    lv_anim_set_time(&PropertyAnimation, 500);
-    lv_anim_set_user_data(&PropertyAnimation, TargetObject);
-    lv_anim_set_custom_exec_cb(&PropertyAnimation, anim_callback_set_y);
-    lv_anim_set_values(&PropertyAnimation, lv_obj_get_y(TargetObject), -605);
-    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_ease_in_out);
-    lv_anim_set_delay(&PropertyAnimation, delay + 0);
-    lv_anim_set_early_apply(&PropertyAnimation, false);
-    lv_anim_set_get_value_cb(&PropertyAnimation, &anim_callback_get_y);
-    lv_anim_start(&PropertyAnimation);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_time(&a, 500);
+    //lv_anim_set_user_data(&a, TargetObject);
+    //lv_anim_set_custom_exec_cb(&a, anim_callback_set_y);
+    lv_anim_set_var(&a, TargetObject);
+    lv_anim_set_exec_cb(&a, anim_callback_set_y);
+    lv_anim_set_values(&a, lv_obj_get_y(TargetObject), -605);
+    lv_anim_set_path_cb(&a, lv_anim_path_ease_in_out);
+    lv_anim_set_delay(&a, delay + 0);
+    lv_anim_set_early_apply(&a, false);
+    lv_anim_set_get_value_cb(&a, &anim_callback_get_y);
+    lv_anim_start(&a);
 }
 
 static void ShowDownAnimation(lv_obj_t * TargetObject, int delay)
 {
-    lv_anim_t PropertyAnimation;
-    lv_anim_init(&PropertyAnimation);
-    lv_anim_set_time(&PropertyAnimation, 500);
-    lv_anim_set_user_data(&PropertyAnimation, TargetObject);
-    lv_anim_set_custom_exec_cb(&PropertyAnimation, anim_callback_set_y);
-    lv_anim_set_values(&PropertyAnimation, lv_obj_get_y(TargetObject), 605);
-    lv_anim_set_path_cb(&PropertyAnimation, lv_anim_path_overshoot);
-    lv_anim_set_delay(&PropertyAnimation, delay + 0);
-    lv_anim_set_early_apply(&PropertyAnimation, false);
-    lv_anim_set_get_value_cb(&PropertyAnimation, &anim_callback_get_y);
-    lv_anim_set_deleted_cb(&PropertyAnimation, anim_callback_delete_obj);
-    lv_anim_start(&PropertyAnimation);
+    lv_anim_t a;
+    lv_anim_init(&a);
+    lv_anim_set_time(&a, 500);
+    //lv_anim_set_user_data(&a, TargetObject);
+    //lv_anim_set_custom_exec_cb(&a, anim_callback_set_y);
+    lv_anim_set_var(&a, TargetObject);
+    lv_anim_set_exec_cb(&a, anim_callback_set_y);
+    lv_anim_set_values(&a, lv_obj_get_y(TargetObject), 605);
+    lv_anim_set_path_cb(&a, lv_anim_path_overshoot);
+    lv_anim_set_delay(&a, delay + 0);
+    lv_anim_set_early_apply(&a, false);
+    lv_anim_set_get_value_cb(&a, &anim_callback_get_y);
+    lv_anim_set_deleted_cb(&a, anim_callback_delete_obj);
+    lv_anim_start(&a);
 }
 
 //SetTotalTimeAndProgress(media_get_totaltime(media_hld));

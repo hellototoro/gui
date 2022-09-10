@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 23:17:05
+ * @LastEditTime: 2022-09-10 22:48:13
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -52,11 +52,6 @@ int main(int argc, char *argv[])
 {
     #ifdef HCCHIP_GCC
     hcscreen();
-    if (argc == 2) {
-        strncpy(m_wifi_module_name, argv[1], sizeof(m_wifi_module_name)-1);
-        wifi_api_set_module(m_wifi_module_name);
-        printf("please modprobe %s!\n", m_wifi_module_name);
-    }
     #endif
 
     if (pthread_mutex_init(&lvgl_task_mutex, NULL) != 0) {
@@ -82,7 +77,6 @@ int main(int argc, char *argv[])
     network_init();
     api_lvgl_init(OSD_MAX_WIDTH, OSD_MAX_HEIGHT);
     key_init();
-    //NetWorkInit();
     network_connect();
     #endif
 
@@ -99,6 +93,7 @@ int main(int argc, char *argv[])
         lv_task_handler();
         pthread_mutex_unlock(&lvgl_task_mutex);
         HotPlugDetect();
+        ProcessSysMsg();
         usleep(5000);
     }
     return 0;
@@ -144,5 +139,8 @@ static void HotPlugDetect(void)
 void exit_console(int signo)
 {
     printf("%s(), signo: %d, error: %s\n", __FUNCTION__, signo, strerror(errno));
+    #ifdef HCCHIP_GCC
+    api_gpio_deinit();
+    #endif
     exit(0);
 }

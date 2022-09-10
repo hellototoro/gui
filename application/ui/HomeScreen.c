@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 21:36:20
+ * @LastEditTime: 2022-09-10 22:31:31
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -43,9 +43,9 @@ enum HomeCategoryList {
 static void CreateMainPanel(lv_obj_t* parent);
 static void ExitHome(ActiveScreen screen);
 
-static void event_handler(lv_event_t* event)
+static void key_event_handler(lv_event_t* event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     lv_obj_t* parent = lv_obj_get_parent(target);
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
@@ -125,19 +125,22 @@ static void event_handler(lv_event_t* event)
             break;
         }
         break;
-    case LV_KEY_VOLUME_UP:
-    case LV_KEY_VOLUME_DOWN:
-        SetVolume(value);
-        break;
 
     default:
         break;
     }
 }
 
+static void sys_event_handler(lv_event_t* event)
+{
+    //lv_obj_t* target = lv_event_get_current_target(event);
+    LastFocusedObjIndex = 0;
+    delete_all_group();
+}
+
 static void UdiskStatus_event_handler(lv_event_t * event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     lv_msg_t* msg = lv_event_get_msg(event);
     const int* UdiskStatus = lv_msg_get_payload(msg);
 
@@ -194,6 +197,7 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_align(MainPanel, LV_ALIGN_CENTER);
     lv_obj_set_style_bg_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(MainPanel, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     UdiskDetectPanel = lv_obj_create(parent);
     lv_obj_set_width(UdiskDetectPanel, 200);
@@ -256,7 +260,8 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_obj_set_style_border_opa(lv_obj, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_width(lv_obj, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(MainGroup, lv_obj);
-        lv_obj_add_event_cb(lv_obj, event_handler, LV_EVENT_KEY, NULL);
+        lv_obj_add_event_cb(lv_obj, key_event_handler, LV_EVENT_KEY, NULL);
+        lv_obj_add_flag(lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);
 
         lv_obj_t* lv_lab = lv_label_create(lv_obj);
         lv_obj_set_size(lv_lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
@@ -277,12 +282,18 @@ static void HomeInit(void)
     lv_obj_set_size(HomeRootScreen, 1280, 720);
     lv_obj_set_style_bg_color(HomeRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(HomeRootScreen, base_event_handler, LV_EVENT_KEY, NULL);
+    #ifdef HCCHIP_GCC
+    lv_msg_subsribe_obj(MSG_EXIT_SCREEN, HomeRootScreen, NULL);
+    #else
+    lv_msg_subscribe_obj(MSG_EXIT_SCREEN, HomeRootScreen, NULL);
+    #endif
+    lv_obj_add_event_cb(HomeRootScreen, sys_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     CreateMainPanel(HomeRootScreen);
     #ifdef USB_PLUG_TEST
     USB_PlugTest(MainPanel);
     #endif
-    //CreateMsgBox2(HomeRootScreen, "test title", "test text", NULL);
 }
 
 static void LoadHome(void)

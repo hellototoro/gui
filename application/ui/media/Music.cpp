@@ -156,7 +156,7 @@ void RefreshLyric(uint32_t played_time)
 
 static void key_event_handler(lv_event_t* event)
 {
-    //lv_obj_t* target = lv_event_get_target(event);
+    //lv_obj_t* target = lv_event_get_current_target(event);
     //lv_obj_t* parents = lv_obj_get_parent(target);
     //lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     (void)event;

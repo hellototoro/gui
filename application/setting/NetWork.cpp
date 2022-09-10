@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 21:02:55
+ * @LastEditTime: 2022-09-10 15:20:25
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -58,7 +58,7 @@ static void WiFiRefresh(void);
 void CreateNetWorkPanel(lv_obj_t* parent)
 {
     auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         //lv_obj_t* parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
@@ -178,7 +178,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_t* lab;
     lv_obj_t* img;
     auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         //lv_obj_t* parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
@@ -269,7 +269,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_add_state(WiFiControlSwitch, LV_STATE_CHECKED);
     lv_obj_set_align(WiFiControlSwitch, LV_ALIGN_CENTER);
     lv_obj_add_event_cb(WiFiControlSwitch, [] (lv_event_t* event) { 
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         if (lv_obj_has_state(target, LV_STATE_CHECKED)) {
             if (WiFiConnectedPanel) lv_obj_clear_flag(WiFiConnectedPanel, LV_OBJ_FLAG_HIDDEN);
             if (WiFiAvailablePanel) lv_obj_clear_flag(WiFiAvailablePanel, LV_OBJ_FLAG_HIDDEN);
@@ -408,6 +408,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     }, LV_EVENT_MSG_RECEIVED, NULL);
     #ifdef HCCHIP_GCC
     lv_msg_subsribe_obj(MSG_SHOW_WIFI_LIST, WiFiAvailableListPanel, nullptr);
+    NetWorkInit();
     #else
     lv_msg_subscribe_obj(MSG_SHOW_WIFI_LIST, WiFiAvailableListPanel, nullptr);
     #endif
@@ -442,7 +443,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
 {
     auto event_cb = [] (lv_event_t* event) {
         lv_event_code_t code = lv_event_get_code(event);
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_t* l_parent = lv_obj_get_parent(target);
         lv_group_t* group = get_activity_group();
         if(code == LV_EVENT_KEY) {
@@ -615,7 +616,7 @@ static void WiFiRefreshAvailableList(void)
     lv_obj_t* lab;
     lv_obj_t* img;
     auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         //lv_obj_t* parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();

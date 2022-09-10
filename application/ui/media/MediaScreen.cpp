@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 00:33:44
+ * @LastEditTime: 2022-09-10 17:54:55
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -86,10 +86,6 @@ static void key_base_event_handler(lv_obj_t* target)
         if(!IsRootPath(current_path)) ReturnUpper();
         else                          ExitMedia(HomeScreen);
         break;
-    case LV_KEY_VOLUME_UP:
-    case LV_KEY_VOLUME_DOWN:
-        SetVolume(value);
-        break;
 
     default:
         break;
@@ -98,7 +94,7 @@ static void key_base_event_handler(lv_obj_t* target)
 
 static void file_list_handler(lv_event_t* event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     if (LV_KEY_ENTER == value) {
         if (target->user_data != nullptr) {
@@ -168,9 +164,10 @@ static void ShowFileList(FileList *file_list)
     lv_obj_t* ReturnButton = lv_btn_create(FileListPanel);
     ReturnButton->user_data = const_cast<char*>("media_file_p_return");
     DrawCell(ReturnButton, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
+    lv_obj_add_flag(ReturnButton, LV_OBJ_FLAG_EVENT_BUBBLE);
     lv_group_add_obj(FileListGroup, ReturnButton);
     lv_obj_add_event_cb(ReturnButton, [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         switch (value)
         {
@@ -227,11 +224,11 @@ static void ShowFileList(FileList *file_list)
         lv_group_add_obj(FileListGroup, btn);
         lv_obj_add_event_cb(btn, file_list_handler, LV_EVENT_KEY, nullptr);
         lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
-            lv_obj_t* target = lv_event_get_target(event);
+            lv_obj_t* target = lv_event_get_current_target(event);
             lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
         }, LV_EVENT_FOCUSED, nullptr);
         lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
-            lv_obj_t* target = lv_event_get_target(event);
+            lv_obj_t* target = lv_event_get_current_target(event);
             lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
         }, LV_EVENT_DEFOCUSED, nullptr);
     }
@@ -250,6 +247,7 @@ static void CreateFilePanel(lv_obj_t* parent, const char *path)
     lv_obj_set_style_border_color(FileListPanel, lv_color_hex(0x009DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(FileListPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(FileListPanel, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(FileListPanel, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     FileListGroup = create_new_group();
     set_group_activity(FileListGroup);
@@ -273,6 +271,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
     lv_obj_clear_flag(CategoryPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_opa(CategoryPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(CategoryPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(CategoryPanel, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     //CategoryGroup = create_new_group();
     CategoryGroup = lv_group_create();//对于类别组做一般处理
@@ -292,9 +291,10 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_style_bg_opa(btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_shadow_color(btn, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_shadow_opa(btn, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
         lv_group_add_obj(CategoryGroup, btn);
         lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
-            lv_obj_t* target = lv_event_get_target(event);
+            lv_obj_t* target = lv_event_get_current_target(event);
             lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
             uint32_t value = lv_indev_get_key(lv_indev_get_act());
             switch (value)
@@ -317,7 +317,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
             }
         }, LV_EVENT_KEY, nullptr);
         lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
-            lv_obj_t* target = lv_event_get_target(event);
+            lv_obj_t* target = lv_event_get_current_target(event);
             FileFilter = static_cast<MediaFileCategoryList>(lv_obj_get_index(target));
             FilterFile(FileFilter);
         }, LV_EVENT_FOCUSED, nullptr);
@@ -415,11 +415,11 @@ static void FilterFile(MediaFileCategoryList filter_type)
                 //lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_ALL, nullptr);
                 lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_KEY, nullptr);
                 lv_obj_add_event_cb(child, [] (lv_event_t* event) {
-                    lv_obj_t* target = lv_event_get_target(event);
+                    lv_obj_t* target = lv_event_get_current_target(event);
                     lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
                 }, LV_EVENT_FOCUSED, nullptr);
                 lv_obj_add_event_cb(child, [] (lv_event_t* event) {
-                    lv_obj_t* target = lv_event_get_target(event);
+                    lv_obj_t* target = lv_event_get_current_target(event);
                     lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
                 }, LV_EVENT_DEFOCUSED, nullptr);
             }
@@ -443,6 +443,7 @@ static void MediaInit(void)
     lv_obj_set_style_bg_opa(MediaRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(MediaRootScreen, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MediaRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_event_cb(MediaRootScreen, base_event_handler, LV_EVENT_KEY, NULL);
     #ifdef HCCHIP_GCC
     lv_msg_subsribe_obj(MSG_HOTPLUG, MediaRootScreen, NULL);
     #else

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-19 15:46:16
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-27 21:19:09
+ * @LastEditTime: 2022-09-10 15:20:03
  * @FilePath: /gui/application/NetWorkApi.c
  * @Description: None
  * @other: None
@@ -301,6 +301,11 @@ int NetWorkInit(void)
     ctl_msg.msg_type = MSG_TYPE_NETWORK_INIT_OK;
     api_control_send_msg(&ctl_msg);
     return -1;*/
+}
+
+void NetWorkDeInit(void)
+{
+    
 }
 
 void WiFi_Connect(wifi_ap_info_t *wifi_info)

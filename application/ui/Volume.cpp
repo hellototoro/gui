@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 22:36:18
+ * @LastEditTime: 2022-09-10 18:42:52
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
@@ -27,6 +27,12 @@ static void fade_up_Animation(lv_obj_t * TargetObject, int delay);
 static void fade_down_Animation(lv_obj_t * TargetObject, int delay);
 static void anim_callback_delete_obj(struct _lv_anim_t *a);
 
+static void event_handler(lv_event_t* event)
+{
+    lv_anim_del(VolumePanel, nullptr);
+    lv_timer_del(VolumeTimer);
+}
+
 void SetVolume(uint32_t value)
 {
     static const lv_img_dsc_t* LastVolumeImg = NULL;
@@ -45,6 +51,7 @@ void SetVolume(uint32_t value)
     }
     if (!lv_obj_is_valid(VolumePanel)) {
         CreateVolumePanel(lv_scr_act());
+        lv_obj_add_event_cb(lv_scr_act(), event_handler, LV_EVENT_SCREEN_UNLOAD_START, nullptr);
         fade_up_Animation(VolumePanel, 300);
         VolumeTimer = lv_timer_create(VolumeTimer_cb, 2*1000, NULL);
         LastVolumeImg = NULL;
@@ -116,10 +123,12 @@ static void fade_up_Animation(lv_obj_t * TargetObject, int delay)
 {
     lv_anim_t Animation;
     lv_anim_init(&Animation);
-    lv_anim_set_time(&Animation, 300);
-    lv_anim_set_user_data(&Animation, TargetObject);
-    lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    //lv_anim_set_user_data(&Animation, TargetObject);
+    lv_anim_set_var(&Animation, TargetObject);
+    //lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    lv_anim_set_exec_cb(&Animation, anim_callback_set_opacity);
     lv_anim_set_values(&Animation, 0, 255);
+    lv_anim_set_time(&Animation, 300);
     lv_anim_set_path_cb(&Animation, lv_anim_path_ease_in);
     lv_anim_set_delay(&Animation, delay + 0);
     lv_anim_set_early_apply(&Animation, false);
@@ -129,7 +138,8 @@ static void fade_up_Animation(lv_obj_t * TargetObject, int delay)
 
 static void anim_callback_delete_obj(struct _lv_anim_t *a)
 {
-    lv_obj_del_async((lv_obj_t *)a->user_data);
+    lv_obj_remove_event_cb(lv_scr_act(), event_handler);
+    lv_obj_del_async((lv_obj_t *)a->var);
     PlayingFadeDownAnimation_Flag = false;
 }
 
@@ -137,10 +147,12 @@ static void fade_down_Animation(lv_obj_t * TargetObject, int delay)
 {
     lv_anim_t Animation;
     lv_anim_init(&Animation);
-    lv_anim_set_time(&Animation, 300);
-    lv_anim_set_user_data(&Animation, TargetObject);
-    lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    //lv_anim_set_user_data(&Animation, TargetObject);
+    lv_anim_set_var(&Animation, TargetObject);
+    //lv_anim_set_custom_exec_cb(&Animation, anim_callback_set_opacity);
+    lv_anim_set_exec_cb(&Animation, anim_callback_set_opacity);
     lv_anim_set_values(&Animation, 255, 0);
+    lv_anim_set_time(&Animation, 300);
     lv_anim_set_path_cb(&Animation, lv_anim_path_ease_out);
     lv_anim_set_delay(&Animation, delay + 0);
     lv_anim_set_early_apply(&Animation, false);

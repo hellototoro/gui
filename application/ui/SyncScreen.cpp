@@ -62,7 +62,7 @@ static constexpr const lv_img_dsc_t* airplay_img_src[] = {
 void CreateSyncScreen(lv_obj_t* parent)
 {
     auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         //lv_obj_t* parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
@@ -131,11 +131,11 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_group_add_obj(MainGroup, MiracastObj);
     lv_obj_add_event_cb(MiracastObj, event_cb, LV_EVENT_KEY, nullptr);
     lv_obj_add_event_cb(MiracastObj, [] (lv_event_t* event) { 
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_set_style_text_color(lv_obj_get_child(target, 0), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     }, LV_EVENT_FOCUSED, nullptr);
     lv_obj_add_event_cb(MiracastObj, [] (lv_event_t* event) { 
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_set_style_text_color(lv_obj_get_child(target, 0), lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     }, LV_EVENT_DEFOCUSED, nullptr);
 
@@ -166,11 +166,11 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_group_add_obj(MainGroup, AirplayObj);
     lv_obj_add_event_cb(AirplayObj, event_cb, LV_EVENT_KEY, nullptr);
     lv_obj_add_event_cb(AirplayObj, [] (lv_event_t* event) { 
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_set_style_text_color(lv_obj_get_child(target, 0), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     }, LV_EVENT_FOCUSED, nullptr);
     lv_obj_add_event_cb(AirplayObj, [] (lv_event_t* event) { 
-        lv_obj_t* target = lv_event_get_target(event);
+        lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_set_style_text_color(lv_obj_get_child(target, 0), lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     }, LV_EVENT_DEFOCUSED, nullptr);
 

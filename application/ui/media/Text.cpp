@@ -90,7 +90,7 @@ void RefreshText(const char* text)
 
 static void key_event_handler(lv_event_t* event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     switch (value)
     {

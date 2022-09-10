@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:19:07
+ * @LastEditTime: 2022-09-10 21:03:48
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -32,6 +32,7 @@ lv_obj_t* creat_photo_window(char* file_name)
     PhotoScreen = lv_obj_create(NULL);
     lv_obj_set_style_bg_opa(PhotoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     #endif
+    lv_obj_add_event_cb(PhotoScreen, base_event_handler, LV_EVENT_KEY, NULL);
     lv_obj_add_event_cb(PhotoScreen, event_handler, LV_EVENT_KEY, NULL);
     lv_obj_clear_flag(PhotoScreen, LV_OBJ_FLAG_SCROLLABLE);
 

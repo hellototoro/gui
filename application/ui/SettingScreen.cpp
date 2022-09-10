@@ -33,7 +33,7 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp);
 
 static void event_handler(lv_event_t* event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     lv_obj_t* parent = lv_obj_get_parent(target);
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     uint32_t index = lv_obj_get_index(target);
@@ -116,7 +116,7 @@ static void event_handler(lv_event_t* event)
 
 static void setting_item_key_event_handler(lv_event_t* event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     lv_obj_t* parent = lv_obj_get_parent(target);
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     uint32_t index = lv_obj_get_index(target);

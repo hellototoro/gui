@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-05 09:05:16
+ * @LastEditTime: 2022-09-10 22:43:33
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -34,6 +34,7 @@ lv_obj_t* creat_video_window(char* file_name)
     VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
     #endif
     lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(VideoScreen, base_event_handler, LV_EVENT_KEY, NULL);
     lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
     #ifdef HCCHIP_GCC
     lv_msg_subsribe_obj(MSG_HOTPLUG, VideoScreen, NULL);
@@ -82,7 +83,7 @@ static void event_handler(lv_event_t* event)
 
 static void UdiskStatus_event_handler(lv_event_t * event)
 {
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     lv_msg_t* msg = lv_event_get_msg(event);
     const int* UdiskStatus = lv_msg_get_payload(msg);
 

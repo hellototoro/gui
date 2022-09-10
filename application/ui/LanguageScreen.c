@@ -45,7 +45,7 @@ void SaveCurrentLanguageType(int index)
 void event_handler(lv_event_t* event)
 {
     lv_event_code_t code = lv_event_get_code(event);
-    lv_obj_t* target = lv_event_get_target(event);
+    lv_obj_t* target = lv_event_get_current_target(event);
     if (LV_EVENT_KEY == code) {
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
