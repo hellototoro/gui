@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 22:25:48
+ * @LastEditTime: 2022-09-11 06:34:02
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -72,6 +72,8 @@ extern void SpinAnimationStop(lv_obj_t * TargetObject);
 extern void base_event_handler(lv_event_t* event);
 extern void other_event_handler(lv_event_t* event);
 extern void ProcessSysMsg(void);
+extern lv_obj_t*  CreateLoadingScreen(lv_obj_t* parent);
+extern void CloseLoadingScreen(void);
 
 
 #ifdef __cplusplus

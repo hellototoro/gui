@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 21:26:17
+ * @LastEditTime: 2022-09-11 06:54:58
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -359,6 +359,40 @@ void SpinAnimation(lv_obj_t * TargetObject, int delay, int time)
     lv_anim_start(&a);
 }
 
+static lv_obj_t* LoadingPanel;
+lv_obj_t* CreateLoadingScreen(lv_obj_t* parent)
+{
+    if (lv_obj_is_valid(LoadingPanel))
+        return LoadingPanel;
+    LoadingPanel = lv_obj_create(parent);//lv_scr_act()
+    lv_obj_set_width(LoadingPanel, 1280);
+    lv_obj_set_height(LoadingPanel, 720);
+    lv_obj_set_x(LoadingPanel, 0);
+    lv_obj_set_y(LoadingPanel, 0);
+    lv_obj_set_align(LoadingPanel, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(LoadingPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_color(LoadingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(LoadingPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_color(LoadingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_t* Spinner = lv_spinner_create(LoadingPanel, 1000, 90);
+    lv_obj_set_width(Spinner, 80);
+    lv_obj_set_height(Spinner, 80);
+    lv_obj_set_x(Spinner, 0);
+    lv_obj_set_y(Spinner, 0);
+    lv_obj_set_align(Spinner, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(Spinner, LV_OBJ_FLAG_CLICKABLE);
+    return LoadingPanel;
+}
+
+void CloseLoadingScreen(void)
+{
+    if (lv_obj_is_valid(LoadingPanel))
+        lv_obj_del(LoadingPanel);
+}
+
 /*************************** 事件 ****************************/
 void base_event_handler(lv_event_t* event)
 {
@@ -393,13 +427,35 @@ void ProcessSysMsg(void)
 {
     #ifdef HCCHIP_GCC
     control_msg_t ctl_msg;
-    int ret = -1;
-    ret = api_control_receive_msg(&ctl_msg);
+    api_control_receive_msg(&ctl_msg);
     switch (ctl_msg.msg_type)
     {
-    case MSG_TYPE_CAST_AIRCAST_START:
+    case MSG_TYPE_CAST_MIRACAST_CONNECTING:
+    {
+        lv_obj_t* obj = CreateLoadingScreen(lv_scr_act());
+        lv_obj_t* text = lv_label_create(obj);
+        lv_obj_set_width(text, LV_SIZE_CONTENT);   /// 1
+        lv_obj_set_height(text, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_x(text, 0);
+        lv_obj_set_y(text, 80);
+        lv_obj_set_align(text, LV_ALIGN_CENTER);
+        lv_label_set_text(text, _("cast_connecting"));
+        lv_obj_set_style_text_color(text, lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
         break;
+    }
+    case MSG_TYPE_CAST_MIRACAST_CONNECTED:
+        //CloseLoadingScreen();
+        break;
+    case MSG_TYPE_CAST_AIRCAST_START:
     case MSG_TYPE_CAST_MIRACAST_START:
+        CloseLoadingScreen();
+        lv_obj_add_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
+        break;
+    case MSG_TYPE_CAST_AIRCAST_STOP:
+    case MSG_TYPE_CAST_MIRACAST_STOP:
+        lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
         break;
     case MSG_TYPE_CAST_DLNA_START:
         break;

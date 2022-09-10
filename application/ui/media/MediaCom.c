@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 05:36:36
+ * @LastEditTime: 2022-09-11 06:34:28
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -34,7 +34,6 @@ int current_path_size = sizeof(current_path);
 /* 文件内全局变量 */
 static lv_obj_t* PlayBar;
 static lv_obj_t* PlayListPanel;
-static lv_obj_t* LoadingPanel;
 static MediaType CurrentPlayingType;
 static PlayListMode CurrentPlayMode;
 static MediaHandle* current_media_hdl;
@@ -81,8 +80,6 @@ static void SetMediaIndex(int index);
 static char* GetPreMediaName(MediaType media_type, PlayListMode mode);
 static char* GetNextMediaName(MediaType media_type, PlayListMode mode, GetNextMode next_mode);
 static file_name_t* GetMediaArray(void);
-static void LoadingMediaFileScreen(lv_obj_t* parent);
-static void CloseLoadingMediaFileScreen(void);
 /************动画*************/
 static void ShowUpAnimation(lv_obj_t * TargetObject, int delay);
 static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
@@ -112,7 +109,7 @@ void MediaComDeinit(void)
     CurrentPlayingType = MEDIA_MAX;
     lv_timer_del(PlayState_Timer);
 
-    CloseLoadingMediaFileScreen();
+    CloseLoadingScreen();
 }
 
 static MediaList* CreateMediaList(MediaType media_type)
@@ -341,7 +338,7 @@ void PlayMedia(char * file_name)
         #endif
         if(CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO ) {
             #ifdef HCCHIP_GCC
-            LoadingMediaFileScreen(lv_scr_act());
+            CreateLoadingScreen(lv_scr_act());
             #endif
         }
         else if(CurrentPlayingType == MEDIA_MUSIC) {
@@ -350,40 +347,6 @@ void PlayMedia(char * file_name)
             MusicCoverSpinRun();
         }
     }
-}
-
-static void LoadingMediaFileScreen(lv_obj_t* parent)
-{
-    if (lv_obj_is_valid(LoadingPanel))
-        return;
-    // LoadingPanel
-    LoadingPanel = lv_obj_create(parent);//lv_scr_act()
-    lv_obj_set_width(LoadingPanel, 1280);
-    lv_obj_set_height(LoadingPanel, 720);
-    lv_obj_set_x(LoadingPanel, 0);
-    lv_obj_set_y(LoadingPanel, 0);
-    lv_obj_set_align(LoadingPanel, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(LoadingPanel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_color(LoadingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(LoadingPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_color(LoadingPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    // Spinner
-    lv_obj_t* Spinner = lv_spinner_create(LoadingPanel, 1000, 90);
-    lv_obj_set_width(Spinner, 80);
-    lv_obj_set_height(Spinner, 80);
-    lv_obj_set_x(Spinner, 0);
-    lv_obj_set_y(Spinner, 0);
-    lv_obj_set_align(Spinner, LV_ALIGN_CENTER);
-    lv_obj_clear_flag(Spinner, LV_OBJ_FLAG_CLICKABLE);
-}
-
-static void CloseLoadingMediaFileScreen(void)
-{
-    if (lv_obj_is_valid(LoadingPanel))
-        lv_obj_del(LoadingPanel);
 }
 
 //公共ui部分
@@ -707,11 +670,10 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_y(PlayListMode_LAB, 0);
     lv_obj_set_align(PlayListMode_LAB, LV_ALIGN_LEFT_MID);
 
-    char buf[64];
-    sprintf(buf, _p("songs", file_number), file_number);
-    //sprintf(buf, _p("user_logged_in", 7)), 7);
-    lv_label_set_text(PlayListMode_LAB, buf);
-    //lv_label_set_text_fmt(PlayListMode_LAB, "顺序播放（%d首）", file_number);
+    //char buf[64];
+    //sprintf(buf, _p("songs", file_number), file_number);
+    //lv_label_set_text(PlayListMode_LAB, buf);
+    lv_label_set_text_fmt(PlayListMode_LAB, _p("songs", file_number), file_number);
     lv_obj_set_style_text_font(PlayListMode_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* FileListPanel = lv_obj_create(PlayListPanel);
@@ -851,7 +813,7 @@ void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
         printf(">> player ready\n");
         pthread_mutex_lock(&lvgl_task_mutex);
         SetTotalTimeAndProgress(media_get_totaltime(media_hld));
-        CloseLoadingMediaFileScreen();
+        CloseLoadingScreen();
         pthread_mutex_unlock(&lvgl_task_mutex);
         break;
     case HCPLAYER_MSG_READ_TIMEOUT:

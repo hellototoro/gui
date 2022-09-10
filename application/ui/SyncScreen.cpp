@@ -2,11 +2,12 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-28 21:18:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 21:57:19
+ * @LastEditTime: 2022-09-11 06:18:01
  * @FilePath: /gui/application/ui/SyncScreen.cpp
  * @Description: None
  * @other: None
  */
+#include <stdio.h>
 #include "SyncScreen.h"
 #include "LanguageScreen.h"
 #ifdef HCCHIP_GCC
@@ -15,8 +16,7 @@
 #endif
 
 static lv_obj_t* SyncRootScreen;
-static lv_obj_t* MiracastPanel;
-static lv_obj_t* AirplayPanel;
+static lv_obj_t* CastPanel;
 static lv_obj_t* CastQr;
 static lv_group_t* MainGroup;
 
@@ -191,14 +191,14 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
 {
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
-    MiracastPanel = lv_obj_create(parent);
-    lv_obj_set_size(MiracastPanel, 1280, 720);
-    lv_obj_clear_flag(MiracastPanel, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_radius(MiracastPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(MiracastPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_center(MiracastPanel);
-    lv_group_add_obj(MainGroup, MiracastPanel);
-    lv_obj_add_event_cb(MiracastPanel, [] (lv_event_t* event) { 
+    CastPanel = lv_obj_create(parent);
+    lv_obj_set_size(CastPanel, 1280, 720);
+    lv_obj_clear_flag(CastPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_radius(CastPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(CastPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_center(CastPanel);
+    lv_group_add_obj(MainGroup, CastPanel);
+    lv_obj_add_event_cb(CastPanel, [] (lv_event_t* event) { 
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         switch (value)
         {
@@ -206,14 +206,14 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
                 break;
             case LV_KEY_ESC:
                 delete_group(MainGroup);
-                lv_obj_del_async(MiracastPanel);
+                lv_obj_del_async(CastPanel);
                 break;
             default:
                 break;
         }
     }, LV_EVENT_KEY, nullptr);
 
-    lv_obj_t* WifiName1 = lv_label_create(MiracastPanel);
+    lv_obj_t* WifiName1 = lv_label_create(CastPanel);
     lv_obj_set_width(WifiName1, LV_SIZE_CONTENT);   /// 1
     lv_obj_set_height(WifiName1, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(WifiName1, LV_ALIGN_LEFT_MID);
@@ -224,7 +224,7 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     #endif
     lv_obj_set_style_text_font(WifiName1, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t* img = lv_img_create(MiracastPanel);
+    lv_obj_t* img = lv_img_create(CastPanel);
     lv_obj_set_width(img, LV_SIZE_CONTENT);
     lv_obj_set_height(img, LV_SIZE_CONTENT); 
     lv_obj_set_x(img, 1040);
@@ -234,12 +234,12 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE); 
 
     if(CastType == SyncScreen_Miracast) {
-        lv_obj_set_style_bg_img_src(MiracastPanel, &AndroidCast, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_src(CastPanel, &AndroidCast, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_x(WifiName1, 540);
         lv_obj_set_y(WifiName1, -55);
         lv_img_set_src(img, &Android_QR);
 
-        img = lv_img_create(MiracastPanel);
+        img = lv_img_create(CastPanel);
         lv_img_set_src(img, mira_img_src[DefaultLanguageIndex]);
         lv_obj_set_width(img, LV_SIZE_CONTENT);
         lv_obj_set_height(img, LV_SIZE_CONTENT); 
@@ -249,18 +249,23 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
-        lv_obj_t* text1_lab = lv_label_create(MiracastPanel);
+        lv_obj_t* text1_lab = lv_label_create(CastPanel);
         lv_obj_set_width(text1_lab, 780);   /// 1
         lv_obj_set_height(text1_lab, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_x(text1_lab, 90);
         lv_obj_set_y(text1_lab, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
-        lv_label_set_text(text1_lab, _("cast_mira_str1"));
+
+        #ifdef HCCHIP_GCC
+        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_mira_str1"), data_mgr_get_device_name());
+        #else
+        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_mira_str1"), "Project_3A4D");
+        #endif
         lv_obj_set_style_text_letter_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        lv_obj_t* text2_lab = lv_label_create(MiracastPanel);
+        lv_obj_t* text2_lab = lv_label_create(CastPanel);
         lv_obj_set_width(text2_lab, 1280);   /// 1
         lv_obj_set_height(text2_lab, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_x(text2_lab, -10);
@@ -276,12 +281,12 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         #endif
     }
     else {
-        lv_obj_set_style_bg_img_src(MiracastPanel, &iOSCast, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_bg_img_src(CastPanel, &iOSCast, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_x(WifiName1, 130);
         lv_obj_set_y(WifiName1, -116);
         lv_img_set_src(img, &iOS_QR);
 
-        img = lv_img_create(MiracastPanel);
+        img = lv_img_create(CastPanel);
         lv_img_set_src(img, airplay_img_src[DefaultLanguageIndex]);
         lv_obj_set_width(img, LV_SIZE_CONTENT);
         lv_obj_set_height(img, LV_SIZE_CONTENT); 
@@ -291,38 +296,52 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
-        lv_obj_t* WifiName2 = lv_label_create(MiracastPanel);
+        lv_obj_t* WifiName2 = lv_label_create(CastPanel);
         lv_obj_set_width(WifiName2, LV_SIZE_CONTENT);   /// 1
         lv_obj_set_height(WifiName2, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_x(WifiName2, 945);
         lv_obj_set_y(WifiName2, -90);
         lv_obj_set_align(WifiName2, LV_ALIGN_LEFT_MID);
+        #ifdef HCCHIP_GCC
+        lv_label_set_text(WifiName2, data_mgr_get_device_name());
+        #else
         lv_label_set_text(WifiName2, "Project_3A4D");
+        #endif
         lv_obj_set_style_text_font(WifiName2, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        lv_obj_t* text1_lab = lv_label_create(MiracastPanel);
-        lv_obj_set_width(text1_lab, 780);   /// 1
+        lv_obj_t* text1_lab = lv_label_create(CastPanel);
+        lv_obj_set_width(text1_lab, 880);   /// 1
         lv_obj_set_height(text1_lab, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_x(text1_lab, 90);
         lv_obj_set_y(text1_lab, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
-        lv_label_set_text(text1_lab, _("cast_airplay_str1"));
+        #ifdef HCCHIP_GCC
+        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_airplay_str1"), data_mgr_get_device_name());
+        #else
+        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_airplay_str1"), "Project_3A4D");
+        #endif
+        //lv_label_set_text(text1_lab, _("cast_airplay_str1"));
         lv_obj_set_style_text_letter_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        lv_obj_t* text2_lab = lv_label_create(MiracastPanel);
+        lv_obj_t* text2_lab = lv_label_create(CastPanel);
         lv_obj_set_width(text2_lab, 780);   /// 1
         lv_obj_set_height(text2_lab, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_x(text2_lab, 90);
         lv_obj_set_y(text2_lab, 445);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
-        lv_label_set_text(text2_lab, _("cast_airplay_str2"));
+        #ifdef HCCHIP_GCC
+        lv_label_set_text_fmt(text2_lab, "%s%s", _("cast_airplay_str2"), data_mgr_get_device_name());
+        #else
+        lv_label_set_text_fmt(text2_lab, "%s%s", _("cast_airplay_str2"), "Project_3A4D");
+        #endif
+        //lv_label_set_text(text2_lab, _("cast_airplay_str2"));
         lv_obj_set_style_text_letter_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        lv_obj_t* text3_lab = lv_label_create(MiracastPanel);
+        lv_obj_t* text3_lab = lv_label_create(CastPanel);
         lv_obj_set_width(text3_lab, 1280);   /// 1
         lv_obj_set_height(text3_lab, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_x(text3_lab, 60);
