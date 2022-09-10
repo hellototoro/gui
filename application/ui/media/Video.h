@@ -12,7 +12,7 @@
 
 #include "application/ui/ui_com.h"
 #ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
+#include "hcscreen/media_player.h"
 #endif
 
 #ifdef __cplusplus

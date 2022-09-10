@@ -101,7 +101,6 @@ enum ui_key
 int key_regist(lv_group_t * group);
 int key_init(void);
 uint32_t key_convert_vkey(uint32_t lv_key);
-lv_indev_t * get_default_indev(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/

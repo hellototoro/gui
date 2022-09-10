@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 21:09:08
+ * @LastEditTime: 2022-09-09 21:36:20
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -20,7 +20,7 @@
 #include "SyncScreen.h"
 #include "application/ui/media/MediaScreen.h"
 #ifdef HCCHIP_GCC
-#include "hcapi/hotplug_mgr.h"
+#include "hcscreen/hotplug_mgr.h"
 #endif
 
 static lv_obj_t* HomeRootScreen;
@@ -224,7 +224,6 @@ static void CreateMainPanel(lv_obj_t* parent)
     if (hotplug_usb_plugout() != 0)
         lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE); 
-    lv_img_set_angle(img, 900);
 
     lv_obj_t* lab = lv_label_create(UdiskDetectPanel);
     lv_obj_set_width(lab, LV_SIZE_CONTENT);

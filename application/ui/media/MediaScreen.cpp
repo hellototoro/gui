@@ -19,7 +19,7 @@
 #include "Photo.h"
 #include "Text.h"
 #ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
+#include "hcscreen/media_player.h"
 #endif
 #include "application/ui/Volume.h"
 #include "application/key_map.h"

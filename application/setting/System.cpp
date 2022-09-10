@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 21:28:02
+ * @LastEditTime: 2022-09-09 21:35:28
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -13,7 +13,7 @@
 #include "application/ui/LanguageScreen.h"
 #include "application/ui/ui_com.h"
 #ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
+#include "hcscreen/com_api.h"
 #endif
 
 namespace Setting {
@@ -35,7 +35,6 @@ System::~System()
     config.put<int>("OsdTime", OsdTime);
     pt.put_child("system_setting",config);
 
-    //SaveCurrentLanguageType(language);
     DefaultLanguageIndex = language;
     config = pt.get_child("default_language");
     config.put<std::string>("language", Language[language]);
@@ -94,7 +93,6 @@ void System::IncreaseUserValue(int index)
     case static_cast<int>(Setting_SystemLanguage):
         IncreaseValueComm(language, 0, sizeof(LanguageName)/sizeof(LanguageName[0]));
         lv_i18n_set_locale(Language[language]);
-        //SaveCurrentLanguageType(language);
         refresh_all_lable_text(lv_scr_act());
         break;
 
@@ -114,7 +112,6 @@ void System::DecreaseUserValue(int index)
     case static_cast<int>(Setting_SystemLanguage):
         DecreaseValueComm(language, 0, sizeof(LanguageName)/sizeof(LanguageName[0]));
         lv_i18n_set_locale(Language[language]);
-        //SaveCurrentLanguageType(language);
         refresh_all_lable_text(lv_scr_act());
         break;
 

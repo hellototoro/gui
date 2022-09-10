@@ -13,8 +13,8 @@
 #include <unistd.h>
 #include "NetWorkApi.h"
 #ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
-#include "hcapi/cast_api.h"
+#include "hcscreen/com_api.h"
+#include "hcscreen/cast_api.h"
 #endif
 
 #ifdef HCCHIP_GCC

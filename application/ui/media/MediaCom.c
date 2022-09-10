@@ -20,8 +20,8 @@
 #include <sys/msg.h>
 #include <ffplayer.h>
 #include <hcuapi/codec_id.h>
-#include "hcapi/com_api.h"
-#include "hcapi/os_api.h"
+#include "hcscreen/com_api.h"
+#include "hcscreen/os_api.h"
 #endif
 #include "application/ui/Volume.h"
 #include "application/key_map.h"

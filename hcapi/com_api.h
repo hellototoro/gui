@@ -231,8 +231,8 @@ typedef struct{
 	uint32_t	msg_code;
 }control_msg_t;
 
-#define BACK_LOGO "/hccast_files/HCCAST.m2v"
-#define MUSIC_LOGO "/hccast_files/music_bg_logo.m2v"
+#define BACK_LOGO "/gui_files/HCCAST.m2v"
+#define MUSIC_LOGO "/gui_files/music_bg_logo.m2v"
 
 #define WLAN0_NAME      "wlan0"
 #define WLAN1_NAME      "wlan1"

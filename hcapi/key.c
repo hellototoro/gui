@@ -3,10 +3,10 @@
 
 #include <sys/poll.h>
 #include <fcntl.h>
-#include <errno.h>
 #include "key.h"
-#include "hcapi/com_api.h"
+#include "hcscreen/com_api.h"
 #include "application/key_map.h"
+#include <errno.h>
 
 static int fd_key;
 static lv_indev_t * indev_keypad;
