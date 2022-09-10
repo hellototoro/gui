@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:19:29
+ * @LastEditTime: 2022-09-11 05:16:08
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -14,27 +14,26 @@
 #include "music_lyric.h"
 
 MediaHandle* MusicHandler;
-static lv_obj_t* MusicScreen;
+static lv_obj_t* MusicWindow;
 static lv_obj_t* MusicName;
 static lv_obj_t* MusicCover;
 static lv_obj_t* LyricPanel;
-static lv_group_t* MainGroup;
+static lv_group_t* MainGroup;//聚焦歌词使用
 
 music_lyric* lyric;
 int lyric_index;
 
 extern "C" {
-static void key_event_handler(lv_event_t* event);
-static lv_obj_t* CreateMusicScreen(lv_obj_t* parent);
+static void CreateMusicWindow(lv_obj_t* parent);
 static void SetStyleForPlayBar(lv_obj_t* bar);
 static void CreateLyricPanel(lv_obj_t* parent);
 }
 
-lv_obj_t* creat_music_window(char* file_name)
+void creat_music_window(lv_obj_t* parent, char* file_name)
 {
-    CreateMusicScreen(lv_scr_act());
+    CreateMusicWindow(parent);
     #ifdef HOST_GCC
-    lv_obj_t* Player = lv_ffmpeg_player_create(MusicScreen);
+    lv_obj_t* Player = lv_ffmpeg_player_create(MusicWindow);
     lv_ffmpeg_player_set_auto_restart(Player, true);
     lv_obj_set_x(Player, -300);
     lv_obj_set_y(Player, -50);
@@ -46,25 +45,23 @@ lv_obj_t* creat_music_window(char* file_name)
     MusicHandler = media_open(MEDIA_TYPE_MUSIC, (void*)MediaMsgProc);
     #endif
 
-    MediaComInit(MusicScreen, MEDIA_MUSIC, MusicHandler);
+    MediaComInit(MEDIA_MUSIC, MusicHandler);
     CreateMediaArray();
     LocateMediaIndex(file_name);
     PlayMedia(file_name);
     SetCurrentMusicTitle(file_name);
     SetCurrentMusicCover(&ui_img_music_cover2_png);
     
-    SetStyleForPlayBar(CreatePlayBar(MusicScreen));
-    return MusicScreen;
+    SetStyleForPlayBar(CreatePlayBar(lv_scr_act()));//lv_scr_act()
 }
 
-void close_music_window(lv_obj_t* music_window)
+void close_music_window(void)
 {
     //step1 停止播放
     #ifdef HOST_GCC
     //lv_ffmpeg_player_set_cmd(MusicHandler, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(MusicHandler);
-    //MediaMonitorDeinit(MusicHandler);
     media_close(MusicHandler);
     MusicHandler = NULL;
     #endif
@@ -76,12 +73,11 @@ void close_music_window(lv_obj_t* music_window)
     //step2 清理播放列表
     DestroyMediaArray();
 
-    lv_group_del(MainGroup);
-
     MediaComDeinit();
 
+    lv_group_del(MainGroup);
     //step4 关闭窗口
-    lv_obj_del_async(music_window);
+    lv_obj_del_async(MusicWindow);
 }
 
 void SetCurrentMusicTitle(char* file_name)
@@ -154,55 +150,24 @@ void RefreshLyric(uint32_t played_time)
     }
 }
 
-static void key_event_handler(lv_event_t* event)
-{
-    //lv_obj_t* target = lv_event_get_current_target(event);
-    //lv_obj_t* parents = lv_obj_get_parent(target);
-    //lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
-    (void)event;
-    uint32_t value = lv_indev_get_key(lv_indev_get_act());
-    switch (value)
-    {
-        /*case LV_KEY_UP:
-            lv_group_focus_prev(ListPanel_Group);
-            break;
-        case LV_KEY_DOWN:
-            lv_group_focus_next(ListPanel_Group);
-            break;*/
-        case LV_KEY_ESC:
-            /*if (ShowPlayList_Flag) {
-                //ShowDownAnimation(PlayListPanel, 300);
-                //ShowPlayList_Flag = false;
-                set_group_activity(old_group);
-            }
-            else */{
-                close_music_window(MusicScreen);
-            }
-        break;
-
-        default:
-        break;
-    }
-}
-
 static void SetStyleForPlayBar(lv_obj_t* bar)
 {
     lv_obj_set_style_bg_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 }
 
-static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
+static void CreateMusicWindow(lv_obj_t* parent)
 {
-    MusicScreen = lv_obj_create(parent);
-    lv_obj_set_size(MusicScreen, 1280, 720);
-    lv_obj_set_style_radius(MusicScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_clear_flag(MusicScreen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(MusicScreen, lv_color_hex(0x2D729C), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(MusicScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(MusicScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_add_event_cb(MusicScreen, key_event_handler, LV_EVENT_KEY, NULL);
+    MusicWindow = lv_obj_create(parent);
+    lv_obj_set_size(MusicWindow, 1280, 720);
+    lv_obj_center(MusicWindow);
+    lv_obj_set_style_radius(MusicWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(MusicWindow, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(MusicWindow, lv_color_hex(0x2D729C), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(MusicWindow, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(MusicWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MusicName = lv_label_create(MusicScreen);
+    MusicName = lv_label_create(MusicWindow);
     lv_obj_set_width(MusicName, LV_SIZE_CONTENT);
     lv_obj_set_height(MusicName, LV_SIZE_CONTENT);
     lv_obj_set_x(MusicName, 0);
@@ -211,8 +176,7 @@ static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
     lv_label_set_text(MusicName, "");
     lv_obj_set_style_text_font(MusicName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    MusicCover = lv_img_create(MusicScreen);
-    //lv_img_set_src(MusicCover, &ui_img_music_cover2_png);
+    MusicCover = lv_img_create(MusicWindow);
     lv_obj_set_width(MusicCover, LV_SIZE_CONTENT);
     lv_obj_set_height(MusicCover, LV_SIZE_CONTENT);
     lv_obj_set_x(MusicCover, -300);
@@ -221,8 +185,7 @@ static lv_obj_t* CreateMusicScreen(lv_obj_t* parent)
     lv_obj_add_flag(MusicCover, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(MusicCover, LV_OBJ_FLAG_SCROLLABLE);
 
-    CreateLyricPanel(MusicScreen);
-    return MusicScreen;
+    CreateLyricPanel(MusicWindow);
 }
 
 static void CreateLyricPanel(lv_obj_t* parent)

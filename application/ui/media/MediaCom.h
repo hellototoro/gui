@@ -58,7 +58,7 @@ typedef media_handle_t MediaHandle;
 
 extern char current_path[];
 extern int current_path_size;
-extern void MediaComInit(lv_obj_t* MediaScreen, MediaType media_type, MediaHandle* media_hdl);
+extern void MediaComInit(MediaType media_type, MediaHandle* media_hdl);
 extern void MediaComDeinit(void);
 extern void AddToMediaList(MediaType media_type, char * media_name);
 extern uint16_t GetMediaListSize(MediaType media_type);

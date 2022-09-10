@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 21:03:48
+ * @LastEditTime: 2022-09-11 05:19:20
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -13,47 +13,43 @@
 #include "MediaFile.h"
 
 MediaHandle* PhotoHandler;
-lv_obj_t* PhotoScreen;
-lv_obj_t* PreScreen;
+lv_obj_t* PhotoWindow;
+lv_obj_t* BackWindow;
 
 static void event_handler(lv_event_t* event);
 static void SetStyleForPlayBar(lv_obj_t* bar);
 
-lv_obj_t* creat_photo_window(char* file_name)
+void creat_photo_window(lv_obj_t* parent, char* file_name)
 {
-    PreScreen = lv_scr_act();
+    BackWindow = parent;
     #ifdef HOST_GCC
-    PhotoScreen = lv_ffmpeg_player_create(NULL);
-    lv_ffmpeg_player_set_auto_restart(PhotoScreen, true);
-    lv_obj_center(PhotoScreen);
-    PhotoHandler = PhotoScreen;
+    PhotoWindow = lv_ffmpeg_player_create(parent);
+    lv_obj_clear_flag(PhotoWindow, LV_OBJ_FLAG_SCROLLABLE);
+    lv_ffmpeg_player_set_auto_restart(PhotoWindow, true);
+    lv_obj_center(PhotoWindow);
+    PhotoHandler = PhotoWindow;
     #elif defined(HCCHIP_GCC)
     PhotoHandler = media_open(MEDIA_TYPE_PHOTO, (void*)MediaMsgProc);
-    PhotoScreen = lv_obj_create(NULL);
-    lv_obj_set_style_bg_opa(PhotoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    PhotoWindow = lv_obj_create(parent);
+    lv_obj_set_style_bg_opa(PhotoWindow, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
     #endif
-    lv_obj_add_event_cb(PhotoScreen, base_event_handler, LV_EVENT_KEY, NULL);
-    lv_obj_add_event_cb(PhotoScreen, event_handler, LV_EVENT_KEY, NULL);
-    lv_obj_clear_flag(PhotoScreen, LV_OBJ_FLAG_SCROLLABLE);
 
-    MediaComInit(PhotoScreen, MEDIA_PHOTO, PhotoHandler);
+    MediaComInit(MEDIA_PHOTO, PhotoHandler);
     CreateMediaArray();
     LocateMediaIndex(file_name);
     PlayMedia(file_name);
 
-    SetStyleForPlayBar(CreatePlayBar(PhotoScreen));
-    lv_disp_load_scr(PhotoScreen);
-    return PhotoScreen;
+    SetStyleForPlayBar(CreatePlayBar(lv_scr_act()));
 }
 
 void close_photo_window(void)
 {
     //step1 停止播放
     #ifdef HOST_GCC
-    lv_ffmpeg_player_set_cmd(PhotoScreen, LV_FFMPEG_PLAYER_CMD_STOP);
+    lv_ffmpeg_player_set_cmd(PhotoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(PhotoHandler);
-    //MediaMonitorDeinit(PhotoHandler);
     media_close(PhotoHandler);
     PhotoHandler = NULL;
     #endif
@@ -64,14 +60,8 @@ void close_photo_window(void)
     MediaComDeinit();
 
     //step4 关闭窗口
-    lv_disp_load_scr(PreScreen);
-    lv_obj_del_async(PhotoScreen);
-}
-
-static void event_handler(lv_event_t* event)
-{
-    (void)event;
-    close_photo_window();
+    lv_obj_clear_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_del_async(PhotoWindow);
 }
 
 static void SetStyleForPlayBar(lv_obj_t* bar)

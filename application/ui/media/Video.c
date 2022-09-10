@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 22:43:33
+ * @LastEditTime: 2022-09-11 04:45:19
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -13,54 +13,50 @@
 #include "MediaFile.h"
 
 MediaHandle* VideoHandler;
-lv_obj_t* VideoScreen;
-lv_obj_t* PreScreen;
+lv_obj_t* VideoWindow;
+lv_obj_t* BackWindow;
 
 static void event_handler(lv_event_t* event);
 static void SetStyleForPlayBar(lv_obj_t* bar);
 static void UdiskStatus_event_handler(lv_event_t * event);
 
-lv_obj_t* creat_video_window(char* file_name)
+void creat_video_window(lv_obj_t* parent, char* file_name)
 {
-    PreScreen = lv_scr_act();
+    BackWindow = parent;
     #ifdef HOST_GCC
-    VideoScreen = lv_ffmpeg_player_create(NULL);
-    lv_ffmpeg_player_set_auto_restart(VideoScreen, true);
-    lv_obj_center(VideoScreen);
-    VideoHandler = VideoScreen;
+    VideoWindow = lv_ffmpeg_player_create(parent);
+    lv_obj_clear_flag(VideoWindow, LV_OBJ_FLAG_SCROLLABLE);
+    lv_ffmpeg_player_set_auto_restart(VideoWindow, true);
+    lv_obj_center(VideoWindow);
+    VideoHandler = VideoWindow;
     #elif defined(HCCHIP_GCC)
-    VideoScreen = lv_obj_create(NULL);
-    lv_obj_set_style_bg_opa(VideoScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
     VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
+    VideoWindow = lv_obj_create(parent);
+    lv_obj_set_style_bg_opa(VideoWindow, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_add_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
     #endif
-    lv_obj_clear_flag(VideoScreen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_add_event_cb(VideoScreen, base_event_handler, LV_EVENT_KEY, NULL);
-    lv_obj_add_event_cb(VideoScreen, event_handler, LV_EVENT_KEY, NULL);
     #ifdef HCCHIP_GCC
-    lv_msg_subsribe_obj(MSG_HOTPLUG, VideoScreen, NULL);
+    lv_msg_subsribe_obj(MSG_HOTPLUG, VideoWindow, NULL);
     #else
-    lv_msg_subscribe_obj(MSG_HOTPLUG, VideoScreen, NULL);
+    lv_msg_subscribe_obj(MSG_HOTPLUG, VideoWindow, NULL);
     #endif
-    lv_obj_add_event_cb(VideoScreen, UdiskStatus_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
+    lv_obj_add_event_cb(VideoWindow, UdiskStatus_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
-    MediaComInit(VideoScreen, MEDIA_VIDEO, VideoHandler);
+    MediaComInit(MEDIA_VIDEO, VideoHandler);
     CreateMediaArray();
     LocateMediaIndex(file_name);
     PlayMedia(file_name);
 
-    SetStyleForPlayBar(CreatePlayBar(VideoScreen));
-    lv_disp_load_scr(VideoScreen);
-    return VideoScreen;
+    SetStyleForPlayBar(CreatePlayBar(lv_scr_act()));
 }
 
 void close_video_window(void)
 {
     //step1 停止播放
     #ifdef HOST_GCC
-    lv_ffmpeg_player_set_cmd(VideoScreen, LV_FFMPEG_PLAYER_CMD_STOP);
+    lv_ffmpeg_player_set_cmd(VideoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
     #elif defined(HCCHIP_GCC)
     media_stop(VideoHandler);
-    //MediaMonitorDeinit(VideoHandler);
     media_close(VideoHandler);
     VideoHandler = NULL;
     #endif
@@ -71,14 +67,8 @@ void close_video_window(void)
     MediaComDeinit();
 
     //step4 关闭窗口
-    lv_disp_load_scr(PreScreen);
-    lv_obj_del_async(VideoScreen);
-}
-
-static void event_handler(lv_event_t* event)
-{
-    (void)event;
-    close_video_window();
+    lv_obj_clear_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_del_async(VideoWindow);
 }
 
 static void UdiskStatus_event_handler(lv_event_t * event)

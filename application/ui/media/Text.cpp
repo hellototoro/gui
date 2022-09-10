@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:14:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:39:26
+ * @LastEditTime: 2022-09-11 05:03:32
  * @FilePath: /gui/application/ui/media/Text.cpp
  * @Description: None
  * @other: None
@@ -17,7 +17,7 @@
 #include "MediaFile.h"
 #include "MediaCom.h"
 
-lv_obj_t* TextScreen;
+lv_obj_t* TextWindow;
 lv_obj_t* TextPanel;
 lv_obj_t* TextName;
 lv_group_t* Text_Group;
@@ -28,12 +28,11 @@ std::vector<std::string> *TextBuff;
 std::string buff;
 
 static void key_event_handler(lv_event_t* event);
-static lv_obj_t* CreateTextScreen(lv_obj_t* parent);
-static void SetStyleForPlayBar(lv_obj_t* bar);
+static void CreateTextWindow(lv_obj_t* parent);
 static void CreateTextPanel(lv_obj_t* parent);
-void LoadText_t(char* file_name);
+static void LoadText(char* file_name);
 
-lv_obj_t* creat_text_window(char* file_name)
+void creat_text_window(lv_obj_t* parent, char* file_name)
 {
     Text_Group = create_new_group();
     set_group_activity(Text_Group);
@@ -41,11 +40,10 @@ lv_obj_t* creat_text_window(char* file_name)
     TextBuff = new std::vector<std::string>;
     LoadText(file_name);
 
-    CreateTextScreen(lv_scr_act());
-    return TextScreen;
+    CreateTextWindow(parent);
 }
 
-void close_text_window(lv_obj_t* text_window)
+void close_text_window(void)
 {
     delete_group(Text_Group);
     Text_Group = NULL;
@@ -54,10 +52,10 @@ void close_text_window(lv_obj_t* text_window)
     delete TextBuff;
     TextBuff = nullptr;
 
-    lv_obj_del_async(text_window);
+    lv_obj_del_async(TextWindow);
 }
 
-void LoadText(char* file_name)
+static void LoadText(char* file_name)
 {
     std::ifstream* text_file = new std::ifstream(std::string(std::string(current_path)+ '/'+ std::string(file_name)).data());
     std::string line;
@@ -81,13 +79,6 @@ void LoadText(char* file_name)
     delete text_file;
 }
 
-void RefreshText(const char* text)
-{
-    (void)text;
-    if (TextBuff->size() != 0)
-        lv_textarea_set_text(TextPanel, TextBuff[0].data()->data());
-}
-
 static void key_event_handler(lv_event_t* event)
 {
     lv_obj_t* target = lv_event_get_current_target(event);
@@ -103,7 +94,7 @@ static void key_event_handler(lv_event_t* event)
                 lv_group_focus_next(Text_Group);
             break;
         case LV_KEY_ESC:
-            close_text_window(TextScreen);
+            close_text_window();
         break;
 
         default:
@@ -111,24 +102,18 @@ static void key_event_handler(lv_event_t* event)
     }
 }
 
-static void SetStyleForPlayBar(lv_obj_t* bar)
+static void CreateTextWindow(lv_obj_t* parent)
 {
-    lv_obj_set_style_bg_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-}
+    TextWindow = lv_obj_create(parent);
+    lv_obj_set_size(TextWindow, 1280, 720);
+    lv_obj_center(TextWindow);
+    lv_obj_set_style_radius(TextWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(TextWindow, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_set_style_bg_color(TextWindow, lv_color_hex(0x2D729C), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(TextWindow, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(TextWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-static lv_obj_t* CreateTextScreen(lv_obj_t* parent)
-{
-    TextScreen = lv_obj_create(parent);
-    lv_obj_set_size(TextScreen, 1280, 720);
-    lv_obj_set_style_radius(TextScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_clear_flag(TextScreen, LV_OBJ_FLAG_SCROLLABLE);
-    lv_obj_set_style_bg_color(TextScreen, lv_color_hex(0x2D729C), LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_bg_opa(TextScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_set_style_border_opa(TextScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    CreateTextPanel(TextScreen);
-    return TextScreen;
+    CreateTextPanel(TextWindow);
 }
 
 static void CreateTextPanel(lv_obj_t* parent)

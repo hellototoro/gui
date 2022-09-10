@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:50:08
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-17 23:35:44
+ * @LastEditTime: 2022-09-11 04:15:22
  * @FilePath: /gui/application/ui/media/Video.h
  * @Description: None
  * @other: None
@@ -19,9 +19,9 @@
 extern "C" {
 #endif
 
-lv_obj_t* creat_video_window(char* file_name);
-void close_video_window(void);
-void PlayVideo(char * file_name);
+extern void creat_video_window(lv_obj_t* parent, char* file_name);
+extern void close_video_window(void);
+extern void PlayVideo(char * file_name);
 
 #ifdef __cplusplus
 } /*extern "C"*/

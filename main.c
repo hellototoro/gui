@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 22:48:13
+ * @LastEditTime: 2022-09-11 03:52:50
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -51,7 +51,7 @@ static void exit_console(int signo);
 int main(int argc, char *argv[])
 {
     #ifdef HCCHIP_GCC
-    hcscreen();
+    //hcscreen();
     #endif
 
     if (pthread_mutex_init(&lvgl_task_mutex, NULL) != 0) {

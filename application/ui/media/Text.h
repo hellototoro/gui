@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:13:52
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-07-14 12:55:29
+ * @LastEditTime: 2022-09-11 04:52:54
  * @FilePath: /gui/application/ui/media/Text.h
  * @Description: None
  * @other: None
@@ -16,9 +16,8 @@
 extern "C" {
 #endif
 
-extern lv_obj_t* creat_text_window(char* file_name);
-extern void LoadText(char* file_name);
-extern void RefreshText(const char* text);
+extern void creat_text_window(lv_obj_t* parent, char* file_name);
+extern void close_text_window(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
