@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 01:56:57
+ * @LastEditTime: 2022-09-11 21:12:49
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -159,6 +159,7 @@ static void setting_item_key_event_handler(lv_event_t* event)
         lv_group_focus_next(group);
         break;
     case LV_KEY_ESC:
+    case LV_KEY_MENU:
         MainGroup = delete_group(MainGroup);
         if(lv_obj_is_valid(SubPanel)) {
             LastFocused = SubLastFocused;

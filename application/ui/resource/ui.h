@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-07 18:37:48
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 21:56:20
+ * @LastEditTime: 2022-09-11 22:03:49
  * @FilePath: /gui/application/ui/resource/ui.h
  * @Description: None
  * @other: None
@@ -135,6 +135,8 @@ LV_IMG_DECLARE(cast_ios_en);
 LV_IMG_DECLARE(cast_ios_it);
 LV_IMG_DECLARE(cast_ios_fr);
 LV_IMG_DECLARE(cast_ios_cn);
+LV_IMG_DECLARE(router_disconnected);
+LV_IMG_DECLARE(router_connected);
 
 LV_FONT_DECLARE(ui_font_Big_Number);
 LV_FONT_DECLARE(ui_font_Bold_Font);

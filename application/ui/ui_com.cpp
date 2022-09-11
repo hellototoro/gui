@@ -2,13 +2,15 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 06:54:58
+ * @LastEditTime: 2022-09-11 20:40:20
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
  */
 #include <stack>
 #include <list>
+#include <stdio.h>
+#include <string.h>
 #include "ui_com.h"
 #include "Volume.h"
 #include "Source.h"
@@ -109,7 +111,7 @@ void refresh_all_lable_text(lv_obj_t* parent)
 }
 
 /*************************** 对话框 ****************************/
-lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
+lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, int btn_num, MsgBoxFunc_t func)
 {
     auto event_cb = [] (lv_event_t* event) {
         lv_obj_t* target = lv_event_get_current_target(event);
@@ -142,6 +144,7 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
         }
     };
 
+    if (btn_num > 2) return nullptr;
     lv_obj_t* MsgBoxPanel = lv_obj_create(parent);
     lv_obj_set_size(MsgBoxPanel, 500, 300);
     lv_obj_center(MsgBoxPanel);
@@ -154,111 +157,57 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func)
     lv_label_set_text(text, _(title));
     lv_obj_set_style_text_font(text, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_group_t* MainGroup = create_new_group();
-    set_group_activity(MainGroup);
-    lv_obj_t* btn_ok = lv_btn_create(MsgBoxPanel);
-    lv_obj_set_size(btn_ok, 110, 60);
-    lv_obj_set_pos(btn_ok, -100, 60);
-    lv_obj_set_align(btn_ok, LV_ALIGN_CENTER);
-    lv_obj_t * ok_lab = lv_label_create(btn_ok);
-    lv_label_set_text(ok_lab, _("setting_p_ok"));
-    lv_obj_set_style_text_font(ok_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_center(ok_lab);
-    lv_group_add_obj(MainGroup, btn_ok);
-    lv_obj_add_event_cb(btn_ok, event_cb, LV_EVENT_KEY, nullptr);
+    if(btn_num > 0) {
+        lv_group_t* MainGroup = create_new_group();
+        set_group_activity(MainGroup);
+        lv_obj_t* btn_ok = lv_btn_create(MsgBoxPanel);
+        lv_obj_set_size(btn_ok, 110, 60);
+        lv_obj_set_y(btn_ok, 60);
+        if (btn_num == 2)
+            lv_obj_set_x(btn_ok, -100);
+        else
+            lv_obj_set_x(btn_ok, 0);
+        //lv_obj_set_pos(btn_ok, -100, 60);
+        lv_obj_set_style_border_color(btn_ok, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_opa(btn_ok, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_border_width(btn_ok, 3, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_color(btn_ok, lv_color_hex(0x2196F3), LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_opa(btn_ok, 180, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_width(btn_ok, 2, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_spread(btn_ok, 2, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_ofs_x(btn_ok, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_style_shadow_ofs_y(btn_ok, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
+        lv_obj_set_align(btn_ok, LV_ALIGN_CENTER);
+        lv_obj_t * ok_lab = lv_label_create(btn_ok);
+        lv_label_set_text(ok_lab, _("setting_p_ok"));
+        lv_obj_set_style_text_font(ok_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_center(ok_lab);
+        lv_group_add_obj(MainGroup, btn_ok);
+        lv_obj_add_event_cb(btn_ok, event_cb, LV_EVENT_KEY, nullptr);
 
-    lv_obj_t* btn_cancel = lv_btn_create(MsgBoxPanel);
-    lv_obj_set_size(btn_cancel, 110, 60);
-    lv_obj_set_pos(btn_cancel, 100, 60);
-    lv_obj_set_align(btn_cancel, LV_ALIGN_CENTER);
-    lv_obj_t * cancel_lab = lv_label_create(btn_cancel);
-    lv_label_set_text(cancel_lab, _("setting_p_cancel"));
-    lv_obj_set_style_text_font(cancel_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_center(cancel_lab);
-    lv_group_add_obj(MainGroup, btn_cancel);
-    lv_obj_add_event_cb(btn_cancel, event_cb, LV_EVENT_KEY, nullptr);
-    lv_group_focus_obj(lv_obj_get_child(MsgBoxPanel, 2));
-
-    return MsgBoxPanel;
-}
-
-lv_obj_t* CreateMsgBox2(lv_obj_t* parent, const char* title, const char* text, MsgBoxFunc_t func)
-{
-    auto event_cb = [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_current_target(event);
-        lv_obj_t* _parent = lv_obj_get_parent(target);
-        uint32_t value = lv_indev_get_key(lv_indev_get_act());
-        lv_group_t* group = get_activity_group();
-        int index = lv_obj_get_index(target);
-        switch (value)
-        {
-            case LV_KEY_LEFT:
-                lv_group_focus_prev(group);
-                break;
-            case LV_KEY_RIGHT:
-                lv_group_focus_next(group);
-                break;
-            case LV_KEY_ENTER:
-                if (index == 1) { //ok
-                    MsgBoxFunc_t SelectedFunc = MsgBoxFunc_t(_parent->user_data);
-                    if (SelectedFunc) SelectedFunc();
-                }
-                delete_group(group);
-                lv_obj_del_async(_parent);
-                break;
-            case LV_KEY_ESC:
-                delete_group(group);
-                lv_obj_del_async(_parent);
-                break;
-            default:
-                break;
+        if (btn_num == 2) {
+            lv_obj_t* btn_cancel = lv_btn_create(MsgBoxPanel);
+            lv_obj_set_size(btn_cancel, 110, 60);
+            lv_obj_set_pos(btn_cancel, 100, 60);
+            lv_obj_set_style_border_color(btn_cancel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_border_opa(btn_cancel, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_border_width(btn_cancel, 3, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_shadow_color(btn_cancel, lv_color_hex(0x2196F3), LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_shadow_opa(btn_cancel, 180, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_shadow_width(btn_cancel, 2, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_shadow_spread(btn_cancel, 2, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_shadow_ofs_x(btn_cancel, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_style_shadow_ofs_y(btn_cancel, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
+            lv_obj_set_align(btn_cancel, LV_ALIGN_CENTER);
+            lv_obj_t * cancel_lab = lv_label_create(btn_cancel);
+            lv_label_set_text(cancel_lab, _("setting_p_cancel"));
+            lv_obj_set_style_text_font(cancel_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+            lv_obj_center(cancel_lab);
+            lv_group_add_obj(MainGroup, btn_cancel);
+            lv_obj_add_event_cb(btn_cancel, event_cb, LV_EVENT_KEY, nullptr);
+            lv_group_focus_obj(lv_obj_get_child(MsgBoxPanel, 2));
         }
-    };
-
-    lv_obj_t* MsgBoxPanel = lv_obj_create(parent);
-    lv_obj_set_size(MsgBoxPanel, 550, 350);
-    lv_obj_center(MsgBoxPanel);
-    MsgBoxPanel->user_data = reinterpret_cast<void*>(func);
-
-    lv_obj_t* title_lab = lv_label_create(MsgBoxPanel);
-    lv_obj_set_size(title_lab,LV_SIZE_CONTENT,LV_SIZE_CONTENT);
-    lv_obj_set_pos(title_lab, 0, 0);
-    lv_obj_set_align(title_lab, LV_ALIGN_TOP_MID);
-    lv_label_set_text(title_lab, _(title));
-    lv_obj_set_style_text_font(title_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_obj_t* text_lab = lv_label_create(MsgBoxPanel);
-    lv_obj_set_size(text_lab,LV_SIZE_CONTENT,LV_SIZE_CONTENT);
-    lv_obj_set_pos(text_lab, 0, 50);
-    lv_obj_set_align(text_lab, LV_ALIGN_TOP_MID);
-    lv_label_set_text(text_lab, _(text));
-    lv_obj_set_style_text_font(text_lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
-
-    lv_group_t* MainGroup = create_new_group();
-    set_group_activity(MainGroup);
-    lv_obj_t* btn_ok = lv_btn_create(MsgBoxPanel);
-    lv_obj_set_size(btn_ok, 110, 60);
-    lv_obj_set_pos(btn_ok, -100, 60);
-    lv_obj_set_align(btn_ok, LV_ALIGN_CENTER);
-    lv_obj_t * ok_lab = lv_label_create(btn_ok);
-    lv_label_set_text(ok_lab, _("setting_p_ok"));
-    lv_obj_set_style_text_font(ok_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_center(ok_lab);
-    lv_group_add_obj(MainGroup, btn_ok);
-    lv_obj_add_event_cb(btn_ok, event_cb, LV_EVENT_KEY, nullptr);
-
-    lv_obj_t* btn_cancel = lv_btn_create(MsgBoxPanel);
-    lv_obj_set_size(btn_cancel, 110, 60);
-    lv_obj_set_pos(btn_cancel, 100, 60);
-    lv_obj_set_align(btn_cancel, LV_ALIGN_CENTER);
-    lv_obj_t * cancel_lab = lv_label_create(btn_cancel);
-    lv_label_set_text(cancel_lab, _("setting_p_cancel"));
-    lv_obj_set_style_text_font(cancel_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_center(cancel_lab);
-    lv_group_add_obj(MainGroup, btn_cancel);
-    lv_obj_add_event_cb(btn_cancel, event_cb, LV_EVENT_KEY, nullptr);
-    lv_group_focus_obj(lv_obj_get_child(MsgBoxPanel, 2));
-
+    }
     return MsgBoxPanel;
 }
 
@@ -426,10 +375,23 @@ void other_event_handler(lv_event_t* event)
 void ProcessSysMsg(void)
 {
     #ifdef HCCHIP_GCC
+    static int UdiskStatus = -1;
     control_msg_t ctl_msg;
     api_control_receive_msg(&ctl_msg);
     switch (ctl_msg.msg_type)
     {
+    case MSG_TYPE_USB_DISK_PLUGIN:
+        UdiskStatus = 0;
+        lv_msg_send(MSG_HOTPLUG_IN, nullptr);
+        lv_msg_send(MSG_HOTPLUG, &UdiskStatus);
+        printf("usb plug in\n");
+        break;
+    case MSG_TYPE_USB_DISK_PLUGOUT:
+        UdiskStatus = 1;
+        lv_msg_send(MSG_HOTPLUG_OUT, nullptr);
+        lv_msg_send(MSG_HOTPLUG, &UdiskStatus);
+        printf("usb plug out\n");
+        break;
     case MSG_TYPE_CAST_MIRACAST_CONNECTING:
     {
         lv_obj_t* obj = CreateLoadingScreen(lv_scr_act());
@@ -464,4 +426,26 @@ void ProcessSysMsg(void)
         break;
     }
     #endif
+}
+
+/*************************** 其他 ****************************/
+bool HasUsbDevice(void)
+{
+    FILE * fp;
+    char buffer[20];
+    #ifdef HCCHIP_GCC
+    fp = popen("ls /proc/scsi","r");
+    #else
+    fp = popen("ls /home/totoro/temp/media","r");
+    #endif
+    if (nullptr != fp) {
+        while (fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
+            if (strncmp("usb-storage", buffer, strlen("usb-storage")) == 0) {
+                pclose(fp);
+                return true;
+            }
+        }
+    }
+    pclose(fp);
+    return false;
 }

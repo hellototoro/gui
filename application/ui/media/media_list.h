@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 14:32:14
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-06-21 21:08:57
- * @FilePath: /gui/application/ui/media_list.h
+ * @LastEditTime: 2022-09-11 19:14:46
+ * @FilePath: /gui/application/ui/media/media_list.h
  * @Description: None
  * @other: None
  */
@@ -76,7 +76,6 @@ Status InitStack(LinkStack *S);
 Status Push(LinkStack *S, ElemType e);
 Status Pop(LinkStack *S, ElemType *e);
 bool StackIsEmpty(LinkStack S);
-Status DestroyStack(LinkStack *S);
 
 
 #ifdef __cplusplus

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 05:16:08
+ * @LastEditTime: 2022-09-11 15:26:09
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -13,12 +13,13 @@
 #include "MediaFile.h"
 #include "music_lyric.h"
 
-MediaHandle* MusicHandler;
+static MediaHandle* MusicHandler;
 static lv_obj_t* MusicWindow;
 static lv_obj_t* MusicName;
 static lv_obj_t* MusicCover;
 static lv_obj_t* LyricPanel;
 static lv_group_t* MainGroup;//聚焦歌词使用
+static lv_obj_t* PlayBar;
 
 music_lyric* lyric;
 int lyric_index;
@@ -52,7 +53,8 @@ void creat_music_window(lv_obj_t* parent, char* file_name)
     SetCurrentMusicTitle(file_name);
     SetCurrentMusicCover(&ui_img_music_cover2_png);
     
-    SetStyleForPlayBar(CreatePlayBar(lv_scr_act()));//lv_scr_act()
+    PlayBar = CreatePlayBar(lv_scr_act());
+    SetStyleForPlayBar(PlayBar);
 }
 
 void close_music_window(void)
@@ -77,6 +79,7 @@ void close_music_window(void)
 
     lv_group_del(MainGroup);
     //step4 关闭窗口
+    lv_obj_del_async(PlayBar);
     lv_obj_del_async(MusicWindow);
 }
 

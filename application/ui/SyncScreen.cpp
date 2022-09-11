@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-28 21:18:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 06:18:01
+ * @LastEditTime: 2022-09-11 22:05:22
  * @FilePath: /gui/application/ui/SyncScreen.cpp
  * @Description: None
  * @other: None
@@ -18,6 +18,7 @@
 static lv_obj_t* SyncRootScreen;
 static lv_obj_t* CastPanel;
 static lv_obj_t* CastQr;
+static lv_obj_t* RouterStatusImg;
 static lv_group_t* MainGroup;
 
 typedef enum {
@@ -25,7 +26,7 @@ typedef enum {
     SyncScreen_Airplay
 } SyncScreenType_t;
 
-static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType);
+static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType);
 #if 0//def HCCHIP_GCC
 static volatile int m_first_flag = 1;
 static void SyncScreenOpen(void);
@@ -79,10 +80,10 @@ void CreateSyncScreen(lv_obj_t* parent)
                 switch (index)
                 {
                 case SyncScreen_Miracast:
-                    CreateMiracastPanel(SyncRootScreen, static_cast<SyncScreenType_t>(index));
+                    CreateCastPanel(SyncRootScreen, static_cast<SyncScreenType_t>(index));
                     break;
                 case SyncScreen_Airplay:
-                    CreateMiracastPanel(SyncRootScreen, static_cast<SyncScreenType_t>(index));
+                    CreateCastPanel(SyncRootScreen, static_cast<SyncScreenType_t>(index));
                     break;
                 default:
                     break;
@@ -93,6 +94,7 @@ void CreateSyncScreen(lv_obj_t* parent)
                 lv_obj_del_async(SyncRootScreen);
                 break;
             default:
+                base_event_handler(event);
                 break;
         }
     };
@@ -145,7 +147,8 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_obj_set_x(MircastLab, 0);
     lv_obj_set_y(MircastLab, 100);
     lv_obj_set_align(MircastLab, LV_ALIGN_CENTER);
-    lv_label_set_text(MircastLab, _("cast_mira"));
+    MircastLab->user_data = (void*)"cast_mira";
+    lv_label_set_text(MircastLab, _(static_cast<const char*>(MircastLab->user_data)));
     lv_obj_set_style_text_color(MircastLab, lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(MircastLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(MircastLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -180,14 +183,15 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_obj_set_x(AirplayLab, 0);
     lv_obj_set_y(AirplayLab, 100);
     lv_obj_set_align(AirplayLab, LV_ALIGN_CENTER);
-    lv_label_set_text(AirplayLab, _("cast_airplay"));
+    AirplayLab->user_data = (void*)"cast_airplay";
+    lv_label_set_text(AirplayLab, _(static_cast<const char*>(AirplayLab->user_data)));
     lv_obj_set_style_text_color(AirplayLab, lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(AirplayLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(AirplayLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_focus_obj(lv_obj_get_child(SyncRootScreen, SyncScreen_Miracast));
 }
 
-static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
+static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
 {
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
@@ -209,6 +213,7 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
                 lv_obj_del_async(CastPanel);
                 break;
             default:
+                base_event_handler(event);
                 break;
         }
     }, LV_EVENT_KEY, nullptr);
@@ -256,10 +261,11 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_y(text1_lab, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
 
+        text1_lab->user_data = (void*)"cast_mira_str1";
         #ifdef HCCHIP_GCC
-        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_mira_str1"), data_mgr_get_device_name());
+        lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), data_mgr_get_device_name());
         #else
-        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_mira_str1"), "Project_3A4D");
+        lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), "Project_3A4D");
         #endif
         lv_obj_set_style_text_letter_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -271,7 +277,8 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_x(text2_lab, -10);
         lv_obj_set_y(text2_lab, 580);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
-        lv_label_set_text(text2_lab, _("cast_mira_str2"));
+        text2_lab->user_data = (void*)"cast_mira_str2";
+        lv_label_set_text(text2_lab, _(static_cast<const char*>(text2_lab->user_data)));
         lv_obj_set_style_text_letter_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -296,6 +303,16 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
+        RouterStatusImg = lv_img_create(CastPanel);
+        lv_img_set_src(RouterStatusImg, &router_disconnected);
+        lv_obj_set_width(RouterStatusImg, LV_SIZE_CONTENT);
+        lv_obj_set_height(RouterStatusImg, LV_SIZE_CONTENT); 
+        lv_obj_set_x(RouterStatusImg, 900);
+        lv_obj_set_y(RouterStatusImg, 20);
+        lv_obj_set_align(RouterStatusImg, LV_ALIGN_TOP_LEFT);
+        lv_obj_add_flag(RouterStatusImg, LV_OBJ_FLAG_ADV_HITTEST);
+        lv_obj_clear_flag(RouterStatusImg, LV_OBJ_FLAG_SCROLLABLE);
+
         lv_obj_t* WifiName2 = lv_label_create(CastPanel);
         lv_obj_set_width(WifiName2, LV_SIZE_CONTENT);   /// 1
         lv_obj_set_height(WifiName2, LV_SIZE_CONTENT);    /// 1
@@ -315,12 +332,12 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_x(text1_lab, 90);
         lv_obj_set_y(text1_lab, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
+        text1_lab->user_data = (void*)"cast_airplay_str1";
         #ifdef HCCHIP_GCC
-        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_airplay_str1"), data_mgr_get_device_name());
+        lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), data_mgr_get_device_name());
         #else
-        lv_label_set_text_fmt(text1_lab, "%s%s", _("cast_airplay_str1"), "Project_3A4D");
+        lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), "Project_3A4D");
         #endif
-        //lv_label_set_text(text1_lab, _("cast_airplay_str1"));
         lv_obj_set_style_text_letter_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -331,12 +348,12 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_x(text2_lab, 90);
         lv_obj_set_y(text2_lab, 445);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
+        text2_lab->user_data = (void*)"cast_airplay_str2";
         #ifdef HCCHIP_GCC
-        lv_label_set_text_fmt(text2_lab, "%s%s", _("cast_airplay_str2"), data_mgr_get_device_name());
+        lv_label_set_text_fmt(text2_lab, "%s%s", _(static_cast<const char*>(text2_lab->user_data)), data_mgr_get_device_name());
         #else
-        lv_label_set_text_fmt(text2_lab, "%s%s", _("cast_airplay_str2"), "Project_3A4D");
+        lv_label_set_text_fmt(text2_lab, "%s%s", _(static_cast<const char*>(text2_lab->user_data)), "Project_3A4D");
         #endif
-        //lv_label_set_text(text2_lab, _("cast_airplay_str2"));
         lv_obj_set_style_text_letter_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -347,7 +364,8 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_x(text3_lab, 60);
         lv_obj_set_y(text3_lab, 580);
         lv_obj_set_align(text3_lab, LV_ALIGN_TOP_LEFT);
-        lv_label_set_text(text3_lab, _("cast_airplay_str3"));
+        text3_lab->user_data = (void*)"cast_airplay_str3";
+        lv_label_set_text(text3_lab, _(static_cast<const char*>(text3_lab->user_data)));
         lv_obj_set_style_text_letter_space(text3_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text3_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text3_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -357,116 +375,3 @@ static void CreateMiracastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         #endif
     }
 }
-
-#if 0//def HCCHIP_GCC
-static void active_connect_timer(bool active)
-{
-    if (NULL == m_connect_timer)
-        m_connect_timer = lv_timer_create(connect_timer_cb, 800, NULL);
-
-    if (active){
-        lv_timer_resume(m_connect_timer);
-    }
-    else{
-        lv_timer_pause(m_connect_timer);
-        lv_obj_clear_flag(m_label_wifi_ssid, LV_OBJ_FLAG_HIDDEN);
-    }
-}
-//The first time enter screen application, WiFi should be station mode
-//if there is wifi ap information in data node.
-static void win_cast_connect_state_upate(bool force_station)
-{
-    char show_txt[64] = {0};
-    int station_mode = 0;
-
-    active_connect_timer(false);
-    lv_label_set_text(m_label_state_msg, "");
-    if (!network_wifi_module_get()){
-        win_cast_no_wifi_device_show();
-        return;
-    }
-    //lv_label_set_text(m_label_local_ssid, data_mgr_get_device_name());
-    lv_label_set_text_fmt(m_label_local_ssid, "SSID: %s", data_mgr_get_device_name());
-
-    //lv_label_set_text(m_label_password, "12345678");
-    lv_label_set_text_fmt(m_label_password, "Password: %s", data_mgr_get_device_psk());
-
-    if (hccast_wifi_mgr_get_connect_status()){
-        station_mode = 1;
-    }else{
-        if (m_first_flag){
-            hccast_wifi_ap_info_t wifi_ap;
-            if (data_mgr_wifi_ap_get(&wifi_ap)){
-                station_mode = 1;
-            }
-        }
-    }
-    m_first_flag = 0;
-
-    
-    if (force_station)
-        station_mode = 1;
-
-    printf("%s(), line:%d, force_station:%d, station_mode:%d\n", __func__, __LINE__, force_station, station_mode);
-
-    if (station_mode){
-        //connect to wifi
-        hccast_wifi_ap_info_t wifi_ap;
-        if (data_mgr_wifi_ap_get(&wifi_ap)){
-            lv_label_set_text_fmt(m_label_wifi_ssid, "%s %s", LV_SYMBOL_WIFI, wifi_ap.ssid);
-        }
-
-        char *local_ip = wifi_local_ip_get();
-        sprintf(show_txt, "IP: %s", local_ip);
-        if (local_ip[0]){
-            lv_label_set_text_fmt(m_label_connect_state, "%s %s", LV_SYMBOL_OK, "Connected");
-            lv_label_set_text_fmt(m_label_ip, "%s %s", LV_SYMBOL_HOME, show_txt);
-            win_cast_update_qr_code(QR_CONFIG);
-        }else{
-            lv_label_set_text(m_label_ip, "");
-            lv_label_set_text(m_label_state_msg, "WiFi connecting ...");
-            active_connect_timer(true);
-            lv_label_set_text_fmt(m_label_connect_state, "%s %s", LV_SYMBOL_CLOSE, "No connection");
-            win_cast_update_qr_code(QR_CLEAR);
-        }
-
-
-        lv_label_set_text(m_label_wifi_mode, "WiFi mode: Station");
-
-
-    }else{
-        lv_label_set_text(m_label_wifi_ssid, "");
-        lv_label_set_text(m_label_wifi_mode, "WiFi mode: AP");
-
-        int connected_cnt = hostap_get_connect_count();
-        if ( connected_cnt > 0){
-        //AP mode, phone has connected.
-            sprintf(show_txt, "IP: %s", HCCAST_HOSTAP_IP);
-            //lv_label_set_text(m_label_ip, show_txt);
-            lv_label_set_text_fmt(m_label_ip, "%s %s", LV_SYMBOL_HOME, show_txt);
-            //lv_label_set_text(m_label_connect_state, "Connected");
-            lv_label_set_text_fmt(m_label_connect_state, "%s [%d] %s", LV_SYMBOL_OK, 
-                connected_cnt, "Connected");
-
-            win_cast_update_qr_code(QR_SCAN_WIFI);
-        }else{
-            //lv_label_set_text(m_label_connect_state, "No connection");
-            lv_label_set_text_fmt(m_label_connect_state, "%s %s", LV_SYMBOL_CLOSE, "No connection");
-
-
-            win_cast_update_qr_code(QR_CONNECT_AP);
-        }
-    }
-
-}
-
-static void SyncScreenOpen(void)
-{
-    sys_data_t *sys_data;
-    sys_data = data_mgr_sys_get();
-    printf("%s(), line: %d!, fw_ver: 0x%x, product_id:%s\n", 
-        __func__, __LINE__, sys_data->firmware_version, sys_data->product_id);
-    //api_logo_show(NULL);
-    win_cast_connect_state_upate(false);
-}
-#endif

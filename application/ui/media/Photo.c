@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-01 18:57:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 05:19:20
+ * @LastEditTime: 2022-09-11 15:27:06
  * @FilePath: /gui/application/ui/media/Photo.c
  * @Description: None
  * @other: None
@@ -12,9 +12,10 @@
 #include "MediaCom.h"
 #include "MediaFile.h"
 
-MediaHandle* PhotoHandler;
-lv_obj_t* PhotoWindow;
-lv_obj_t* BackWindow;
+static MediaHandle* PhotoHandler;
+static lv_obj_t* PhotoWindow;
+static lv_obj_t* BackWindow;
+static lv_obj_t* PlayBar;
 
 static void event_handler(lv_event_t* event);
 static void SetStyleForPlayBar(lv_obj_t* bar);
@@ -40,7 +41,8 @@ void creat_photo_window(lv_obj_t* parent, char* file_name)
     LocateMediaIndex(file_name);
     PlayMedia(file_name);
 
-    SetStyleForPlayBar(CreatePlayBar(lv_scr_act()));
+    PlayBar = CreatePlayBar(lv_scr_act());
+    SetStyleForPlayBar(PlayBar);
 }
 
 void close_photo_window(void)
@@ -60,8 +62,9 @@ void close_photo_window(void)
     MediaComDeinit();
 
     //step4 关闭窗口
-    lv_obj_clear_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_del_async(PlayBar);
     lv_obj_del_async(PhotoWindow);
+    lv_obj_clear_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
 }
 
 static void SetStyleForPlayBar(lv_obj_t* bar)

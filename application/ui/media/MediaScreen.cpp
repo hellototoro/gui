@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 05:48:39
+ * @LastEditTime: 2022-09-11 21:32:27
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -29,8 +29,10 @@
 #define FileWidth 150
 #define FileHeight 180
 
+/*********************** 全局变量 *************************/
 MediaFileCategoryList FileFilter;
 
+/*********************** static变量 *************************/
 static constexpr uint16_t FileListPanelRowNumber = FileListPanelWidth/FileWidth;
 static lv_obj_t* MediaRootScreen;
 static lv_obj_t* MediaSubScreen;
@@ -42,6 +44,7 @@ static lv_group_t* FileListGroup;
 static MediaFileCategoryList last_filter_type;
 std::stack<lv_obj_t*, std::list<lv_obj_t*>> FileListPanelStack;
 
+/*********************** static函数 *************************/
 static void CreateCategoryPanel(lv_obj_t* parent);
 static void CreateFilePanel(lv_obj_t* parent, const char *path);
 static void ShowFileList(FileList *file_list);
@@ -50,8 +53,9 @@ static void ReturnUpper(void);
 static void FilterFile(MediaFileCategoryList file_type);
 static void ExitMedia(ActiveScreen screen);
 
-static void key_base_event_handler(lv_obj_t* target)
+static void key_base_event_handler(lv_event_t* event)
 {
+    lv_obj_t* target = lv_event_get_current_target(event);
     uint32_t value = lv_indev_get_key(lv_indev_get_act());
     lv_group_t* group = (lv_group_t*)lv_obj_get_group(target);
     int index = lv_obj_get_index(target);
@@ -88,6 +92,7 @@ static void key_base_event_handler(lv_obj_t* target)
         break;
 
     default:
+        base_event_handler(event);
         break;
     }
 }
@@ -124,7 +129,7 @@ static void file_list_handler(lv_event_t* event)
         }
     }
     else {
-        key_base_event_handler(target);
+        key_base_event_handler(event);
     }
 }
 
@@ -161,24 +166,25 @@ static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* p
 
 static void ShowFileList(FileList *file_list)
 {
-    lv_obj_t* ReturnButton = lv_btn_create(FileListPanel);
-    ReturnButton->user_data = const_cast<char*>("media_file_p_return");
-    DrawCell(ReturnButton, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
-    lv_obj_add_flag(ReturnButton, LV_OBJ_FLAG_EVENT_BUBBLE);
-    lv_group_add_obj(FileListGroup, ReturnButton);
-    lv_obj_add_event_cb(ReturnButton, [] (lv_event_t* event) {
-        lv_obj_t* target = lv_event_get_current_target(event);
-        uint32_t value = lv_indev_get_key(lv_indev_get_act());
-        switch (value)
-        {
-        case LV_KEY_ENTER:
-            if ( !IsRootPath(current_path)) ReturnUpper();
-            break;
-        default:
-            key_base_event_handler(target);
-            break;
-        }
-    }, LV_EVENT_KEY, nullptr);
+    if (lv_obj_get_child_cnt(FileListPanel) == 0) {
+        lv_obj_t* ReturnButton = lv_btn_create(FileListPanel);
+        ReturnButton->user_data = const_cast<char*>("media_file_p_return");
+        DrawCell(ReturnButton, FileWidth, FileHeight, &ui_img_delivery_png, _("media_file_p_return"));
+        lv_group_add_obj(FileListGroup, ReturnButton);
+        lv_obj_add_event_cb(ReturnButton, [] (lv_event_t* event) {
+            uint32_t value = lv_indev_get_key(lv_indev_get_act());
+            switch (value)
+            {
+            case LV_KEY_ENTER:
+                if ( !IsRootPath(current_path)) ReturnUpper();
+                break;
+            default:
+                key_base_event_handler(event);
+                break;
+            }
+        }, LV_EVENT_KEY, nullptr);
+    }
+    if (file_list == nullptr) return;
     int FileCnt = GetFileNumber(file_list);
     DestroyAllMediaList();
     GetNextFileFromFileList(nullptr);//清理前一次使用痕迹
@@ -247,7 +253,6 @@ static void CreateFilePanel(lv_obj_t* parent, const char *path)
     lv_obj_set_style_border_color(FileListPanel, lv_color_hex(0x009DFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(FileListPanel, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_width(FileListPanel, 6, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_add_flag(FileListPanel, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     FileListGroup = create_new_group();
     set_group_activity(FileListGroup);
@@ -271,9 +276,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
     lv_obj_clear_flag(CategoryPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_opa(CategoryPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(CategoryPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_add_flag(CategoryPanel, LV_OBJ_FLAG_EVENT_BUBBLE);
 
-    //CategoryGroup = create_new_group();
     CategoryGroup = lv_group_create();//对于类别组做一般处理
     set_group_activity(CategoryGroup);
     for (int i = 0; i < MediaFile_CategoryNumber; i++) {
@@ -291,7 +294,6 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_style_bg_opa(btn, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_shadow_color(btn, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_shadow_opa(btn, 0, LV_PART_MAIN | LV_STATE_FOCUSED);
-        lv_obj_add_flag(btn, LV_OBJ_FLAG_EVENT_BUBBLE);
         lv_group_add_obj(CategoryGroup, btn);
         lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
             lv_obj_t* target = lv_event_get_current_target(event);
@@ -313,6 +315,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
                 ExitMedia(HomeScreen);
                 break;
             default:
+                key_base_event_handler(event);
                 break;
             }
         }, LV_EVENT_KEY, nullptr);
@@ -340,7 +343,6 @@ static void CreateCategoryPanel(lv_obj_t* parent)
         lv_obj_set_style_img_recolor(ui_IMG, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_img_recolor_opa(ui_IMG, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
-    //FileFilter = MediaFile_All;
     lv_group_focus_obj(lv_obj_get_child(CategoryPanel, FileFilter));
 }
 
@@ -412,7 +414,6 @@ static void FilterFile(MediaFileCategoryList filter_type)
                 child->user_data = file;
                 DrawCell(child, FileWidth, FileHeight, image_src[file->type], file->name);
                 lv_group_add_obj(FileListGroup, child);
-                //lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_ALL, nullptr);
                 lv_obj_add_event_cb(child, file_list_handler, LV_EVENT_KEY, nullptr);
                 lv_obj_add_event_cb(child, [] (lv_event_t* event) {
                     lv_obj_t* target = lv_event_get_current_target(event);
@@ -449,7 +450,6 @@ static void MediaInit(void)
     lv_obj_set_style_bg_color(MediaSubScreen, lv_color_hex(0x0C9D89), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(MediaSubScreen, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MediaSubScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_add_event_cb(MediaSubScreen, base_event_handler, LV_EVENT_KEY, NULL);
     #ifdef HCCHIP_GCC
     lv_msg_subsribe_obj(MSG_HOTPLUG, MediaSubScreen, NULL);
     #else
@@ -458,18 +458,39 @@ static void MediaInit(void)
     lv_obj_add_event_cb(MediaSubScreen, [] (lv_event_t* event) {
         lv_msg_t* msg = lv_event_get_msg(event);
         const int* UdiskStatus = static_cast<const int*>(lv_msg_get_payload(msg));
-        if (lv_obj_is_valid(FileListPanel)) 
-            lv_obj_del_async(FileListPanel);
         if (*UdiskStatus) {//拔出
+            switch (GetPlayingMediaType())/***如果在播放，则先停止播放***/
+            {
+            case MEDIA_VIDEO:
+                close_video_window();
+                break;
+            case MEDIA_MUSIC:
+                close_music_window();
+                break;
+            case MEDIA_PHOTO:
+                close_photo_window();
+                break;
+            
+            default:
+                break;
+            }
+            lv_obj_del_async(FileListPanel);
             while (!FileListPanelStack.empty()) {
                 FileListPanel = FileListPanelStack.top();
                 lv_obj_del_async(FileListPanel);
                 FileListPanelStack.pop();
             }
+            DestroyAllMediaList();
+            MediaFileDeInit();
+            memset(current_path, 0, current_path_size );
+            delete_all_group();
+            CreateFilePanel(MediaSubScreen, media_dir);
+            CreateMsgBox(lv_scr_act(), _("media_udisk_removed"), 1, nullptr);
         }
-        delete_all_group();
-        memset(current_path, 0, current_path_size );
-        CreateFilePanel(MediaSubScreen, media_dir);
+        else {
+            MediaFileInit();
+            ShowFileList(GetFileList(current_path));
+        }
     }, LV_EVENT_MSG_RECEIVED, NULL);
     #ifdef USB_PLUG_TEST
     USB_PlugTest(MediaSubScreen);

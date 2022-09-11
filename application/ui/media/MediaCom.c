@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 06:34:28
+ * @LastEditTime: 2022-09-11 21:22:40
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -34,7 +34,7 @@ int current_path_size = sizeof(current_path);
 /* 文件内全局变量 */
 static lv_obj_t* PlayBar;
 static lv_obj_t* PlayListPanel;
-static MediaType CurrentPlayingType;
+static MediaType CurrentPlayingType = MEDIA_MAX;
 static PlayListMode CurrentPlayMode;
 static MediaHandle* current_media_hdl;
 static MediaList* media_list[MEDIA_MAX];
@@ -311,6 +311,11 @@ static file_name_t* GetMediaArray(void)
     return media_file_name_array;
 }
 
+MediaType GetPlayingMediaType(void)
+{
+    return CurrentPlayingType;
+}
+
 void DestroyMediaArray(void)
 {
     if (media_file_name_array != NULL) {
@@ -438,7 +443,6 @@ static void key_event_handler(lv_event_t* event)
             break;
         case LV_KEY_ESC:
             if (!PlayingAnimation_Flag) {
-                lv_obj_del_async(PlayBar);
                 switch (CurrentPlayingType)
                 {
                 case MEDIA_VIDEO:
@@ -459,6 +463,7 @@ static void key_event_handler(lv_event_t* event)
             break;
 
         default:
+            base_event_handler(event);
             break;
     }
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
@@ -493,6 +498,7 @@ static void play_list_event_handler(lv_event_t* event)
             }
             break;
         default:
+            base_event_handler(event);
             break;
     }
 }
@@ -610,7 +616,6 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayList), play_list_image_src[CurrentPlayingType], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
-
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
         PlayBar_Timer = lv_timer_create(PlayBar_Timer_cb, 5*1000, NULL);
     }

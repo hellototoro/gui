@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 06:34:02
+ * @LastEditTime: 2022-09-11 21:14:19
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -29,7 +29,9 @@ extern void USB_PlugTest(lv_obj_t* parent);
 /*Define a message ID*/
 #define MSG_SHOW_WIFI_LIST      1
 #define MSG_HOTPLUG             2
-#define MSG_EXIT_SCREEN         3
+#define MSG_HOTPLUG_IN          3
+#define MSG_HOTPLUG_OUT         4
+#define MSG_EXIT_SCREEN         5
 
 typedef struct ObjNavigation
 {
@@ -56,8 +58,7 @@ extern lv_group_t* delete_group(lv_group_t* group);
 extern void delete_all_group(void);
 extern lv_indev_t* get_keypad_indev(void);
 extern void refresh_all_lable_text(lv_obj_t* parent);
-extern lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, MsgBoxFunc_t func);
-extern lv_obj_t* CreateMsgBox2(lv_obj_t* parent, const char* title, const char* text, MsgBoxFunc_t func);
+extern lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, int btn_num, MsgBoxFunc_t func);
 extern lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func);
 extern void anim_callback_set_x(void * var, int32_t v);
 extern int32_t anim_callback_get_x(lv_anim_t * a);
@@ -72,8 +73,9 @@ extern void SpinAnimationStop(lv_obj_t * TargetObject);
 extern void base_event_handler(lv_event_t* event);
 extern void other_event_handler(lv_event_t* event);
 extern void ProcessSysMsg(void);
-extern lv_obj_t*  CreateLoadingScreen(lv_obj_t* parent);
+extern lv_obj_t* CreateLoadingScreen(lv_obj_t* parent);
 extern void CloseLoadingScreen(void);
+extern bool HasUsbDevice(void);
 
 
 #ifdef __cplusplus

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-19 15:46:16
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 15:20:03
+ * @LastEditTime: 2022-09-11 21:51:09
  * @FilePath: /gui/application/NetWorkApi.c
  * @Description: None
  * @other: None
@@ -305,7 +305,7 @@ int NetWorkInit(void)
 
 void NetWorkDeInit(void)
 {
-    
+    wifi_wpa_close(WiFi_handle);
 }
 
 void WiFi_Connect(wifi_ap_info_t *wifi_info)

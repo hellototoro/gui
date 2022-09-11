@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:17:27
+ * @LastEditTime: 2022-09-11 21:02:39
  * @FilePath: /gui/application/ui/media/MediaFile.c
  * @Description: None
  * @other: None
@@ -13,42 +13,39 @@
 #include <string.h>
 #include <strings.h>
 #include "MediaFile.h"
+#include "application/ui/ui_com.h"
 
-LinkStack* file_list_stack;
+LinkStack file_list_stack;
 FileList *current_list;
 
 static FileType GetFileType(char *file_name);
 
 void MediaFileInit(void)
 {
-    file_list_stack = (LinkStack *) malloc(sizeof (LinkStack));
-    InitStack(file_list_stack);
+    InitStack(&file_list_stack);
     current_list = NULL;
 }
 
 void MediaFileDeInit(void)
 {
     CloseFileList();
-    free(file_list_stack);
 }
 
 FileList * GetFileList(char *path)
 {
     DIR *dir;
-    struct dirent *file;
+    if (HasUsbDevice() == false) return NULL;
+    if ((dir = opendir(path)) == NULL) return NULL;
+
     FileStr* file_node = NULL;
-    FileList *file_list = (FileList*) malloc(sizeof(FileList));
     LinkList *dir_list = (LinkList*) malloc(sizeof(LinkList));
     LinkList *other_list = (LinkList*) malloc(sizeof(LinkList));
-    if ((dir = opendir(path)) == NULL) {
-        return NULL;
-    }
 
     InitList(dir_list);
     InitList(other_list);
+    struct dirent *file;
     while ((file = readdir(dir)) != NULL) {
-        if (!strncmp(file->d_name, ".", 1)) {
-            //skip the upper dir
+        if (strncmp(file->d_name, ".", 1) == 0) {//skip the upper dir
             continue;
         }
         file_node = (FileStr*)malloc(sizeof(FileStr));
@@ -62,9 +59,15 @@ FileList * GetFileList(char *path)
             ListAppend(other_list, file_node);
         }
     }
+    if (file_node == NULL) {
+        DestroyList(dir_list);
+        DestroyList(other_list);
+        return NULL;
+    }
+    FileList *file_list = (FileList*) malloc(sizeof(FileList));
     file_list->DirList = dir_list;
     file_list->NonDirList = other_list;
-    Push(file_list_stack, current_list);
+    Push(&file_list_stack, current_list);
     current_list = file_list;
     closedir(dir);
     return file_list;
@@ -73,10 +76,11 @@ FileList * GetFileList(char *path)
 /* 获取上一个文件列表，并删除当前文件列表 */
 FileList * GetPreviousFileList(void)
 {
+    if (current_list == NULL) return NULL;
     DestroyList(current_list->DirList);
     DestroyList(current_list->NonDirList);
     free(current_list);
-    if (Pop(file_list_stack, (ElemType *)&current_list) == OK)
+    if (Pop(&file_list_stack, (ElemType *)&current_list) == OK)
         return current_list;
     else 
         return NULL;
@@ -165,8 +169,14 @@ bool IsRootPath(const char * path)
 
 void CloseFileList(void)
 {
-    while (GetPreviousFileList() != NULL);//清理栈里面所有内容
-    DestroyStack(file_list_stack);
+    do {
+        if (current_list != NULL) {
+            DestroyList(current_list->DirList);
+            DestroyList(current_list->NonDirList);
+            free(current_list);
+            current_list = NULL;
+        }
+    } while ( Pop(&file_list_stack, (ElemType *)&current_list) != ERROR );
 }
 
 static FileType GetFileType(char *file_name)

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:20:58
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 04:37:40
+ * @LastEditTime: 2022-09-11 19:38:59
  * @FilePath: /gui/application/ui/media/Music.h
  * @Description: None
  * @other: None
@@ -17,10 +17,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif
-
-#ifdef HCCHIP_GCC
-extern media_handle_t *MusicHandler;
 #endif
 
 extern void creat_music_window(lv_obj_t* parent, char* file_name);

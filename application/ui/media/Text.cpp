@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:14:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 05:03:32
+ * @LastEditTime: 2022-09-11 21:21:37
  * @FilePath: /gui/application/ui/media/Text.cpp
  * @Description: None
  * @other: None
@@ -98,7 +98,8 @@ static void key_event_handler(lv_event_t* event)
         break;
 
         default:
-        break;
+            base_event_handler(event);
+            break;
     }
 }
 

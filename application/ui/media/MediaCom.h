@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 21:15:24
+ * @LastEditTime: 2022-09-11 16:19:02
  * @FilePath: /gui/application/ui/media/MediaCom.h
  * @Description: None
  * @other: None
@@ -66,6 +66,7 @@ extern void DestroyAllMediaList(void);
 extern void CreateMediaArray(void);
 extern uint16_t LocateMediaIndex(char * file_name);
 extern char* GetCurrentMediaName(void);
+extern MediaType GetPlayingMediaType(void);
 extern void DestroyMediaArray(void);
 extern void PlayMedia(char * file_name);
 

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 15:20:25
+ * @LastEditTime: 2022-09-11 21:59:37
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -403,15 +403,16 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_set_style_border_opa(WiFiAvailableListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_flex_flow(WiFiAvailableListPanel, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(WiFiAvailableListPanel, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_add_event_cb(WiFiAvailableListPanel, [] (lv_event_t* event) {
-        WiFiRefreshAvailableList();
-    }, LV_EVENT_MSG_RECEIVED, NULL);
+
     #ifdef HCCHIP_GCC
     lv_msg_subsribe_obj(MSG_SHOW_WIFI_LIST, WiFiAvailableListPanel, nullptr);
     NetWorkInit();
     #else
     lv_msg_subscribe_obj(MSG_SHOW_WIFI_LIST, WiFiAvailableListPanel, nullptr);
     #endif
+    lv_obj_add_event_cb(WiFiAvailableListPanel, [] (lv_event_t* event) {
+        WiFiRefreshAvailableList();
+    }, LV_EVENT_MSG_RECEIVED, NULL);
     WiFiRefresh();
 }
 
@@ -617,10 +618,8 @@ static void WiFiRefreshAvailableList(void)
     lv_obj_t* img;
     auto event_cb = [] (lv_event_t* event) {
         lv_obj_t* target = lv_event_get_current_target(event);
-        //lv_obj_t* parent = lv_obj_get_parent(target);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
         lv_group_t* group = get_activity_group();
-        //int index = lv_obj_get_index(target);
         switch (value)
         {
             case LV_KEY_UP:
@@ -695,6 +694,9 @@ static void WiFiRefreshAvailableList(void)
     }
     lv_obj_add_flag(WiFiRefreshObj,LV_OBJ_FLAG_HIDDEN);
     lv_anim_del(WiFiRefreshObj, nullptr);
+    #ifdef HCCHIP_GCC
+    NetWorkDeInit();
+    #endif
 }
 
 static void WiFiRefresh(void)

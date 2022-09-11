@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 03:52:50
+ * @LastEditTime: 2022-09-11 20:25:21
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -36,16 +36,9 @@ extern int sdl_init_2(void);
 pthread_mutex_t lvgl_task_mutex;
 
 #ifdef HCCHIP_GCC
-extern int wifi_api_set_module(char *wifi_module);
-extern void lv_fb_hotplug_support_set(bool enable);
-#endif
-
-#ifdef HCCHIP_GCC
-static char m_wifi_module_name[32];
 int hcscreen(void);
 #endif
 
-static void HotPlugDetect(void);
 static void exit_console(int signo);
 
 int main(int argc, char *argv[])
@@ -92,7 +85,6 @@ int main(int argc, char *argv[])
         pthread_mutex_lock(&lvgl_task_mutex);
         lv_task_handler();
         pthread_mutex_unlock(&lvgl_task_mutex);
-        HotPlugDetect();
         ProcessSysMsg();
         usleep(5000);
     }
@@ -100,7 +92,7 @@ int main(int argc, char *argv[])
 }
 
 #ifdef USB_PLUG_TEST
-int status = -1;
+int status = 1;
 void set_plug_status(void)
 {
     status = status == 0 ? 1 : 0;
@@ -114,6 +106,11 @@ int hotplug_usb_plugout(void)
 static void plug_status_event_handler(lv_event_t* event)
 {
     set_plug_status();
+    lv_msg_send(MSG_HOTPLUG, &status);
+    if(status == 1)
+        lv_msg_send(MSG_HOTPLUG_OUT, NULL);
+    else
+        lv_msg_send(MSG_HOTPLUG_IN, NULL);
 }
 
 void USB_PlugTest(lv_obj_t* parent)
@@ -125,16 +122,6 @@ void USB_PlugTest(lv_obj_t* parent)
     lv_obj_add_event_cb(plug_test, plug_status_event_handler, LV_EVENT_CLICKED, NULL);
 }
 #endif
-
-static void HotPlugDetect(void)
-{
-    static int LastUdiskStatus_PlugOut = -1;
-    int Status = hotplug_usb_plugout();
-    if (LastUdiskStatus_PlugOut != Status) {
-        LastUdiskStatus_PlugOut = Status;
-        lv_msg_send(MSG_HOTPLUG, &LastUdiskStatus_PlugOut);
-    }
-}
 
 void exit_console(int signo)
 {

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 22:31:31
+ * @LastEditTime: 2022-09-11 21:28:20
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -127,13 +127,13 @@ static void key_event_handler(lv_event_t* event)
         break;
 
     default:
+        base_event_handler(event);
         break;
     }
 }
 
 static void sys_event_handler(lv_event_t* event)
 {
-    //lv_obj_t* target = lv_event_get_current_target(event);
     LastFocusedObjIndex = 0;
     delete_all_group();
 }
@@ -197,7 +197,6 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_align(MainPanel, LV_ALIGN_CENTER);
     lv_obj_set_style_bg_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_add_flag(MainPanel, LV_OBJ_FLAG_EVENT_BUBBLE);
 
     UdiskDetectPanel = lv_obj_create(parent);
     lv_obj_set_width(UdiskDetectPanel, 200);
@@ -225,7 +224,7 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_y(img, 0);
     lv_obj_set_align(img, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
-    if (hotplug_usb_plugout() != 0)
+    if (HasUsbDevice() == false)
         lv_obj_add_flag(img, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE); 
 
@@ -237,7 +236,7 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
     lab->user_data = (void*)"media_no_device";
     lv_label_set_text(lab, _(lab->user_data));
-    if (hotplug_usb_plugout() != 1)
+    if (HasUsbDevice() == true)
         lv_obj_add_flag(lab, LV_OBJ_FLAG_HIDDEN);
     lv_obj_set_style_text_color(lab, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(lab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -261,7 +260,6 @@ static void CreateMainPanel(lv_obj_t* parent)
         lv_obj_set_style_border_width(lv_obj, 5, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_group_add_obj(MainGroup, lv_obj);
         lv_obj_add_event_cb(lv_obj, key_event_handler, LV_EVENT_KEY, NULL);
-        lv_obj_add_flag(lv_obj, LV_OBJ_FLAG_EVENT_BUBBLE);
 
         lv_obj_t* lv_lab = lv_label_create(lv_obj);
         lv_obj_set_size(lv_lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
@@ -282,7 +280,6 @@ static void HomeInit(void)
     lv_obj_set_size(HomeRootScreen, 1280, 720);
     lv_obj_set_style_bg_color(HomeRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_add_event_cb(HomeRootScreen, base_event_handler, LV_EVENT_KEY, NULL);
     #ifdef HCCHIP_GCC
     lv_msg_subsribe_obj(MSG_EXIT_SCREEN, HomeRootScreen, NULL);
     #else
