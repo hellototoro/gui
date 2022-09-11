@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-28 21:18:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 22:05:22
+ * @LastEditTime: 2022-09-11 23:03:39
  * @FilePath: /gui/application/ui/SyncScreen.cpp
  * @Description: None
  * @other: None
@@ -10,12 +10,14 @@
 #include <stdio.h>
 #include "SyncScreen.h"
 #include "LanguageScreen.h"
+#include "application/windows.h"
 #ifdef HCCHIP_GCC
 #include "hcscreen/cast_api.h"
 #include "hcscreen/data_mgr.h"
 #endif
 
 static lv_obj_t* SyncRootScreen;
+static lv_obj_t* SyncSubScreen;
 static lv_obj_t* CastPanel;
 static lv_obj_t* CastQr;
 static lv_obj_t* RouterStatusImg;
@@ -27,6 +29,7 @@ typedef enum {
 } SyncScreenType_t;
 
 static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType);
+static void ExitSync(ActiveScreen screen);
 #if 0//def HCCHIP_GCC
 static volatile int m_first_flag = 1;
 static void SyncScreenOpen(void);
@@ -80,18 +83,17 @@ void CreateSyncScreen(lv_obj_t* parent)
                 switch (index)
                 {
                 case SyncScreen_Miracast:
-                    CreateCastPanel(SyncRootScreen, static_cast<SyncScreenType_t>(index));
+                    CreateCastPanel(SyncSubScreen, static_cast<SyncScreenType_t>(index));
                     break;
                 case SyncScreen_Airplay:
-                    CreateCastPanel(SyncRootScreen, static_cast<SyncScreenType_t>(index));
+                    CreateCastPanel(SyncSubScreen, static_cast<SyncScreenType_t>(index));
                     break;
                 default:
                     break;
                 }
                 break;
             case LV_KEY_ESC:
-                delete_group(group);
-                lv_obj_del_async(SyncRootScreen);
+                ExitSync(HomeScreen);
                 break;
             default:
                 base_event_handler(event);
@@ -99,12 +101,14 @@ void CreateSyncScreen(lv_obj_t* parent)
         }
     };
 
-    SyncRootScreen = lv_obj_create(parent);
-    lv_obj_set_size(SyncRootScreen, 1280, 720);
-    lv_obj_set_style_radius(SyncRootScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_obj_clear_flag(SyncRootScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    SyncSubScreen = lv_obj_create(parent);
+    lv_obj_set_size(SyncSubScreen, 1280, 720);
+    lv_obj_set_style_radius(SyncSubScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_clear_flag(SyncSubScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
+    lv_obj_set_style_border_width(SyncSubScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(SyncSubScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t* img = lv_img_create(SyncRootScreen);
+    lv_obj_t* img = lv_img_create(SyncSubScreen);
     lv_img_set_src(img, root_img_src[DefaultLanguageIndex]);
     lv_obj_set_width(img, LV_SIZE_CONTENT);
     lv_obj_set_height(img, LV_SIZE_CONTENT); 
@@ -117,7 +121,7 @@ void CreateSyncScreen(lv_obj_t* parent)
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
 
-    lv_obj_t* MiracastObj = lv_obj_create(SyncRootScreen);
+    lv_obj_t* MiracastObj = lv_obj_create(SyncSubScreen);
     lv_obj_set_width(MiracastObj, 300);
     lv_obj_set_height(MiracastObj, 309);
     lv_obj_set_x(MiracastObj, -250);
@@ -153,7 +157,7 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_obj_set_style_text_opa(MircastLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(MircastLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    lv_obj_t* AirplayObj = lv_obj_create(SyncRootScreen);
+    lv_obj_t* AirplayObj = lv_obj_create(SyncSubScreen);
     lv_obj_set_width(AirplayObj, 300);
     lv_obj_set_height(AirplayObj, 309);
     lv_obj_set_x(AirplayObj, 250);
@@ -188,7 +192,7 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_obj_set_style_text_color(AirplayLab, lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_opa(AirplayLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_font(AirplayLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_group_focus_obj(lv_obj_get_child(SyncRootScreen, SyncScreen_Miracast));
+    lv_group_focus_obj(lv_obj_get_child(SyncSubScreen, SyncScreen_Miracast));
 }
 
 static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
@@ -209,6 +213,8 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
             case LV_KEY_ENTER:
                 break;
             case LV_KEY_ESC:
+                if (lv_obj_has_flag(SyncSubScreen, LV_OBJ_FLAG_HIDDEN)) 
+                    lv_obj_clear_flag(SyncSubScreen, LV_OBJ_FLAG_HIDDEN);
                 delete_group(MainGroup);
                 lv_obj_del_async(CastPanel);
                 break;
@@ -375,3 +381,28 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         #endif
     }
 }
+
+static void SyncInit(void)
+{
+    SyncRootScreen = lv_obj_create(NULL);
+    lv_obj_set_style_bg_opa(SyncRootScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    CreateSyncScreen(SyncRootScreen);
+}
+
+static void LoadSync(void)
+{
+    lv_scr_load_anim(SyncRootScreen, LV_SCR_LOAD_ANIM_NONE, 0, 0, true);
+    //lv_scr_load_anim(SyncRootScreen, LV_SCR_LOAD_ANIM_FADE_IN, 300, 0, true);
+}
+
+static void ExitSync(ActiveScreen screen)
+{
+    CurrentScreen = screen;
+    delete_all_group();
+}
+
+window SyncWindow = {
+    .ScreenInit = SyncInit,
+    .ScreenLoad = LoadSync,
+};

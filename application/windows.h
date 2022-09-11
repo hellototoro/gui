@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-22 18:12:45
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-29 22:30:20
+ * @LastEditTime: 2022-09-11 22:46:06
  * @FilePath: /gui/application/windows.h
  * @Description: None
  * @other: None
@@ -20,6 +20,7 @@ typedef enum  {
     LanguageScreen,
     HomeScreen,
     MediaScreen,
+    SyncScreen,
     HdmiScreen,
     SettingScreen,
     ScreenNumber

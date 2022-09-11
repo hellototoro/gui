@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 20:40:20
+ * @LastEditTime: 2022-09-11 22:44:18
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -413,11 +413,11 @@ void ProcessSysMsg(void)
     case MSG_TYPE_CAST_AIRCAST_START:
     case MSG_TYPE_CAST_MIRACAST_START:
         CloseLoadingScreen();
-        lv_obj_add_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(lv_obj_get_child(lv_scr_act(), 0), LV_OBJ_FLAG_HIDDEN);
         break;
     case MSG_TYPE_CAST_AIRCAST_STOP:
     case MSG_TYPE_CAST_MIRACAST_STOP:
-        lv_obj_clear_flag(lv_scr_act(), LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(lv_obj_get_child(lv_scr_act(), 0), LV_OBJ_FLAG_HIDDEN);
         break;
     case MSG_TYPE_CAST_DLNA_START:
         break;

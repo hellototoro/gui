@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:28:20
+ * @LastEditTime: 2022-09-11 23:03:34
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -119,7 +119,8 @@ static void key_event_handler(lv_event_t* event)
             CreateSettingScreen(HomeRootScreen);
             break;
         case HOME_MIRRORING:
-            CreateSyncScreen(HomeRootScreen);
+            ExitHome(SyncScreen);
+            //CreateSyncScreen(HomeRootScreen);
             break;
         default:
             break;
