@@ -12,8 +12,8 @@
 #include "LanguageScreen.h"
 #include "application/windows.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/cast_api.h"
-#include "hcscreen/data_mgr.h"
+#include "hcapi/cast_api.h"
+#include "hcapi/data_mgr.h"
 #endif
 
 static lv_obj_t* SyncRootScreen;

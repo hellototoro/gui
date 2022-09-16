@@ -13,7 +13,7 @@
 #include "application/ui/LanguageScreen.h"
 #include "application/ui/ui_com.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/com_api.h"
+#include "hcapi/com_api.h"
 #endif
 
 namespace Setting {

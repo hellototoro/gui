@@ -16,7 +16,7 @@
 #include "Source.h"
 #include "SettingScreen.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/com_api.h"
+#include "hcapi/com_api.h"
 #endif
 
 /************全局变量*****************/

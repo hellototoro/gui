@@ -1,5 +1,5 @@
 build/
 .vscode/
 .metadata/
-boost_1_79_0/
-lv_i18n/
+lv_host_sim/build/
+

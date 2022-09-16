@@ -12,7 +12,7 @@
 
 #include <stdbool.h>
 #ifdef HCCHIP_GCC
-#include "hcscreen/wifi_api.h"
+#include "hcapi/wifi_api.h"
 #endif
 
 #ifdef __cplusplus

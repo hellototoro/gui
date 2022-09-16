@@ -33,10 +33,9 @@ GUI_LIBS += -lcjson -lwpa_client -lhccast-com -lhccast-net -lhccast-wl -lmdns -l
 
 MAINSRC = ./main.c
 
-#include $(ROOT_DIR)/hcapi/hcapi.mk
+include $(ROOT_DIR)/hcapi/hcapi.mk
 include $(ROOT_DIR)/application/gui_app.mk
 include $(ROOT_DIR)/lv_i18n/lv_i18n.mk
-include $(ROOT_DIR)/hcscreen/hcscreen.mk
 
 OBJEXT ?= .o
 

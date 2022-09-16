@@ -9,8 +9,8 @@
 #include <sys/ioctl.h>
 #include <linux/fb.h>
 #include <hcuapi/fb.h>
-#include "lvgl/lvgl.h"
-#include "lv_drivers/display/fbdev.h"
+//#include "lvgl/lvgl.h"
+//#include "lv_drivers/display/fbdev.h"
 #include <hccast/hccast_wifi_mgr.h>
 #include "gpio_ctrl.h"
 #include "com_api.h"

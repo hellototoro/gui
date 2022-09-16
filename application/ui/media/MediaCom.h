@@ -14,7 +14,7 @@
 #include "media_list.h"
 #include "MediaFile.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/media_player.h"
+#include "hcapi/media_player.h"
 #endif
 
 #ifdef __cplusplus

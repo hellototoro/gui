@@ -20,7 +20,7 @@
 #include "SyncScreen.h"
 #include "application/ui/media/MediaScreen.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/hotplug_mgr.h"
+#include "hcapi/hotplug_mgr.h"
 #endif
 
 static lv_obj_t* HomeRootScreen;

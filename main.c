@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 20:25:21
+ * @LastEditTime: 2022-09-16 22:38:04
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -16,13 +16,13 @@
 #include <pthread.h>
 #include <semaphore.h>
 #ifdef HCCHIP_GCC
-#include "hcscreen/com_api.h"
-#include "hcscreen/key.h"
-#include "hcscreen/wifi_api.h"
-#include "hcscreen/data_mgr.h"
-#include "hcscreen/tv_sys.h"
-#include "hcscreen/hotplug_mgr.h"
-#include "hcscreen/network_api.h"
+#include "hcapi/com_api.h"
+#include "hcapi/key.h"
+#include "hcapi/wifi_api.h"
+#include "hcapi/data_mgr.h"
+#include "hcapi/tv_sys.h"
+#include "hcapi/hotplug_mgr.h"
+#include "hcapi/network_api.h"
 #endif
 #include "application/ui/ui_com.h"
 #include "application/windows.h"

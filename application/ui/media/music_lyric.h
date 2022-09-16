@@ -12,7 +12,7 @@
 
 #include "lvgl/lvgl.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/media_player.h"
+#include "hcapi/media_player.h"
 #endif
 
 #include <vector>

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:12:49
+ * @LastEditTime: 2022-09-15 13:35:56
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -105,6 +105,7 @@ static void event_handler(lv_event_t* event)
         }
         break;
     case LV_KEY_ESC:
+    case LV_KEY_MENU:
         delete_group(MainGroup);
         lv_obj_del_async(SettingRootScreen);
     break;
@@ -131,9 +132,7 @@ static void setting_item_key_event_handler(lv_event_t* event)
             Setting->SelectedValue(index);
         break;
     case LV_KEY_LEFT:
-        if (lv_obj_get_child_cnt(target) == 1) {//只能响应enter键的控件
-            break;
-        }
+        if (lv_obj_get_child_cnt(target) == 1) break;//只能响应enter键的控件
         Setting->DecreaseUserValue(index);
         target->spec_attr->children[1]->user_data = const_cast<char*>(Setting->GetStr(index));
         lv_label_set_text(target->spec_attr->children[1], _(Setting->GetStr(index)));
@@ -462,7 +461,6 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
     for(int i = 0; i < ItemNum; ++i) {
-        // item_panel
         lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
         lv_obj_set_width(item_panel, 600);
         lv_obj_set_height(item_panel, 70);
@@ -480,7 +478,6 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
         lv_obj_add_event_cb(item_panel, setting_item_key_event_handler, LV_EVENT_KEY, NULL);
         lv_group_set_focus_cb(MainGroup, focused_handler);
 
-        // item_text1
         lv_obj_t* item_text1 = lv_label_create(item_panel);
         lv_obj_set_width(item_text1, LV_SIZE_CONTENT);
         lv_obj_set_height(item_text1, LV_SIZE_CONTENT);
@@ -493,7 +490,6 @@ void CreateSubSettingPanel(void* user_data, bool BgTransp)
         lv_obj_set_style_text_opa(item_text1, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(item_text1, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        // item_text2
         lv_obj_t* item_text2 = lv_label_create(item_panel);
         lv_obj_set_width(item_text2, LV_SIZE_CONTENT);
         lv_obj_set_height(item_text2, LV_SIZE_CONTENT);

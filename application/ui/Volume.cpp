@@ -10,7 +10,7 @@
 #include "Volume.h"
 #include "application/key_map.h"
 #ifdef HCCHIP_GCC
-#include "hcscreen/media_player.h"
+#include "hcapi/media_player.h"
 #endif
 
 lv_obj_t* VolumePanel;

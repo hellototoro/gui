@@ -21,7 +21,7 @@ extern "C" {
 #define MAX_DEV_NAME	32
 #define MAX_DEV_PSK	32
 #define MAX_WIFI_SAVE	5
-#define SSID_NAME "Project"
+#define SSID_NAME "Projector"
 #define DEVICE_PSK "12345678"
 
 #define HOATAP_CHANNEL_24G  6

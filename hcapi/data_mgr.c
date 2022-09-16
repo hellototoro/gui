@@ -499,7 +499,7 @@ int data_mgr_init_device_name(void)
     int rand_num = 0;
 
     if (api_get_mac_addr((char*)mac) == 0){
-        if (!m_app_data.cast_dev_name_changed && memcmp(mac, m_app_data.mac_addr, MAC_ADDR_LEN)){
+        if (!m_app_data.cast_dev_name_changed/* && memcmp(mac, m_app_data.mac_addr, MAC_ADDR_LEN)*/){
             snprintf(m_app_data.cast_dev_name, MAX_DEV_NAME, "%s-%02X%02X%02X", 
                 SSID_NAME, mac[3]&0xff, mac[4]&0xff, mac[5]&0xff);   
             data_mgr_item_save(offsetof(app_data_t, cast_dev_name), MAX_DEV_NAME, PERSISTENTMEM_NODE_ID_CASTAPP);
