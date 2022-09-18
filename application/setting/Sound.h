@@ -11,7 +11,7 @@
 #define __SOUND_SETTING_H__
 
 #include <stdint.h>
-#include "Base.h"
+#include "SettingBase.h"
 #include "lv_i18n/src/lv_i18n.h"
 
 namespace Setting {

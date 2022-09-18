@@ -2,8 +2,8 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-31 17:22:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-08-08 20:47:16
- * @FilePath: /gui/application/setting/Base.h
+ * @LastEditTime: 2022-09-18 13:26:27
+ * @FilePath: /gui/application/setting/SettingBase.h
  * @Description: None
  * @other: None
  */

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:10:02
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 15:39:46
+ * @LastEditTime: 2022-09-18 23:37:50
  * @FilePath: /gui/application/setting/System.cpp
  * @Description: None
  * @other: None
@@ -15,6 +15,7 @@
 #ifdef HCCHIP_GCC
 #include "hcapi/com_api.h"
 #endif
+#include "application/ui/SettingScreen.h"
 
 namespace Setting {
 
@@ -98,6 +99,7 @@ void System::IncreaseUserValue(int index)
 
     case static_cast<int>(Setting_SystemOsdTime):
         IncreaseValueComm(OsdTime, 0, sizeof(OsdTimeName)/sizeof(OsdTimeName[0]));
+        SetOsdTime(OsdTime);
         break;
 
     default:
@@ -117,6 +119,7 @@ void System::DecreaseUserValue(int index)
 
     case static_cast<int>(Setting_SystemOsdTime):
         DecreaseValueComm(OsdTime, 0, sizeof(OsdTimeName)/sizeof(OsdTimeName[0]));
+        SetOsdTime(OsdTime);
         break;
 
     default:

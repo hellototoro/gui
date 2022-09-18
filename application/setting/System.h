@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-01 14:09:36
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 20:00:46
+ * @LastEditTime: 2022-09-18 13:27:16
  * @FilePath: /gui/application/setting/System.h
  * @Description: None
  * @other: None
@@ -11,7 +11,7 @@
 #define __SYSTEM_SETTING_H__
 
 #include <stdint.h>
-#include "Base.h"
+#include "SettingBase.h"
 
 namespace Setting {
 

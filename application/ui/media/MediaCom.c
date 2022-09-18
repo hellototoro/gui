@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:22:40
+ * @LastEditTime: 2022-09-18 23:07:10
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -503,14 +503,14 @@ static void play_list_event_handler(lv_event_t* event)
     }
 }
 
-static void PlayBar_Timer_cb(lv_timer_t * timer)
+static void PlayBarTimer_cb(lv_timer_t * timer)
 {
     lv_obj_add_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);// | LV_OBJ_FLAG_ADV_HITTEST
     lv_timer_pause(timer);
     lv_timer_reset(timer);
 }
 
-static void ShowPlayedState(lv_timer_t * timer)
+static void PlayedStateTimer_cb(lv_timer_t * timer)
 {
     #ifdef HOST_GCC
     if (play_state == LV_FFMPEG_PLAYER_CMD_START)
@@ -577,7 +577,6 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj = lv_slider_create(PlayBar);
-    //lv_slider_set_range(ProgressSlider, 0, 100);
     lv_slider_set_value(lv_obj, 0, LV_ANIM_OFF);
     if(lv_slider_get_mode(lv_obj) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(lv_obj, 0, LV_ANIM_OFF);
     lv_obj_set_width(lv_obj, 900);
@@ -617,9 +616,9 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayList), play_list_image_src[CurrentPlayingType], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
-        PlayBar_Timer = lv_timer_create(PlayBar_Timer_cb, 5*1000, NULL);
+        PlayBar_Timer = lv_timer_create(PlayBarTimer_cb, 5*1000, NULL);
     }
-    PlayState_Timer = lv_timer_create(ShowPlayedState, 1000, NULL);
+    PlayState_Timer = lv_timer_create(PlayedStateTimer_cb, 1000, NULL);
     lv_timer_set_repeat_count(PlayState_Timer, -1);
     lv_timer_pause(PlayState_Timer);
     #ifdef HOST_GCC
@@ -675,9 +674,6 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_y(PlayListMode_LAB, 0);
     lv_obj_set_align(PlayListMode_LAB, LV_ALIGN_LEFT_MID);
 
-    //char buf[64];
-    //sprintf(buf, _p("songs", file_number), file_number);
-    //lv_label_set_text(PlayListMode_LAB, buf);
     lv_label_set_text_fmt(PlayListMode_LAB, _p("songs", file_number), file_number);
     lv_obj_set_style_text_font(PlayListMode_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
 
@@ -691,8 +687,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_style_bg_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    //设置组
-    MainGroup = create_new_group();
+    MainGroup = create_new_group();//设置组
     set_group_activity(MainGroup);
     for(int i = 0; i < file_number; i++) {
         lv_obj_t* file_panel = lv_obj_create(FileListPanel);
@@ -774,7 +769,6 @@ static void ShowDownAnimation(lv_obj_t * TargetObject, int delay)
     lv_anim_start(&a);
 }
 
-//SetTotalTimeAndProgress(media_get_totaltime(media_hld));
 #ifdef HCCHIP_GCC
 void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
 {

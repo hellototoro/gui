@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 21:24:17
+ * @LastEditTime: 2022-09-16 22:59:16
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -59,11 +59,9 @@ void event_handler(lv_event_t* event)
             lv_group_focus_next(group);
             break;
         case LV_KEY_ENTER:
-            if (index == English || index == Chinese) {
-                WriteConfigFile_I("guide_flag.flag", 0);
-                SaveCurrentLanguageType(index);
-                ExitLanguage(HomeScreen);
-            }
+            WriteConfigFile_I("guide_flag.flag", 0);
+            SaveCurrentLanguageType(index);
+            ExitLanguage(HomeScreen);
             break;
         case LV_KEY_ESC:
             break;
