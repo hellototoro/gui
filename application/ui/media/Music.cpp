@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 15:26:09
+ * @LastEditTime: 2022-09-19 01:06:57
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -36,10 +36,8 @@ void creat_music_window(lv_obj_t* parent, char* file_name)
     #ifdef HOST_GCC
     lv_obj_t* Player = lv_ffmpeg_player_create(MusicWindow);
     lv_ffmpeg_player_set_auto_restart(Player, true);
-    lv_obj_set_x(Player, -300);
-    lv_obj_set_y(Player, -50);
-    lv_obj_set_width(Player, 256);
-    lv_obj_set_height(Player, 256);
+    lv_obj_set_pos(Player, -300, -50);
+    lv_obj_set_size(Player, 256, 256);
     //lv_obj_center(Player);
     MusicHandler = Player;
     #elif defined(HCCHIP_GCC)
@@ -106,8 +104,7 @@ void LoadLyric(char* music_file_name)
         lv_obj_t* lrc = lv_obj_get_child(LyricPanel, i);
         if (lrc == NULL) {
             lrc = lv_label_create(LyricPanel);
-            lv_obj_set_width(lrc, 450);
-            lv_obj_set_height(lrc, LV_SIZE_CONTENT);
+            lv_obj_set_size(lrc, 450, LV_SIZE_CONTENT);
             lv_obj_set_align(lrc, LV_ALIGN_CENTER);
             lv_obj_add_flag(lrc, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
             lv_obj_set_style_text_color(lrc, lv_color_hex(0x89A29E), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -171,19 +168,15 @@ static void CreateMusicWindow(lv_obj_t* parent)
     lv_obj_set_style_border_opa(MusicWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     MusicName = lv_label_create(MusicWindow);
-    lv_obj_set_width(MusicName, LV_SIZE_CONTENT);
-    lv_obj_set_height(MusicName, LV_SIZE_CONTENT);
-    lv_obj_set_x(MusicName, 0);
-    lv_obj_set_y(MusicName, -300);
+    lv_obj_set_size(MusicName, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(MusicName, 0, -300);
     lv_obj_set_align(MusicName, LV_ALIGN_CENTER);
     lv_label_set_text(MusicName, "");
     lv_obj_set_style_text_font(MusicName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     MusicCover = lv_img_create(MusicWindow);
-    lv_obj_set_width(MusicCover, LV_SIZE_CONTENT);
-    lv_obj_set_height(MusicCover, LV_SIZE_CONTENT);
-    lv_obj_set_x(MusicCover, -300);
-    lv_obj_set_y(MusicCover, -50);
+    lv_obj_set_size(MusicCover, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(MusicCover, -300, -50);
     lv_obj_set_align(MusicCover, LV_ALIGN_CENTER);
     lv_obj_add_flag(MusicCover, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(MusicCover, LV_OBJ_FLAG_SCROLLABLE);
@@ -195,10 +188,8 @@ static void CreateLyricPanel(lv_obj_t* parent)
 {
     lyric = new music_lyric;
     LyricPanel = lv_obj_create(parent);
-    lv_obj_set_width(LyricPanel, 500);
-    lv_obj_set_height(LyricPanel, 456);
-    lv_obj_set_x(LyricPanel, 300);
-    lv_obj_set_y(LyricPanel, -15);
+    lv_obj_set_size(LyricPanel, 500, 456);
+    lv_obj_set_pos(LyricPanel, 300, -15);
     lv_obj_set_align(LyricPanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(LyricPanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(LyricPanel, LV_DIR_VER);

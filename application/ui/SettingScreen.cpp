@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-26 11:13:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-18 23:57:29
+ * @LastEditTime: 2022-09-19 00:58:41
  * @FilePath: /gui/application/ui/SettingScreen.cpp
  * @Description: None
  * @other: None
@@ -163,8 +163,7 @@ void CreateSettingScreen(lv_obj_t* parent)
     for (int i = 0; i < CategoryNumber; i++) {
         lv_obj_t* img = lv_img_create(SettingRootScreen);
         lv_img_set_src(img, image_src[i]);
-        lv_obj_set_width(img, LV_SIZE_CONTENT);
-        lv_obj_set_height(img, LV_SIZE_CONTENT);
+        lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         lv_obj_set_pos(img, img_area[i][0], img_area[i][1]);
         lv_obj_set_align(img, LV_ALIGN_CENTER);
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
@@ -177,8 +176,7 @@ void CreateSettingScreen(lv_obj_t* parent)
         lv_obj_add_event_cb(img, event_cb, LV_EVENT_KEY, NULL);
 
         lv_obj_t* lab = lv_label_create(img);
-        lv_obj_set_width(lab, LV_SIZE_CONTENT);
-        lv_obj_set_height(lab, LV_SIZE_CONTENT);
+        lv_obj_set_size(lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         lv_obj_set_pos(lab, lab_area[i][0], lab_area[i][1]);
         lv_obj_set_align(lab, LV_ALIGN_CENTER);
         lab->user_data = const_cast<char*>(str[i]);
@@ -279,16 +277,14 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
     lv_obj_set_align(SettingPanel, LV_ALIGN_CENTER);
 
     lv_obj_t* SettingPanelLayout = lv_obj_create(SettingPanel);
-    lv_obj_set_width(SettingPanelLayout, w);
-    lv_obj_set_height(SettingPanelLayout, h * (ItemNum + 1));
+    lv_obj_set_size(SettingPanelLayout, w, h * (ItemNum + 1));
     lv_obj_set_pos(SettingPanelLayout, 0, 0);
     lv_obj_set_align(SettingPanelLayout, LV_ALIGN_CENTER);
     lv_obj_clear_flag(SettingPanelLayout, LV_OBJ_FLAG_SCROLLABLE);
     SettingPanelLayout->user_data = setting_obj;
 
     lv_obj_t* title = lv_obj_create(SettingPanelLayout);
-    lv_obj_set_width(title, w);
-    lv_obj_set_height(title, h);
+    lv_obj_set_size(title, w, h);
     lv_obj_set_pos(title, 0, -(h / 2) * ItemNum);
     lv_obj_set_align(title, LV_ALIGN_CENTER);
     lv_obj_clear_flag(title, LV_OBJ_FLAG_SCROLLABLE);
@@ -298,8 +294,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
     lv_obj_set_style_border_side(title, LV_BORDER_SIDE_BOTTOM, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* title_text = lv_label_create(title);
-    lv_obj_set_width(title_text, LV_SIZE_CONTENT);
-    lv_obj_set_height(title_text, LV_SIZE_CONTENT);
+    lv_obj_set_size(title_text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(title_text, 0, 0);
     lv_obj_set_align(title_text, LV_ALIGN_CENTER);
     title_text->user_data = const_cast<char*>(text[0]);
@@ -312,8 +307,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
     set_group_activity(MainGroup);
     for(int i = 0; i < ItemNum; ++i) {
         lv_obj_t* item_panel = lv_obj_create(SettingPanelLayout);
-        lv_obj_set_width(item_panel, w);
-        lv_obj_set_height(item_panel, h);
+        lv_obj_set_size(item_panel, w, h);
         lv_obj_set_pos(item_panel, 0, -(h / 2) * ItemNum + (i + 1) * h);
         lv_obj_set_align(item_panel, LV_ALIGN_CENTER);
         lv_obj_clear_flag(item_panel, LV_OBJ_FLAG_SCROLLABLE);
@@ -349,8 +343,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
         }, LV_EVENT_DEFOCUSED, nullptr);
 
         lv_obj_t* item_text1 = lv_label_create(item_panel);
-        lv_obj_set_width(item_text1, LV_SIZE_CONTENT);
-        lv_obj_set_height(item_text1, LV_SIZE_CONTENT);
+        lv_obj_set_size(item_text1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         lv_obj_set_y(item_text1, 0);
         lv_obj_set_align(item_text1, LV_ALIGN_CENTER);
         lv_obj_set_style_text_color(item_text1, lv_color_hex(0x1438FF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -371,8 +364,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
             continue;
         }
         lv_obj_t* item_text2 = lv_label_create(item_panel);
-        lv_obj_set_width(item_text2, LV_SIZE_CONTENT);
-        lv_obj_set_height(item_text2, LV_SIZE_CONTENT);
+        lv_obj_set_size(item_text2, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
         uint8_t mid = 0;
         if (IsMainPanel) mid = (100+320)/2;
         else             mid = 230;
@@ -390,8 +382,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
         if (IsMainPanel) {
             lv_obj_t* item_image1 = lv_img_create(item_panel);
             lv_img_set_src(item_image1, &ui_img_menu_arrow_right32_png);
-            lv_obj_set_width(item_image1, LV_SIZE_CONTENT);
-            lv_obj_set_height(item_image1, LV_SIZE_CONTENT);
+            lv_obj_set_size(item_image1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_pos(item_image1, 320, 0);
             lv_obj_set_align(item_image1, LV_ALIGN_CENTER);
             lv_obj_add_flag(item_image1, LV_OBJ_FLAG_ADV_HITTEST);
@@ -401,8 +392,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
 
             lv_obj_t* item_image2 = lv_img_create(item_panel);
             lv_img_set_src(item_image2, &ui_img_menu_arrow_left32_png);
-            lv_obj_set_width(item_image2, LV_SIZE_CONTENT);
-            lv_obj_set_height(item_image2, LV_SIZE_CONTENT);
+            lv_obj_set_size(item_image2, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
             lv_obj_set_pos(item_image2, 100, 0);
             lv_obj_set_align(item_image2, LV_ALIGN_CENTER);
             lv_obj_add_flag(item_image2, LV_OBJ_FLAG_ADV_HITTEST);
@@ -415,8 +405,7 @@ static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, voi
             lv_slider_set_range(slider, 0, 100);
             lv_slider_set_value(slider, Setting->GetUserValue(i+1), LV_ANIM_OFF);
             if(lv_slider_get_mode(slider) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(slider, 0, LV_ANIM_OFF);
-            lv_obj_set_width(slider, 200);
-            lv_obj_set_height(slider, 7);
+            lv_obj_set_size(slider, 200, 7);
             lv_obj_set_pos(slider, 80, 0);
             lv_obj_set_align(slider, LV_ALIGN_CENTER);
             lv_obj_clear_state(slider, LV_STATE_FOCUS_KEY);

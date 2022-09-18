@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:59:37
+ * @LastEditTime: 2022-09-19 01:05:39
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -95,8 +95,7 @@ void CreateNetWorkPanel(lv_obj_t* parent)
     };
 
     NetWorkPanel = lv_obj_create(parent);
-    lv_obj_set_width(NetWorkPanel, 1280);
-    lv_obj_set_height(NetWorkPanel, 720);
+    lv_obj_set_size(NetWorkPanel, 1280, 720);
     lv_obj_center(NetWorkPanel);
     lv_obj_clear_flag(NetWorkPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_border_color(NetWorkPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -106,10 +105,8 @@ void CreateNetWorkPanel(lv_obj_t* parent)
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
     lv_obj_t* obj = lv_obj_create(NetWorkPanel);
-    lv_obj_set_width(obj, 800);
-    lv_obj_set_height(obj, 90);
-    lv_obj_set_x(obj, 10);
-    lv_obj_set_y(obj, -119);
+    lv_obj_set_size(obj, 800, 90);
+    lv_obj_set_pos(obj, 10, -119);
     lv_obj_set_align(obj, LV_ALIGN_CENTER);
     lv_obj_add_state(obj, LV_STATE_FOCUSED);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
@@ -121,28 +118,22 @@ void CreateNetWorkPanel(lv_obj_t* parent)
 
     lv_obj_t* img = lv_img_create(obj);
     lv_img_set_src(img, &ui_img_wifi_free_64_png);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT);
-    lv_obj_set_x(img, -200);
-    lv_obj_set_y(img, 0);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(img, -200, 0);
     lv_obj_set_align(img, LV_ALIGN_CENTER);
     lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t* lab = lv_label_create(obj);
-    lv_obj_set_width(lab, LV_SIZE_CONTENT);
-    lv_obj_set_height(lab, LV_SIZE_CONTENT);
-    lv_obj_set_x(lab, 250);
-    lv_obj_set_y(lab, 0);
+    lv_obj_set_size(lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(lab, 250, 0);
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
     lv_label_set_text(lab, _("setting_p_wifi"));
     lv_obj_set_style_text_font(lab, &ui_font_MyFont38, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     obj = lv_obj_create(NetWorkPanel);
-    lv_obj_set_width(obj, 800);
-    lv_obj_set_height(obj, 90);
-    lv_obj_set_x(obj, 14);
-    lv_obj_set_y(obj, 10);
+    lv_obj_set_size(obj, 800, 90);
+    lv_obj_set_pos(obj, 14, 10);
     lv_obj_set_align(obj, LV_ALIGN_CENTER);
     lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(obj, 20, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -153,19 +144,15 @@ void CreateNetWorkPanel(lv_obj_t* parent)
 
     img = lv_img_create(obj);
     lv_img_set_src(img, &ui_img_bluetooth_64_png);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT);
-    lv_obj_set_x(img, -200);
-    lv_obj_set_y(img, 0);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(img, -200, 0);
     lv_obj_set_align(img, LV_ALIGN_CENTER);
     lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
     lab = lv_label_create(obj);
-    lv_obj_set_width(lab, LV_SIZE_CONTENT);
-    lv_obj_set_height(lab, LV_SIZE_CONTENT);
-    lv_obj_set_x(lab, 250);
-    lv_obj_set_y(lab, 0);
+    lv_obj_set_size(lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(lab, 250, 0);
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
     lv_label_set_text(lab, _("setting_p_bluetooth"));
     lv_obj_set_style_text_align(lab, LV_TEXT_ALIGN_AUTO, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -214,10 +201,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
     };
     
     WiFiPanel = lv_obj_create(parent);
-    lv_obj_set_width(WiFiPanel, 1280);
-    lv_obj_set_height(WiFiPanel, 720);
-    lv_obj_set_x(WiFiPanel, 0);
-    lv_obj_set_y(WiFiPanel, 0);
+    lv_obj_set_size(WiFiPanel, 1280, 720);
+    lv_obj_set_pos(WiFiPanel, 0, 0);
     lv_obj_set_align(WiFiPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(WiFiPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_color(WiFiPanel, lv_color_hex(0xE2E2E2), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -230,20 +215,16 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_group_set_wrap(MainGroup, false);
 
     WiFiControlPanel = lv_obj_create(WiFiPanel);
-    lv_obj_set_width(WiFiControlPanel, 1020);
-    lv_obj_set_height(WiFiControlPanel, 150);
-    lv_obj_set_x(WiFiControlPanel, 0);
-    lv_obj_set_y(WiFiControlPanel, -10);
+    lv_obj_set_size(WiFiControlPanel, 1020, 150);
+    lv_obj_set_pos(WiFiControlPanel, 0, -10);
     lv_obj_set_align(WiFiControlPanel, LV_ALIGN_TOP_MID);
     lv_obj_clear_flag(WiFiControlPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(WiFiControlPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(WiFiControlPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     panel = lv_obj_create(WiFiControlPanel);
-    lv_obj_set_width(panel, 980);
-    lv_obj_set_height(panel, 65);
-    lv_obj_set_x(panel, 0);
-    lv_obj_set_y(panel, -36);
+    lv_obj_set_size(panel, 980, 65);
+    lv_obj_set_pos(panel, 0, -36);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(panel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_radius(panel, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -253,19 +234,15 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_add_event_cb(panel, event_cb, LV_EVENT_KEY, nullptr);
 
     lab = lv_label_create(panel);
-    lv_obj_set_width(lab, 600);
-    lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(lab, -170);
-    lv_obj_set_y(lab, 0);
+    lv_obj_set_size(lab, 600, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_pos(lab, -170, 0);
     lv_obj_set_align(lab, LV_ALIGN_CENTER);
     lv_label_set_text(lab, "WLAN");
     lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     WiFiControlSwitch = lv_switch_create(panel);
-    lv_obj_set_width(WiFiControlSwitch, 90);
-    lv_obj_set_height(WiFiControlSwitch, 45);
-    lv_obj_set_x(WiFiControlSwitch, 370);
-    lv_obj_set_y(WiFiControlSwitch, 0);
+    lv_obj_set_size(WiFiControlSwitch, 90, 45);
+    lv_obj_set_pos(WiFiControlSwitch, 370, 0);
     lv_obj_add_state(WiFiControlSwitch, LV_STATE_CHECKED);
     lv_obj_set_align(WiFiControlSwitch, LV_ALIGN_CENTER);
     lv_obj_add_event_cb(WiFiControlSwitch, [] (lv_event_t* event) { 
@@ -281,10 +258,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
     }, LV_EVENT_RELEASED, nullptr);
 
     panel = lv_obj_create(WiFiControlPanel);
-    lv_obj_set_width(panel, 980);
-    lv_obj_set_height(panel, 65);
-    lv_obj_set_x(panel, 0);
-    lv_obj_set_y(panel, 30);
+    lv_obj_set_size(panel, 980, 65);
+    lv_obj_set_pos(panel, 0, 30);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(panel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_radius(panel, 15, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -294,10 +269,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_add_event_cb(panel, event_cb, LV_EVENT_KEY, nullptr);
 
     lab = lv_label_create(panel);
-    lv_obj_set_width(lab, 600);
-    lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(lab, -170);
-    lv_obj_set_y(lab, 0);
+    lv_obj_set_size(lab, 600, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_pos(lab, -170, 0);
     lv_obj_set_align(lab, LV_ALIGN_CENTER);
     lv_label_set_text(lab, _("setting_p_refresh"));
     lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -305,29 +278,23 @@ void CreateWiFiPanel(lv_obj_t* parent)
     if (WiFi_IsConnected()) {
     //if (1) {
         WiFiConnectedPanel = lv_obj_create(WiFiPanel);
-        lv_obj_set_width(WiFiConnectedPanel, 1020);
-        lv_obj_set_height(WiFiConnectedPanel, 110);
-        lv_obj_set_x(WiFiConnectedPanel, 0);
-        lv_obj_set_y(WiFiConnectedPanel, 145);
+        lv_obj_set_size(WiFiConnectedPanel, 1020, 110);
+        lv_obj_set_pos(WiFiConnectedPanel, 0, 145);
         lv_obj_set_align(WiFiConnectedPanel, LV_ALIGN_TOP_MID);
         lv_obj_clear_flag(WiFiConnectedPanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
         lv_obj_set_style_bg_color(WiFiConnectedPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_bg_opa(WiFiConnectedPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lab = lv_label_create(WiFiConnectedPanel);
-        lv_obj_set_width(lab, 200);   /// 1
-        lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(lab, -370);
-        lv_obj_set_y(lab, -20);
+        lv_obj_set_size(lab, 200, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(lab, -370, -20);
         lv_obj_set_align(lab, LV_ALIGN_TOP_MID);
         lv_label_set_text(lab, _("setting_p_wifi_connected"));
         lv_obj_set_style_text_font(lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         panel = lv_obj_create(WiFiConnectedPanel);
-        lv_obj_set_width(panel, 980);
-        lv_obj_set_height(panel, 65);
-        lv_obj_set_x(panel, 0);
-        lv_obj_set_y(panel, 10);
+        lv_obj_set_size(panel, 980, 65);
+        lv_obj_set_pos(panel, 0, 10);
         lv_obj_set_align(panel, LV_ALIGN_TOP_MID);
         lv_obj_clear_flag(panel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
         lv_obj_set_style_bg_color(panel, lv_color_hex(0x87A4C1), LV_PART_MAIN | LV_STATE_FOCUSED);
@@ -336,10 +303,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
         lv_obj_add_event_cb(panel, event_cb, LV_EVENT_KEY, nullptr);
 
         lab = lv_label_create(panel);
-        lv_obj_set_width(lab, 600);
-        lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(lab, -170);
-        lv_obj_set_y(lab, 0);
+        lv_obj_set_size(lab, 600, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(lab, -170, 0);
         lv_obj_set_align(lab, LV_ALIGN_CENTER);
         lv_label_set_text(lab, "HONOR");
         lv_obj_set_style_text_color(lab, lv_color_hex(0x2565B0), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -348,10 +313,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
 
         img = lv_img_create(panel);
         lv_img_set_src(img, &ui_img_wifi_64_png);
-        lv_obj_set_width(img, LV_SIZE_CONTENT);   /// 64
-        lv_obj_set_height(img, LV_SIZE_CONTENT);    /// 64
-        lv_obj_set_x(img, 430);
-        lv_obj_set_y(img, 0);
+        lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 64
+        lv_obj_set_pos(img, 430, 0);
         lv_obj_set_align(img, LV_ALIGN_CENTER);
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
         lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
@@ -364,39 +327,31 @@ void CreateWiFiPanel(lv_obj_t* parent)
         AvailablePanelPos_h = 555;
     }
     WiFiAvailablePanel = lv_obj_create(WiFiPanel);
-    lv_obj_set_width(WiFiAvailablePanel, 1020);
-    lv_obj_set_height(WiFiAvailablePanel, AvailablePanelPos_h);
-    lv_obj_set_x(WiFiAvailablePanel, 0);
-    lv_obj_set_y(WiFiAvailablePanel, AvailablePanelPos_y);
+    lv_obj_set_size(WiFiAvailablePanel, 1020, AvailablePanelPos_h);
+    lv_obj_set_pos(WiFiAvailablePanel, 0, AvailablePanelPos_y);
     lv_obj_set_align(WiFiAvailablePanel, LV_ALIGN_TOP_MID);
     lv_obj_clear_flag(WiFiAvailablePanel, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_opa(WiFiAvailablePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lab = lv_label_create(WiFiAvailablePanel);
-    lv_obj_set_width(lab, 200);   /// 1
-    lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(lab, -370);
-    lv_obj_set_y(lab, -20);
+    lv_obj_set_size(lab, 200, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_pos(lab, -370, -20);
     lv_obj_set_align(lab, LV_ALIGN_TOP_MID);
     lv_label_set_text(lab, _("setting_p_wifi_available"));
     lv_obj_set_style_text_font(lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     WiFiRefreshObj = lv_img_create(WiFiAvailablePanel);
     lv_img_set_src(WiFiRefreshObj, &ui_img_refresh32_png);
-    lv_obj_set_width(WiFiRefreshObj, LV_SIZE_CONTENT);   /// 48
-    lv_obj_set_height(WiFiRefreshObj, LV_SIZE_CONTENT);    /// 48
-    lv_obj_set_x(WiFiRefreshObj, 430);
-    lv_obj_set_y(WiFiRefreshObj, -20);
+    lv_obj_set_size(WiFiRefreshObj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 48
+    lv_obj_set_pos(WiFiRefreshObj, 430, -20);
     lv_obj_set_align(WiFiRefreshObj, LV_ALIGN_TOP_MID);
     lv_obj_add_flag(WiFiRefreshObj, LV_OBJ_FLAG_HIDDEN | LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
     lv_obj_clear_flag(WiFiRefreshObj, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
 
     WiFiAvailableListPanel = lv_obj_create(WiFiAvailablePanel);
     lv_obj_remove_style_all(WiFiAvailableListPanel);
-    lv_obj_set_width(WiFiAvailableListPanel, 1000);
-    lv_obj_set_height(WiFiAvailableListPanel, AvailablePanelPos_h - 35);
-    lv_obj_set_x(WiFiAvailableListPanel, 0);
-    lv_obj_set_y(WiFiAvailableListPanel, 10);
+    lv_obj_set_size(WiFiAvailableListPanel, 1000, AvailablePanelPos_h - 35);
+    lv_obj_set_pos(WiFiAvailableListPanel, 0, 10);
     lv_obj_set_align(WiFiAvailableListPanel, LV_ALIGN_TOP_MID);
     lv_obj_set_scrollbar_mode(WiFiAvailableListPanel,LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_style_bg_opa(WiFiAvailableListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -422,10 +377,8 @@ void CreateInputCodePanel(lv_obj_t* parent)
     set_group_activity(MainGroup);
     Keyboard = lv_keyboard_create(parent);
     lv_keyboard_set_mode(Keyboard, LV_KEYBOARD_MODE_TEXT_LOWER);
-    lv_obj_set_width(Keyboard, 1130);
-    lv_obj_set_height(Keyboard, 410);
-    lv_obj_set_x(Keyboard, 0);
-    lv_obj_set_y(Keyboard, 120);
+    lv_obj_set_size(Keyboard, 1130, 410);
+    lv_obj_set_pos(Keyboard, 0, 120);
     lv_obj_set_align(Keyboard, LV_ALIGN_CENTER);
     lv_obj_set_style_text_font(Keyboard, &lv_font_montserrat_30, LV_PART_ITEMS | LV_STATE_DEFAULT);
     lv_group_add_obj(MainGroup, Keyboard);
@@ -524,28 +477,22 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     set_group_activity(MainGroup);
 
     ConnectPanel = lv_obj_create(parent);
-    lv_obj_set_width(ConnectPanel, 900);
-    lv_obj_set_height(ConnectPanel, 400);
-    lv_obj_set_x(ConnectPanel, 0);
-    lv_obj_set_y(ConnectPanel, 0);//-150
+    lv_obj_set_size(ConnectPanel, 900, 400);
+    lv_obj_set_pos(ConnectPanel, 0, 0);//-150
     lv_obj_set_align(ConnectPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ConnectPanel, LV_OBJ_FLAG_SCROLLABLE);
     ConnectPanel->user_data = wifi_info;
 
     lv_obj_t* WiFiName = lv_label_create(ConnectPanel);
-    lv_obj_set_width(WiFiName, LV_SIZE_CONTENT);
-    lv_obj_set_height(WiFiName, LV_SIZE_CONTENT);
-    lv_obj_set_x(WiFiName, 0);
-    lv_obj_set_y(WiFiName, -135);
+    lv_obj_set_size(WiFiName, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(WiFiName, 0, -135);
     lv_obj_set_align(WiFiName, LV_ALIGN_CENTER);
     lv_label_set_text(WiFiName, "HONOR");
     lv_obj_set_style_text_font(WiFiName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     PwdArea = lv_textarea_create(ConnectPanel);
-    lv_obj_set_width(PwdArea, 600);
-    lv_obj_set_height(PwdArea, 50);
-    lv_obj_set_x(PwdArea, 0);
-    lv_obj_set_y(PwdArea, -50);
+    lv_obj_set_size(PwdArea, 600, 50);
+    lv_obj_set_pos(PwdArea, 0, -50);
     lv_obj_set_align(PwdArea, LV_ALIGN_CENTER);
     lv_textarea_set_text(PwdArea, "");
     lv_textarea_set_password_mode(PwdArea, true);
@@ -560,10 +507,8 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
 
     Checkbox = lv_checkbox_create(ConnectPanel);
     lv_checkbox_set_text(Checkbox, _("setting_p_show_code"));
-    lv_obj_set_width(Checkbox, LV_SIZE_CONTENT);
-    lv_obj_set_height(Checkbox, LV_SIZE_CONTENT);
-    lv_obj_set_x(Checkbox, -220);
-    lv_obj_set_y(Checkbox, 10);
+    lv_obj_set_size(Checkbox, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(Checkbox, -220, 10);
     lv_obj_set_align(Checkbox, LV_ALIGN_CENTER);
     lv_obj_add_flag(Checkbox, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_style_text_font(Checkbox, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -571,10 +516,8 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_add_event_cb(Checkbox, event_cb, LV_EVENT_KEY, nullptr);
 
     lv_obj_t* ConnectButton = lv_btn_create(ConnectPanel);
-    lv_obj_set_width(ConnectButton, 100);
-    lv_obj_set_height(ConnectButton, 50);
-    lv_obj_set_x(ConnectButton, -180);
-    lv_obj_set_y(ConnectButton, 125);
+    lv_obj_set_size(ConnectButton, 100, 50);
+    lv_obj_set_pos(ConnectButton, -180, 125);
     lv_obj_set_align(ConnectButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(ConnectButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_clear_flag(ConnectButton, LV_OBJ_FLAG_SCROLLABLE);
@@ -582,19 +525,15 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_add_event_cb(ConnectButton, event_cb, LV_EVENT_KEY, nullptr);
 
     lv_obj_t* ConnectLab = lv_label_create(ConnectButton);
-    lv_obj_set_width(ConnectLab, LV_SIZE_CONTENT);
-    lv_obj_set_height(ConnectLab, LV_SIZE_CONTENT);
-    lv_obj_set_x(ConnectLab, 0);
-    lv_obj_set_y(ConnectLab, 0);
+    lv_obj_set_size(ConnectLab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(ConnectLab, 0, 0);
     lv_obj_set_align(ConnectLab, LV_ALIGN_CENTER);
     lv_label_set_text(ConnectLab, _("setting_p_connect"));
     lv_obj_set_style_text_font(ConnectLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* CancelButton = lv_btn_create(ConnectPanel);
-    lv_obj_set_width(CancelButton, 100);
-    lv_obj_set_height(CancelButton, 50);
-    lv_obj_set_x(CancelButton, 180);
-    lv_obj_set_y(CancelButton, 125);
+    lv_obj_set_size(CancelButton, 100, 50);
+    lv_obj_set_pos(CancelButton, 180, 125);
     lv_obj_set_align(CancelButton, LV_ALIGN_CENTER);
     lv_obj_add_flag(CancelButton, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_clear_flag(CancelButton, LV_OBJ_FLAG_SCROLLABLE);
@@ -602,10 +541,8 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_add_event_cb(CancelButton, event_cb, LV_EVENT_KEY, nullptr);
 
     lv_obj_t* CancelLab = lv_label_create(CancelButton);
-    lv_obj_set_width(CancelLab, LV_SIZE_CONTENT);
-    lv_obj_set_height(CancelLab, LV_SIZE_CONTENT);
-    lv_obj_set_x(CancelLab, 0);
-    lv_obj_set_y(CancelLab, 0);
+    lv_obj_set_size(CancelLab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(CancelLab, 0, 0);
     lv_obj_set_align(CancelLab, LV_ALIGN_CENTER);
     lv_label_set_text(CancelLab, _("setting_p_cancel"));
     lv_obj_set_style_text_font(CancelLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -653,8 +590,7 @@ static void WiFiRefreshAvailableList(void)
         child = lv_obj_get_child(WiFiAvailableListPanel, i);
         if (!child) {
             child = lv_obj_create(WiFiAvailableListPanel);
-            lv_obj_set_width(child, 980);
-            lv_obj_set_height(child, 65);
+            lv_obj_set_size(child, 980, 65);
             lv_obj_set_align(child, LV_ALIGN_TOP_MID);
             lv_obj_clear_flag(child, LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_add_flag(child, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -664,19 +600,15 @@ static void WiFiRefreshAvailableList(void)
             lv_obj_add_event_cb(child, event_cb, LV_EVENT_KEY, nullptr);
 
             lab = lv_label_create(child);
-            lv_obj_set_width(lab, 600);
-            lv_obj_set_height(lab, LV_SIZE_CONTENT);    /// 1
-            lv_obj_set_x(lab, -170);
-            lv_obj_set_y(lab, 0);
+            lv_obj_set_size(lab, 600, LV_SIZE_CONTENT);    /// 1
+            lv_obj_set_pos(lab, -170, 0);
             lv_obj_set_align(lab, LV_ALIGN_CENTER);
             lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
             img = lv_img_create(child);
             lv_img_set_src(img, &ui_img_wifi_64_png);
-            lv_obj_set_width(img, LV_SIZE_CONTENT);   /// 64
-            lv_obj_set_height(img, LV_SIZE_CONTENT);    /// 64
-            lv_obj_set_x(img, 430);
-            lv_obj_set_y(img, 0);
+            lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 64
+            lv_obj_set_pos(img, 430, 0);
             lv_obj_set_align(img, LV_ALIGN_CENTER);
             lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
             lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);      /// Flags

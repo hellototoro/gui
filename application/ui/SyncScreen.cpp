@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-28 21:18:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 23:03:39
+ * @LastEditTime: 2022-09-19 00:22:14
  * @FilePath: /gui/application/ui/SyncScreen.cpp
  * @Description: None
  * @other: None
@@ -110,10 +110,8 @@ void CreateSyncScreen(lv_obj_t* parent)
 
     lv_obj_t* img = lv_img_create(SyncSubScreen);
     lv_img_set_src(img, root_img_src[DefaultLanguageIndex]);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT); 
-    lv_obj_set_x(img, 0);
-    lv_obj_set_y(img, 100);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+    lv_obj_set_pos(img, 0, 100);
     lv_obj_set_align(img, LV_ALIGN_TOP_MID);
     lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
@@ -122,10 +120,8 @@ void CreateSyncScreen(lv_obj_t* parent)
     set_group_activity(MainGroup);
 
     lv_obj_t* MiracastObj = lv_obj_create(SyncSubScreen);
-    lv_obj_set_width(MiracastObj, 300);
-    lv_obj_set_height(MiracastObj, 309);
-    lv_obj_set_x(MiracastObj, -250);
-    lv_obj_set_y(MiracastObj, 60);
+    lv_obj_set_size(MiracastObj, 300, 309);
+    lv_obj_set_pos(MiracastObj, -250, 60);
     lv_obj_set_align(MiracastObj, LV_ALIGN_CENTER);
     lv_obj_clear_flag(MiracastObj, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(MiracastObj, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -146,10 +142,8 @@ void CreateSyncScreen(lv_obj_t* parent)
     }, LV_EVENT_DEFOCUSED, nullptr);
 
     lv_obj_t* MircastLab = lv_label_create(MiracastObj);
-    lv_obj_set_width(MircastLab, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(MircastLab, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(MircastLab, 0);
-    lv_obj_set_y(MircastLab, 100);
+    lv_obj_set_size(MircastLab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_pos(MircastLab, 0, 100);
     lv_obj_set_align(MircastLab, LV_ALIGN_CENTER);
     MircastLab->user_data = (void*)"cast_mira";
     lv_label_set_text(MircastLab, _(static_cast<const char*>(MircastLab->user_data)));
@@ -158,10 +152,8 @@ void CreateSyncScreen(lv_obj_t* parent)
     lv_obj_set_style_text_font(MircastLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* AirplayObj = lv_obj_create(SyncSubScreen);
-    lv_obj_set_width(AirplayObj, 300);
-    lv_obj_set_height(AirplayObj, 309);
-    lv_obj_set_x(AirplayObj, 250);
-    lv_obj_set_y(AirplayObj, 60);
+    lv_obj_set_size(AirplayObj, 300, 309);
+    lv_obj_set_pos(AirplayObj, 250, 60);
     lv_obj_set_align(AirplayObj, LV_ALIGN_CENTER);
     lv_obj_clear_flag(AirplayObj, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_bg_color(AirplayObj, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -182,10 +174,8 @@ void CreateSyncScreen(lv_obj_t* parent)
     }, LV_EVENT_DEFOCUSED, nullptr);
 
     lv_obj_t* AirplayLab = lv_label_create(AirplayObj);
-    lv_obj_set_width(AirplayLab, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(AirplayLab, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(AirplayLab, 0);
-    lv_obj_set_y(AirplayLab, 100);
+    lv_obj_set_size(AirplayLab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_pos(AirplayLab, 0, 100);
     lv_obj_set_align(AirplayLab, LV_ALIGN_CENTER);
     AirplayLab->user_data = (void*)"cast_airplay";
     lv_label_set_text(AirplayLab, _(static_cast<const char*>(AirplayLab->user_data)));
@@ -225,8 +215,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     }, LV_EVENT_KEY, nullptr);
 
     lv_obj_t* WifiName1 = lv_label_create(CastPanel);
-    lv_obj_set_width(WifiName1, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(WifiName1, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_size(WifiName1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(WifiName1, LV_ALIGN_LEFT_MID);
     #ifdef HCCHIP_GCC
     lv_label_set_text(WifiName1, data_mgr_get_device_name());
@@ -236,35 +225,28 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     lv_obj_set_style_text_font(WifiName1, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* img = lv_img_create(CastPanel);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT); 
-    lv_obj_set_x(img, 1040);
-    lv_obj_set_y(img, 135);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+    lv_obj_set_pos(img, 1040, 135);
     lv_obj_set_align(img, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE); 
 
     if(CastType == SyncScreen_Miracast) {
         lv_obj_set_style_bg_img_src(CastPanel, &AndroidCast, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_x(WifiName1, 540);
-        lv_obj_set_y(WifiName1, -55);
+        lv_obj_set_pos(WifiName1, 540, -55);
         lv_img_set_src(img, &Android_QR);
 
         img = lv_img_create(CastPanel);
         lv_img_set_src(img, mira_img_src[DefaultLanguageIndex]);
-        lv_obj_set_width(img, LV_SIZE_CONTENT);
-        lv_obj_set_height(img, LV_SIZE_CONTENT); 
-        lv_obj_set_x(img, 10);
-        lv_obj_set_y(img, 20);
+        lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+        lv_obj_set_pos(img, 10, 20);
         lv_obj_set_align(img, LV_ALIGN_TOP_LEFT);
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
         lv_obj_t* text1_lab = lv_label_create(CastPanel);
-        lv_obj_set_width(text1_lab, 780);   /// 1
-        lv_obj_set_height(text1_lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(text1_lab, 90);
-        lv_obj_set_y(text1_lab, 410);
+        lv_obj_set_size(text1_lab, 780, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(text1_lab, 90, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
 
         text1_lab->user_data = (void*)"cast_mira_str1";
@@ -278,10 +260,8 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text2_lab = lv_label_create(CastPanel);
-        lv_obj_set_width(text2_lab, 1280);   /// 1
-        lv_obj_set_height(text2_lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(text2_lab, -10);
-        lv_obj_set_y(text2_lab, 580);
+        lv_obj_set_size(text2_lab, 1280, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(text2_lab, -10, 580);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
         text2_lab->user_data = (void*)"cast_mira_str2";
         lv_label_set_text(text2_lab, _(static_cast<const char*>(text2_lab->user_data)));
@@ -295,35 +275,28 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     }
     else {
         lv_obj_set_style_bg_img_src(CastPanel, &iOSCast, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_x(WifiName1, 130);
-        lv_obj_set_y(WifiName1, -116);
+        lv_obj_set_pos(WifiName1, 130, -116);
         lv_img_set_src(img, &iOS_QR);
 
         img = lv_img_create(CastPanel);
         lv_img_set_src(img, airplay_img_src[DefaultLanguageIndex]);
-        lv_obj_set_width(img, LV_SIZE_CONTENT);
-        lv_obj_set_height(img, LV_SIZE_CONTENT); 
-        lv_obj_set_x(img, 10);
-        lv_obj_set_y(img, 20);
+        lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+        lv_obj_set_pos(img, 10, 20);
         lv_obj_set_align(img, LV_ALIGN_TOP_LEFT);
         lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);
 
         RouterStatusImg = lv_img_create(CastPanel);
         lv_img_set_src(RouterStatusImg, &router_disconnected);
-        lv_obj_set_width(RouterStatusImg, LV_SIZE_CONTENT);
-        lv_obj_set_height(RouterStatusImg, LV_SIZE_CONTENT); 
-        lv_obj_set_x(RouterStatusImg, 900);
-        lv_obj_set_y(RouterStatusImg, 20);
+        lv_obj_set_size(RouterStatusImg, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+        lv_obj_set_pos(RouterStatusImg, 900, 20);
         lv_obj_set_align(RouterStatusImg, LV_ALIGN_TOP_LEFT);
         lv_obj_add_flag(RouterStatusImg, LV_OBJ_FLAG_ADV_HITTEST);
         lv_obj_clear_flag(RouterStatusImg, LV_OBJ_FLAG_SCROLLABLE);
 
         lv_obj_t* WifiName2 = lv_label_create(CastPanel);
-        lv_obj_set_width(WifiName2, LV_SIZE_CONTENT);   /// 1
-        lv_obj_set_height(WifiName2, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(WifiName2, 945);
-        lv_obj_set_y(WifiName2, -90);
+        lv_obj_set_size(WifiName2, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(WifiName2, 945, -90);
         lv_obj_set_align(WifiName2, LV_ALIGN_LEFT_MID);
         #ifdef HCCHIP_GCC
         lv_label_set_text(WifiName2, data_mgr_get_device_name());
@@ -333,10 +306,8 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_font(WifiName2, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text1_lab = lv_label_create(CastPanel);
-        lv_obj_set_width(text1_lab, 880);   /// 1
-        lv_obj_set_height(text1_lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(text1_lab, 90);
-        lv_obj_set_y(text1_lab, 410);
+        lv_obj_set_size(text1_lab, 880, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(text1_lab, 90, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
         text1_lab->user_data = (void*)"cast_airplay_str1";
         #ifdef HCCHIP_GCC
@@ -349,10 +320,8 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text2_lab = lv_label_create(CastPanel);
-        lv_obj_set_width(text2_lab, 780);   /// 1
-        lv_obj_set_height(text2_lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(text2_lab, 90);
-        lv_obj_set_y(text2_lab, 445);
+        lv_obj_set_size(text2_lab, 780, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(text2_lab, 90, 445);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
         text2_lab->user_data = (void*)"cast_airplay_str2";
         #ifdef HCCHIP_GCC
@@ -365,10 +334,8 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text3_lab = lv_label_create(CastPanel);
-        lv_obj_set_width(text3_lab, 1280);   /// 1
-        lv_obj_set_height(text3_lab, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(text3_lab, 60);
-        lv_obj_set_y(text3_lab, 580);
+        lv_obj_set_size(text3_lab, 1280, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(text3_lab, 60, 580);
         lv_obj_set_align(text3_lab, LV_ALIGN_TOP_LEFT);
         text3_lab->user_data = (void*)"cast_airplay_str3";
         lv_label_set_text(text3_lab, _(static_cast<const char*>(text3_lab->user_data)));

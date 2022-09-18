@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-16 22:59:16
+ * @LastEditTime: 2022-09-19 00:14:29
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -92,10 +92,8 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     //SaveCurrentLanguageType(DefaultLanguageIndex);
 
     MainPanel = lv_obj_create(LanguageRootScreen);
-    lv_obj_set_width(MainPanel, 540);
-    lv_obj_set_height(MainPanel, 520);
-    lv_obj_set_x(MainPanel, 240);
-    lv_obj_set_y(MainPanel, 0);
+    lv_obj_set_size(MainPanel, 540, 520);
+    lv_obj_set_pos(MainPanel, 240, 0);
     lv_obj_set_align(MainPanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(MainPanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(MainPanel, LV_DIR_VER);
@@ -107,8 +105,7 @@ static void CreateLanguagePanel(lv_obj_t* parent)
     set_group_activity(MainGroup);
     for (int i = 0; i < LanguageNumber; i++) {
         lv_obj_t* obj = lv_obj_create(MainPanel);
-        lv_obj_set_width(obj, 500);
-        lv_obj_set_height(obj, 92);
+        lv_obj_set_size(obj, 500, 92);
         lv_obj_set_align(obj, LV_ALIGN_CENTER);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -121,10 +118,8 @@ static void CreateLanguagePanel(lv_obj_t* parent)
         lv_obj_add_event_cb(obj, event_handler, LV_EVENT_ALL, NULL);
 
         lv_obj_t* text = lv_label_create(obj);
-        lv_obj_set_width(text, LV_SIZE_CONTENT);
-        lv_obj_set_height(text, LV_SIZE_CONTENT);
-        lv_obj_set_x(text, 0);
-        lv_obj_set_y(text, 0);
+        lv_obj_set_size(text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_pos(text, 0, 0);
         lv_obj_set_align(text, LV_ALIGN_CENTER);
         text->user_data = (void*)language_list[i];
         lv_label_set_text(text, _(language_list[i]));
@@ -147,26 +142,20 @@ static void LanguageInit(void)
 
     LangImage = lv_img_create(LanguageRootScreen);
     lv_img_set_src(LangImage, &ui_img_install_bg_eng_png);
-    lv_obj_set_width(LangImage, LV_SIZE_CONTENT);
-    lv_obj_set_height(LangImage, LV_SIZE_CONTENT);
-    lv_obj_set_x(LangImage, -260);
-    lv_obj_set_y(LangImage, -15);
+    lv_obj_set_size(LangImage, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(LangImage, -260, -15);
     lv_obj_set_align(LangImage, LV_ALIGN_CENTER);
 
     lv_obj_t* img = lv_img_create(LanguageRootScreen);
     lv_img_set_src(img, &ui_img_img_arrow_down2_png);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT);
-    lv_obj_set_x(img, 240);
-    lv_obj_set_y(img, 310);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(img, 240, 310);
     lv_obj_set_align(img, LV_ALIGN_CENTER);
 
     img = lv_img_create(LanguageRootScreen);
     lv_img_set_src(img, &ui_img_img_arrow_up2_png);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT);
-    lv_obj_set_x(img, 240);
-    lv_obj_set_y(img, -310);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(img, 240, -310);
     lv_obj_set_align(img, LV_ALIGN_CENTER);
 
     CreateLanguagePanel(LanguageRootScreen);

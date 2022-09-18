@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 22:44:18
+ * @LastEditTime: 2022-09-19 01:05:59
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -167,7 +167,6 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, int btn_num, MsgBoxF
             lv_obj_set_x(btn_ok, -100);
         else
             lv_obj_set_x(btn_ok, 0);
-        //lv_obj_set_pos(btn_ok, -100, 60);
         lv_obj_set_style_border_color(btn_ok, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_opa(btn_ok, 255, LV_PART_MAIN | LV_STATE_FOCUSED);
         lv_obj_set_style_border_width(btn_ok, 3, LV_PART_MAIN | LV_STATE_FOCUSED);
@@ -214,26 +213,21 @@ lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, int btn_num, MsgBoxF
 lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func)
 {
     lv_obj_t* SpinBox = lv_obj_create(parent);
-    lv_obj_set_width(SpinBox, 500);
-    lv_obj_set_height(SpinBox, 300);
+    lv_obj_set_size(SpinBox, 500, 300);
     lv_obj_set_align(SpinBox, LV_ALIGN_CENTER);
     lv_obj_clear_flag(SpinBox, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     SpinBox->user_data = reinterpret_cast<void*>(func);
 
     lv_obj_t* title_lab = lv_label_create(SpinBox);
-    lv_obj_set_width(title_lab, LV_SIZE_CONTENT);   /// 1
-    lv_obj_set_height(title_lab, LV_SIZE_CONTENT);    /// 1
-    lv_obj_set_x(title_lab, 0);
-    lv_obj_set_y(title_lab, 70);
+    lv_obj_set_size(title_lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
+    lv_obj_set_pos(title_lab, 0, 70);
     lv_obj_set_align(title_lab, LV_ALIGN_CENTER);
     lv_label_set_text(title_lab, title);
     lv_obj_set_style_text_font(title_lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* spinner = lv_spinner_create(SpinBox, 1000, 90);
-    lv_obj_set_width(spinner, 60);
-    lv_obj_set_height(spinner, 60);
-    lv_obj_set_x(spinner, 0);
-    lv_obj_set_y(spinner, -40);
+    lv_obj_set_size(spinner, 60, 60);
+    lv_obj_set_pos(spinner, 0, -40);
     lv_obj_set_align(spinner, LV_ALIGN_CENTER);
     lv_obj_clear_flag(spinner, LV_OBJ_FLAG_CLICKABLE);      /// Flags
 
@@ -314,10 +308,8 @@ lv_obj_t* CreateLoadingScreen(lv_obj_t* parent)
     if (lv_obj_is_valid(LoadingPanel))
         return LoadingPanel;
     LoadingPanel = lv_obj_create(parent);//lv_scr_act()
-    lv_obj_set_width(LoadingPanel, 1280);
-    lv_obj_set_height(LoadingPanel, 720);
-    lv_obj_set_x(LoadingPanel, 0);
-    lv_obj_set_y(LoadingPanel, 0);
+    lv_obj_set_size(LoadingPanel, 1280, 720);
+    lv_obj_set_pos(LoadingPanel, 0, 0);
     lv_obj_set_align(LoadingPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(LoadingPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -327,10 +319,8 @@ lv_obj_t* CreateLoadingScreen(lv_obj_t* parent)
     lv_obj_set_style_border_opa(LoadingPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* Spinner = lv_spinner_create(LoadingPanel, 1000, 90);
-    lv_obj_set_width(Spinner, 80);
-    lv_obj_set_height(Spinner, 80);
-    lv_obj_set_x(Spinner, 0);
-    lv_obj_set_y(Spinner, 0);
+    lv_obj_set_size(Spinner, 80, 80);
+    lv_obj_set_pos(Spinner, 0, 0);
     lv_obj_set_align(Spinner, LV_ALIGN_CENTER);
     lv_obj_clear_flag(Spinner, LV_OBJ_FLAG_CLICKABLE);
     return LoadingPanel;
@@ -396,10 +386,8 @@ void ProcessSysMsg(void)
     {
         lv_obj_t* obj = CreateLoadingScreen(lv_scr_act());
         lv_obj_t* text = lv_label_create(obj);
-        lv_obj_set_width(text, LV_SIZE_CONTENT);   /// 1
-        lv_obj_set_height(text, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_x(text, 0);
-        lv_obj_set_y(text, 80);
+        lv_obj_set_size(text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_pos(text, 0, 80);
         lv_obj_set_align(text, LV_ALIGN_CENTER);
         lv_label_set_text(text, _("cast_connecting"));
         lv_obj_set_style_text_color(text, lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);

@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:14:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:21:37
+ * @LastEditTime: 2022-09-19 01:07:08
  * @FilePath: /gui/application/ui/media/Text.cpp
  * @Description: None
  * @other: None
@@ -120,8 +120,7 @@ static void CreateTextWindow(lv_obj_t* parent)
 static void CreateTextPanel(lv_obj_t* parent)
 {
     TextPanel = lv_obj_create(parent);
-    lv_obj_set_width(TextPanel, 1280);
-    lv_obj_set_height(TextPanel, 720);
+    lv_obj_set_size(TextPanel, 1280, 720);
     lv_obj_set_align(TextPanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(TextPanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(TextPanel, LV_DIR_HOR);
@@ -134,10 +133,8 @@ static void CreateTextPanel(lv_obj_t* parent)
     int page = TextBuff->size();
     for(int i = 0; i < page; ++i) {
         lv_obj_t* obj = lv_obj_create(TextPanel);
-        lv_obj_set_width(obj, 1280);
-        lv_obj_set_height(obj, 720);
-        lv_obj_set_x(obj, i * 1280);
-        lv_obj_set_y(obj, 0);
+        lv_obj_set_size(obj, 1280, 720);
+        lv_obj_set_pos(obj, i * 1280, 0);
         lv_obj_set_align(obj, LV_ALIGN_CENTER);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -146,8 +143,7 @@ static void CreateTextPanel(lv_obj_t* parent)
         lv_obj_add_event_cb(obj, key_event_handler, LV_EVENT_KEY, NULL);
 
         lv_obj_t* ui_Label = lv_label_create(obj);
-        lv_obj_set_width(ui_Label, TextLabWidth);
-        lv_obj_set_height(ui_Label, 680);
+        lv_obj_set_size(ui_Label, TextLabWidth, 680);
         lv_obj_set_align(ui_Label, LV_ALIGN_TOP_MID);
         lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_label_set_text(ui_Label, TextBuff->at(i).c_str());

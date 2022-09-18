@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-18 23:07:10
+ * @LastEditTime: 2022-09-19 01:06:42
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -560,18 +560,14 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     };
 
     PlayBar = lv_obj_create(parent);
-    lv_obj_set_width(PlayBar, 1260);
-    lv_obj_set_height(PlayBar, 150);
-    lv_obj_set_x(PlayBar, 0);
-    lv_obj_set_y(PlayBar, 300);
+    lv_obj_set_size(PlayBar, 1260, 150);
+    lv_obj_set_pos(PlayBar, 0, 300);
     lv_obj_set_align(PlayBar, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj = lv_label_create(PlayBar);
-    lv_obj_set_width(lv_obj, LV_SIZE_CONTENT);
-    lv_obj_set_height(lv_obj, LV_SIZE_CONTENT);
-    lv_obj_set_x(lv_obj, -550);
-    lv_obj_set_y(lv_obj, -50);
+    lv_obj_set_size(lv_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(lv_obj, -550, -50);
     lv_obj_set_align(lv_obj, LV_ALIGN_CENTER);
     lv_label_set_text(lv_obj, "00:00:00");
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -579,17 +575,13 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj = lv_slider_create(PlayBar);
     lv_slider_set_value(lv_obj, 0, LV_ANIM_OFF);
     if(lv_slider_get_mode(lv_obj) == LV_SLIDER_MODE_RANGE) lv_slider_set_left_value(lv_obj, 0, LV_ANIM_OFF);
-    lv_obj_set_width(lv_obj, 900);
-    lv_obj_set_height(lv_obj, 7);
-    lv_obj_set_x(lv_obj, 0);
-    lv_obj_set_y(lv_obj, -50);
+    lv_obj_set_size(lv_obj, 900, 7);
+    lv_obj_set_pos(lv_obj, 0, -50);
     lv_obj_set_align(lv_obj, LV_ALIGN_CENTER);
 
     lv_obj = lv_label_create(PlayBar);
-    lv_obj_set_width(lv_obj, LV_SIZE_CONTENT);
-    lv_obj_set_height(lv_obj, LV_SIZE_CONTENT);
-    lv_obj_set_x(lv_obj, 540);
-    lv_obj_set_y(lv_obj, -50);
+    lv_obj_set_size(lv_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(lv_obj, 540, -50);
     lv_obj_set_align(lv_obj, LV_ALIGN_CENTER);
     lv_label_set_text(lv_obj, "00:00:00");
     lv_obj_set_style_text_font(lv_obj, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -639,19 +631,15 @@ static void SetTotalTimeAndProgress(uint32_t total_time)
 static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int file_number)
 {
     PlayListPanel = lv_obj_create(lv_scr_act());
-    lv_obj_set_width(PlayListPanel, 1280);
-    lv_obj_set_height(PlayListPanel, 682);
-    lv_obj_set_x(PlayListPanel, 0);
-    lv_obj_set_y(PlayListPanel, 705);
+    lv_obj_set_size(PlayListPanel, 1280, 682);
+    lv_obj_set_pos(PlayListPanel, 0, 705);
     lv_obj_set_align(PlayListPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayListPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(PlayListPanel, 40, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* PlayListInfo = lv_obj_create(PlayListPanel);
-    lv_obj_set_width(PlayListInfo, 647);
-    lv_obj_set_height(PlayListInfo, 64);
-    lv_obj_set_x(PlayListInfo, -300);
-    lv_obj_set_y(PlayListInfo, -300);
+    lv_obj_set_size(PlayListInfo, 647, 64);
+    lv_obj_set_pos(PlayListInfo, -300, -300);
     lv_obj_set_align(PlayListInfo, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayListInfo, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_bg_opa(PlayListInfo, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -659,29 +647,23 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
 
     lv_obj_t* PlayListMode_IMG = lv_img_create(PlayListInfo);
     lv_img_set_src(PlayListMode_IMG, play_mode_image_src[CurrentPlayMode]);
-    lv_obj_set_width(PlayListMode_IMG, LV_SIZE_CONTENT);
-    lv_obj_set_height(PlayListMode_IMG, LV_SIZE_CONTENT);
-    lv_obj_set_x(PlayListMode_IMG, 0);
-    lv_obj_set_y(PlayListMode_IMG, 0);
+    lv_obj_set_size(PlayListMode_IMG, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(PlayListMode_IMG, 0, 0);
     lv_obj_set_align(PlayListMode_IMG, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(PlayListMode_IMG, LV_OBJ_FLAG_ADV_HITTEST);
     lv_obj_clear_flag(PlayListMode_IMG, LV_OBJ_FLAG_SCROLLABLE);
 
     lv_obj_t* PlayListMode_LAB = lv_label_create(PlayListInfo);
-    lv_obj_set_width(PlayListMode_LAB, LV_SIZE_CONTENT);
-    lv_obj_set_height(PlayListMode_LAB, LV_SIZE_CONTENT);
-    lv_obj_set_x(PlayListMode_LAB, 79);
-    lv_obj_set_y(PlayListMode_LAB, 0);
+    lv_obj_set_size(PlayListMode_LAB, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+    lv_obj_set_pos(PlayListMode_LAB, 79, 0);
     lv_obj_set_align(PlayListMode_LAB, LV_ALIGN_LEFT_MID);
 
     lv_label_set_text_fmt(PlayListMode_LAB, _p("songs", file_number), file_number);
     lv_obj_set_style_text_font(PlayListMode_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* FileListPanel = lv_obj_create(PlayListPanel);
-    lv_obj_set_width(FileListPanel, 1280);
-    lv_obj_set_height(FileListPanel, 535);
-    lv_obj_set_x(FileListPanel, 0);
-    lv_obj_set_y(FileListPanel, -5);
+    lv_obj_set_size(FileListPanel, 1280, 535);
+    lv_obj_set_pos(FileListPanel, 0, -5);
     lv_obj_set_align(FileListPanel, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(FileListPanel, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_style_bg_opa(FileListPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -691,8 +673,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     set_group_activity(MainGroup);
     for(int i = 0; i < file_number; i++) {
         lv_obj_t* file_panel = lv_obj_create(FileListPanel);
-        lv_obj_set_width(file_panel, 1140);
-        lv_obj_set_height(file_panel, 75);
+        lv_obj_set_size(file_panel, 1140, 75);
         lv_obj_set_align(file_panel, LV_ALIGN_CENTER);
         lv_obj_clear_flag(file_panel, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_add_flag(file_panel, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
@@ -708,10 +689,8 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
         lv_obj_add_event_cb(file_panel, play_list_event_handler, LV_EVENT_KEY, NULL);
 
         lv_obj_t* file_name = lv_label_create(file_panel);
-        lv_obj_set_width(file_name, LV_SIZE_CONTENT);
-        lv_obj_set_height(file_name, LV_SIZE_CONTENT);
-        lv_obj_set_x(file_name, -12);
-        lv_obj_set_y(file_name, 0);
+        lv_obj_set_size(file_name, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_pos(file_name, -12, 0);
         lv_label_set_text(file_name, name_list[i]);
         lv_obj_set_style_text_font(file_name, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     }

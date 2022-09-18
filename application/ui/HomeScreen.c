@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 23:03:34
+ * @LastEditTime: 2022-09-19 00:10:55
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -200,10 +200,8 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_style_border_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     UdiskDetectPanel = lv_obj_create(parent);
-    lv_obj_set_width(UdiskDetectPanel, 200);
-    lv_obj_set_height(UdiskDetectPanel, 80);
-    lv_obj_set_x(UdiskDetectPanel, 520);
-    lv_obj_set_y(UdiskDetectPanel, -310);
+    lv_obj_set_size(UdiskDetectPanel, 200, 80);
+    lv_obj_set_pos(UdiskDetectPanel, 520, -310);
     lv_obj_set_align(UdiskDetectPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(UdiskDetectPanel, LV_OBJ_FLAG_SCROLLABLE); 
     lv_obj_set_style_bg_color(UdiskDetectPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -219,10 +217,8 @@ static void CreateMainPanel(lv_obj_t* parent)
 
     lv_obj_t* img = lv_img_create(UdiskDetectPanel);
     lv_img_set_src(img, &ui_img_usb_icon);
-    lv_obj_set_width(img, LV_SIZE_CONTENT);
-    lv_obj_set_height(img, LV_SIZE_CONTENT); 
-    lv_obj_set_x(img, 0);
-    lv_obj_set_y(img, 0);
+    lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+    lv_obj_set_pos(img, 0, 0);
     lv_obj_set_align(img, LV_ALIGN_LEFT_MID);
     lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);
     if (HasUsbDevice() == false)
@@ -230,10 +226,8 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE); 
 
     lv_obj_t* lab = lv_label_create(UdiskDetectPanel);
-    lv_obj_set_width(lab, LV_SIZE_CONTENT);
-    lv_obj_set_height(lab, LV_SIZE_CONTENT); 
-    lv_obj_set_x(lab, 0);
-    lv_obj_set_y(lab, 0);
+    lv_obj_set_size(lab, LV_SIZE_CONTENT, LV_SIZE_CONTENT); 
+    lv_obj_set_pos(lab, 0, 0);
     lv_obj_set_align(lab, LV_ALIGN_LEFT_MID);
     lab->user_data = (void*)"media_no_device";
     lv_label_set_text(lab, _(lab->user_data));

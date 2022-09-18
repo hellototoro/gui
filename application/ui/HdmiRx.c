@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-21 20:34:15
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 17:25:20
+ * @LastEditTime: 2022-09-19 00:11:42
  * @FilePath: /gui/application/ui/HdmiRx.c
  * @Description: None
  * @other: None
@@ -111,8 +111,6 @@ void AutoMoving_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_time(&a, 1000);
-    //lv_anim_set_user_data(&a, TargetObject);
-    //lv_anim_set_custom_exec_cb(&a, anim_callback_set_x);
     lv_anim_set_var(&a, TargetObject);
     lv_anim_set_exec_cb(&a, anim_callback_set_x);
     lv_anim_set_values(&a, 0, 500);
@@ -122,11 +120,8 @@ void AutoMoving_Animation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_get_value_cb(&a, &anim_callback_get_x);
     lv_anim_start(&a);
 
-    //lv_anim_t a;
     lv_anim_init(&a);
     lv_anim_set_time(&a, 1000);
-    //lv_anim_set_user_data(&a, TargetObject);
-    //lv_anim_set_custom_exec_cb(&a, anim_callback_set_y);
     lv_anim_set_var(&a, TargetObject);
     lv_anim_set_exec_cb(&a, anim_callback_set_y);
     lv_anim_set_values(&a, 0, 500);
@@ -157,10 +152,8 @@ void CreateHdmiRxScreen(void)
     lv_obj_set_style_border_opa(HdmiRxScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* lab = lv_label_create(HdmiRxScreen);
-    lv_obj_set_width(lab, 250);
-    lv_obj_set_height(lab, 60);
-    lv_obj_set_x(lab, 0);
-    lv_obj_set_y(lab, 0);
+    lv_obj_set_size(lab, 250, 60);
+    lv_obj_set_pos(lab, 0, 0);
     lv_obj_set_align(lab, LV_ALIGN_CENTER);
     lv_label_set_text(lab, _("hdmi_no_single"));
     lv_obj_set_style_text_letter_space(lab, 5, LV_PART_MAIN | LV_STATE_DEFAULT);
