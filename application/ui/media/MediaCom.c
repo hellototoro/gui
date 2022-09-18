@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:06:42
+ * @LastEditTime: 2022-09-19 01:25:13
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -512,33 +512,29 @@ static void PlayBarTimer_cb(lv_timer_t * timer)
 
 static void PlayedStateTimer_cb(lv_timer_t * timer)
 {
+    uint32_t played_time = 0;
     #ifdef HOST_GCC
     if (play_state == LV_FFMPEG_PLAYER_CMD_START)
         played_time_host++;
+    played_time = played_time_host;
+    #elif defined(HCCHIP_GCC)
+    if (current_media_hdl != NULL)
+        played_time = media_get_playtime(current_media_hdl);
     #endif
-    if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
+    if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
+        lv_timer_pause(timer);
         #ifdef HOST_GCC
-        uint32_t played_time = played_time_host;
-        #elif defined(HCCHIP_GCC)
-        uint32_t played_time = 0;
-        if (current_media_hdl != NULL)
-            played_time = media_get_playtime(current_media_hdl);
+        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
+        if (played_time_host == 0)
+            SetTotalTimeAndProgress(20);
         #endif
-        if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
-            lv_timer_pause(timer);
-            #ifdef HOST_GCC
-            PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
-            if (played_time_host == 0)
-                SetTotalTimeAndProgress(20);
-            #endif
-            return;
-        }
-        if(CurrentPlayingType == MEDIA_MUSIC) { //刷新歌词
-            RefreshLyric(played_time);
-        }
-        lv_label_set_text_fmt(lv_obj_get_child(PlayBar, PlayedTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, played_time / 3600, (played_time % 3600) / 60, played_time % 60);
-        lv_slider_set_value(lv_obj_get_child(PlayBar, ProgressSlider), played_time, LV_ANIM_ON);
+        return;
     }
+    if(CurrentPlayingType == MEDIA_MUSIC) { //刷新歌词
+        RefreshLyric(played_time);
+    }
+    lv_label_set_text_fmt(lv_obj_get_child(PlayBar, PlayedTime), "%02"LV_PRIu32":%02"LV_PRIu32":%02"LV_PRIu32, played_time / 3600, (played_time % 3600) / 60, played_time % 60);
+    lv_slider_set_value(lv_obj_get_child(PlayBar, ProgressSlider), played_time, LV_ANIM_ON);
 }
 
 lv_obj_t* CreatePlayBar(lv_obj_t* parent)
@@ -608,7 +604,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayList), play_list_image_src[CurrentPlayingType], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
     if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
-        PlayBar_Timer = lv_timer_create(PlayBarTimer_cb, 5*1000, NULL);
+        PlayBar_Timer = lv_timer_create(PlayBarTimer_cb, (5+1)*1000, NULL);
     }
     PlayState_Timer = lv_timer_create(PlayedStateTimer_cb, 1000, NULL);
     lv_timer_set_repeat_count(PlayState_Timer, -1);
