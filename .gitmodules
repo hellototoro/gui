@@ -1,9 +1,9 @@
 [submodule "lv_host_sim/lvgl"]
 	path = lv_host_sim/lvgl
-	url = https://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@github.com/hellototoro/lvgl.git/
+	url = https://github.com/hellototoro/lvgl.git/
 [submodule "lv_host_sim/lv_drivers"]
 	path = lv_host_sim/lv_drivers
-	url = https://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@github.com/hellototoro/lv_drivers.git/
+	url = https://github.com/hellototoro/lv_drivers.git/
 [submodule "lv_i18n"]
 	path = lv_i18n
 	url = https://github.com/hellototoro/lv_i18n.git

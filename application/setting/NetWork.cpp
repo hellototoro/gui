@@ -2,7 +2,7 @@
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
  * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:05:39
+ * @LastEditTime: 2022-09-19 15:06:08
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
@@ -24,7 +24,7 @@ static lv_obj_t* WiFiRefreshObj;
 static lv_obj_t* WiFiAvailableListPanel;
 static lv_obj_t* ConnectPanel;
 static lv_obj_t* PwdArea;
-static lv_obj_t* Checkbox;
+static lv_obj_t* CheckboxPanel;
 static lv_obj_t* Keyboard;
 static lv_group_t* MainGroup;
 static lv_coord_t AvailablePanelPos_y;
@@ -396,80 +396,62 @@ void CreateInputCodePanel(lv_obj_t* parent)
 void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
 {
     auto event_cb = [] (lv_event_t* event) {
-        lv_event_code_t code = lv_event_get_code(event);
         lv_obj_t* target = lv_event_get_current_target(event);
         lv_obj_t* l_parent = lv_obj_get_parent(target);
         lv_group_t* group = get_activity_group();
-        if(code == LV_EVENT_KEY) {
-            uint32_t value = lv_indev_get_key(lv_indev_get_act());
-            int index = lv_obj_get_index(target);
-            switch (value)
-            {
-                case LV_KEY_UP:
-                    if (target != lv_obj_get_child(ConnectPanel, 1))
-                        lv_group_focus_prev(group);
+        int index = lv_obj_get_index(target);
+        uint32_t value = lv_indev_get_key(lv_indev_get_act());
+        switch (value)
+        {
+            case LV_KEY_UP:
+                if (target != lv_obj_get_child(ConnectPanel, 1))
+                    lv_group_focus_prev(group);
+                break;
+            case LV_KEY_DOWN:
+                if (target != lv_obj_get_child(ConnectPanel, lv_obj_get_child_cnt(ConnectPanel) - 1))
+                    lv_group_focus_next(group);
+                break;
+            case LV_KEY_LEFT:
+                if (target == lv_obj_get_child(ConnectPanel, lv_obj_get_child_cnt(ConnectPanel) - 1))
+                    lv_group_focus_prev(group);
+                break;
+            case LV_KEY_RIGHT:
+                if (target == lv_obj_get_child(ConnectPanel, lv_obj_get_child_cnt(ConnectPanel) - 2))
+                    lv_group_focus_next(group);
+                break;
+            case LV_KEY_ENTER:
+                switch (index)
+                {
+                case WiFiConnectPanel_CodeArea://
+                    lv_obj_set_y(ConnectPanel, -150);//-150
+                    CreateInputCodePanel(WiFiPanel);
                     break;
-                case LV_KEY_DOWN:
-                    if (target != lv_obj_get_child(ConnectPanel, lv_obj_get_child_cnt(ConnectPanel) - 1))
-                        lv_group_focus_next(group);
+                case WiFiConnectPanel_Checkbox:
+                    
                     break;
-                case LV_KEY_LEFT:
-                    if (target == lv_obj_get_child(ConnectPanel, lv_obj_get_child_cnt(ConnectPanel) - 1))
-                        lv_group_focus_prev(group);
-                    break;
-                case LV_KEY_RIGHT:
-                    if (target == lv_obj_get_child(ConnectPanel, lv_obj_get_child_cnt(ConnectPanel) - 2))
-                        lv_group_focus_next(group);
-                    break;
-                case LV_KEY_ENTER:
-                    switch (index)
-                    {
-                    case WiFiConnectPanel_CodeArea://
-                        lv_obj_set_y(ConnectPanel, -150);//-150
-                        CreateInputCodePanel(WiFiPanel);
-                        break;
-                    case WiFiConnectPanel_Checkbox:
-
-                        break;
-                    case WiFiConnectPanel_Ok:
-                        memcpy(password, lv_textarea_get_text(PwdArea),20);
-                        #ifdef HCCHIP_GCC
-                        WiFi_Connect(static_cast<wifi_ap_info_t *>(l_parent->user_data));
-                        #else
-                        std::cout << "password: " << password << std::endl;
-                        #endif
-
-                        break;
-                    case WiFiConnectPanel_Cancel:
-                        delete_group(group);
-                        lv_obj_del_async(ConnectPanel);
-                        break;
-                    default:
-                        break;
-                    }
-                    break;
-                case LV_KEY_ESC:
-                    delete_group(group);
-                    lv_obj_del_async(ConnectPanel);
-                    break;
-                default:
-                    break;
-            }
-        }
-        else if (code == LV_EVENT_READY) {
-            if (target == PwdArea) {
-                if (lv_obj_is_valid(Keyboard)) {
+                case WiFiConnectPanel_Ok:
                     memcpy(password, lv_textarea_get_text(PwdArea),20);
                     #ifdef HCCHIP_GCC
                     WiFi_Connect(static_cast<wifi_ap_info_t *>(l_parent->user_data));
                     #else
                     std::cout << "password: " << password << std::endl;
                     #endif
+
+                    break;
+                case WiFiConnectPanel_Cancel:
                     delete_group(group);
-                    lv_obj_del_async(Keyboard);
-                    lv_obj_set_y(ConnectPanel, 0);//-150
+                    lv_obj_del_async(ConnectPanel);
+                    break;
+                default:
+                    break;
                 }
-            }
+                break;
+            case LV_KEY_ESC:
+                delete_group(group);
+                lv_obj_del_async(ConnectPanel);
+                break;
+            default:
+                break;
         }
     };
 
@@ -478,7 +460,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
 
     ConnectPanel = lv_obj_create(parent);
     lv_obj_set_size(ConnectPanel, 900, 400);
-    lv_obj_set_pos(ConnectPanel, 0, 0);//-150
+    lv_obj_set_pos(ConnectPanel, 0, 0);
     lv_obj_set_align(ConnectPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(ConnectPanel, LV_OBJ_FLAG_SCROLLABLE);
     ConnectPanel->user_data = wifi_info;
@@ -497,23 +479,47 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_textarea_set_text(PwdArea, "");
     lv_textarea_set_password_mode(PwdArea, true);
     lv_textarea_set_one_line(PwdArea, true);
-    //if("" == "") lv_textarea_set_accepted_chars(PwdArea, NULL);
-    //else lv_textarea_set_accepted_chars(PwdArea, "");
-    //lv_textarea_set_text(PwdArea, "");
     lv_textarea_set_placeholder_text(PwdArea, _("setting_p_code"));
     lv_obj_set_style_text_font(PwdArea, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_add_obj(MainGroup, PwdArea);
-    lv_obj_add_event_cb(PwdArea, event_cb, LV_EVENT_ALL, nullptr);
+    lv_obj_add_event_cb(PwdArea, event_cb, LV_EVENT_KEY, nullptr);
+    lv_obj_add_event_cb(PwdArea, [] (lv_event_t* event) {
+        lv_obj_t* target = lv_event_get_current_target(event);
+        lv_obj_t* parent = lv_obj_get_parent(target);
+        if (lv_obj_is_valid(Keyboard)) {
+            memcpy(password, lv_textarea_get_text(target),20);
+            #ifdef HCCHIP_GCC
+            WiFi_Connect(static_cast<wifi_ap_info_t *>(parent->user_data));
+            #else
+            std::cout << "password: " << password << std::endl;
+            #endif
+            MainGroup = delete_group(MainGroup);
+            lv_obj_del_async(Keyboard);
+            lv_obj_set_y(ConnectPanel, 0);//-150
+        }
+    }, LV_EVENT_READY, nullptr);
 
-    Checkbox = lv_checkbox_create(ConnectPanel);
+
+    CheckboxPanel = lv_obj_create(ConnectPanel);
+    lv_obj_set_size(CheckboxPanel, 200, 50);
+    lv_obj_set_pos(CheckboxPanel, -210, 10);
+    lv_obj_set_align(CheckboxPanel, LV_ALIGN_CENTER);
+    lv_obj_clear_flag(CheckboxPanel, LV_OBJ_FLAG_SCROLLABLE);
+    lv_obj_add_event_cb(CheckboxPanel, event_cb, LV_EVENT_KEY, nullptr);
+
+    lv_obj_t* Checkbox = lv_checkbox_create(CheckboxPanel);
     lv_checkbox_set_text(Checkbox, _("setting_p_show_code"));
     lv_obj_set_size(Checkbox, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
-    lv_obj_set_pos(Checkbox, -220, 10);
+    //lv_obj_set_pos(Checkbox, -220, 10);
     lv_obj_set_align(Checkbox, LV_ALIGN_CENTER);
-    lv_obj_add_flag(Checkbox, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+    //lv_obj_add_flag(Checkbox, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
     lv_obj_set_style_text_font(Checkbox, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_group_add_obj(MainGroup, Checkbox);
-    lv_obj_add_event_cb(Checkbox, event_cb, LV_EVENT_KEY, nullptr);
+    lv_obj_add_event_cb(Checkbox, [] (lv_event_t* event) {
+        lv_obj_t* target = lv_event_get_current_target(event);
+        bool show_code = lv_obj_get_state(target) & LV_STATE_CHECKED ? false : true;
+        lv_textarea_set_password_mode(PwdArea, show_code);
+    }, LV_EVENT_VALUE_CHANGED, nullptr);
 
     lv_obj_t* ConnectButton = lv_btn_create(ConnectPanel);
     lv_obj_set_size(ConnectButton, 100, 50);
