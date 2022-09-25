@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-28 21:18:24
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 00:22:14
  * @FilePath: /gui/application/ui/SyncScreen.cpp
  * @Description: None
  * @other: None
@@ -102,7 +100,7 @@ void CreateSyncScreen(lv_obj_t* parent)
     };
 
     SyncSubScreen = lv_obj_create(parent);
-    lv_obj_set_size(SyncSubScreen, 1280, 720);
+    lv_obj_set_size(SyncSubScreen, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_style_radius(SyncSubScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_clear_flag(SyncSubScreen, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
     lv_obj_set_style_border_width(SyncSubScreen, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -190,7 +188,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     MainGroup = create_new_group();
     set_group_activity(MainGroup);
     CastPanel = lv_obj_create(parent);
-    lv_obj_set_size(CastPanel, 1280, 720);
+    lv_obj_set_size(CastPanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_clear_flag(CastPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(CastPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(CastPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -260,7 +258,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text2_lab = lv_label_create(CastPanel);
-        lv_obj_set_size(text2_lab, 1280, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_size(text2_lab, LV_HOR_RES, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_pos(text2_lab, -10, 580);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
         text2_lab->user_data = (void*)"cast_mira_str2";
@@ -334,7 +332,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text3_lab = lv_label_create(CastPanel);
-        lv_obj_set_size(text3_lab, 1280, LV_SIZE_CONTENT);    /// 1
+        lv_obj_set_size(text3_lab, LV_HOR_RES, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_pos(text3_lab, 60, 580);
         lv_obj_set_align(text3_lab, LV_ALIGN_TOP_LEFT);
         text3_lab->user_data = (void*)"cast_airplay_str3";

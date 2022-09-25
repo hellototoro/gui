@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 20:21:23
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:06:57
  * @FilePath: /gui/application/ui/media/Music.cpp
  * @Description: None
  * @other: None
@@ -159,7 +157,7 @@ static void SetStyleForPlayBar(lv_obj_t* bar)
 static void CreateMusicWindow(lv_obj_t* parent)
 {
     MusicWindow = lv_obj_create(parent);
-    lv_obj_set_size(MusicWindow, 1280, 720);
+    lv_obj_set_size(MusicWindow, LV_HOR_RES, LV_VER_RES);
     lv_obj_center(MusicWindow);
     lv_obj_set_style_radius(MusicWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_clear_flag(MusicWindow, LV_OBJ_FLAG_SCROLLABLE);

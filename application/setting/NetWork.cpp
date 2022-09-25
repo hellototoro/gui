@@ -92,7 +92,7 @@ void CreateNetWorkPanel(lv_obj_t* parent)
     };
 
     NetWorkPanel = lv_obj_create(parent);
-    lv_obj_set_size(NetWorkPanel, 1280, 720);
+    lv_obj_set_size(NetWorkPanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_center(NetWorkPanel);
     lv_obj_clear_flag(NetWorkPanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_border_color(NetWorkPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -194,7 +194,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     };
     
     WiFiPanel = lv_obj_create(parent);
-    lv_obj_set_size(WiFiPanel, 1280, 720);
+    lv_obj_set_size(WiFiPanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_pos(WiFiPanel, 0, 0);
     lv_obj_set_align(WiFiPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(WiFiPanel, LV_OBJ_FLAG_SCROLLABLE);

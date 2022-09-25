@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-07-05 11:14:24
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:07:08
  * @FilePath: /gui/application/ui/media/Text.cpp
  * @Description: None
  * @other: None
@@ -23,7 +21,7 @@ lv_obj_t* TextName;
 lv_group_t* Text_Group;
 static constexpr lv_coord_t letter_space = 4;
 static constexpr lv_coord_t line_space = 10;
-static constexpr lv_coord_t TextLabWidth = 1240;
+static lv_coord_t TextLabWidth;
 std::vector<std::string> *TextBuff;
 std::string buff;
 
@@ -34,6 +32,8 @@ static void LoadText(char* file_name);
 
 void creat_text_window(lv_obj_t* parent, char* file_name)
 {
+    TextLabWidth = LV_HOR_RES * 0.96875;
+
     Text_Group = create_new_group();
     set_group_activity(Text_Group);
 
@@ -106,7 +106,7 @@ static void key_event_handler(lv_event_t* event)
 static void CreateTextWindow(lv_obj_t* parent)
 {
     TextWindow = lv_obj_create(parent);
-    lv_obj_set_size(TextWindow, 1280, 720);
+    lv_obj_set_size(TextWindow, LV_HOR_RES, LV_VER_RES);
     lv_obj_center(TextWindow);
     lv_obj_set_style_radius(TextWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_clear_flag(TextWindow, LV_OBJ_FLAG_SCROLLABLE);
@@ -120,7 +120,7 @@ static void CreateTextWindow(lv_obj_t* parent)
 static void CreateTextPanel(lv_obj_t* parent)
 {
     TextPanel = lv_obj_create(parent);
-    lv_obj_set_size(TextPanel, 1280, 720);
+    lv_obj_set_size(TextPanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_align(TextPanel, LV_ALIGN_CENTER);
     lv_obj_set_scrollbar_mode(TextPanel, LV_SCROLLBAR_MODE_OFF);
     lv_obj_set_scroll_dir(TextPanel, LV_DIR_HOR);
@@ -133,8 +133,8 @@ static void CreateTextPanel(lv_obj_t* parent)
     int page = TextBuff->size();
     for(int i = 0; i < page; ++i) {
         lv_obj_t* obj = lv_obj_create(TextPanel);
-        lv_obj_set_size(obj, 1280, 720);
-        lv_obj_set_pos(obj, i * 1280, 0);
+        lv_obj_set_size(obj, LV_HOR_RES, LV_VER_RES);
+        lv_obj_set_pos(obj, i * LV_HOR_RES, 0);
         lv_obj_set_align(obj, LV_ALIGN_CENTER);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);

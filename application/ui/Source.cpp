@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-09-10 13:41:27
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 22:38:41
  * @FilePath: /gui/application/ui/Source.cpp
  * @Description: None
  * @other: None
@@ -70,7 +68,7 @@ static void source_event_handler(lv_event_t* event)
 void CreateSourcePanel(lv_obj_t* parent)
 {
     SourcePanel = lv_obj_create(parent);
-    lv_obj_set_size(SourcePanel, 1280, 720);
+    lv_obj_set_size(SourcePanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_clear_flag(SourcePanel, LV_OBJ_FLAG_SCROLLABLE);
     lv_obj_set_style_radius(SourcePanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_color(SourcePanel, lv_color_hex(0x3500FE), LV_PART_MAIN | LV_STATE_DEFAULT);

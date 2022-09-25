@@ -188,7 +188,7 @@ static void CreateMainPanel(lv_obj_t* parent)
         & ui_img_home_new_setting_png };
 
     MainPanel = lv_obj_create(parent);
-    lv_obj_set_size(MainPanel, 1280, 720);
+    lv_obj_set_size(MainPanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_pos(MainPanel, 0, 0);
     lv_obj_set_align(MainPanel, LV_ALIGN_CENTER);
     lv_obj_set_style_bg_opa(MainPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -267,7 +267,7 @@ static void CreateMainPanel(lv_obj_t* parent)
 static void HomeInit(void)
 {
     HomeRootScreen = lv_obj_create(NULL);
-    lv_obj_set_size(HomeRootScreen, 1280, 720);
+    lv_obj_set_size(HomeRootScreen, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_style_bg_color(HomeRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     #ifdef HCCHIP_GCC

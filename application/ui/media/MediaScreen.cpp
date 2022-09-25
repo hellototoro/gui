@@ -440,7 +440,7 @@ static void MediaInit(void)
     lv_obj_clear_flag(MediaRootScreen, LV_OBJ_FLAG_SCROLLABLE);
 
     MediaSubScreen = lv_obj_create(MediaRootScreen);
-    lv_obj_set_size(MediaSubScreen, 1280, 720);
+    lv_obj_set_size(MediaSubScreen, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_pos(MediaSubScreen, 0, 0);
     lv_obj_set_align(MediaSubScreen, LV_ALIGN_CENTER);
     lv_obj_clear_flag(MediaSubScreen, LV_OBJ_FLAG_SCROLLABLE);

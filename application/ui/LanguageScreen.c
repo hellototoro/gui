@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 00:14:29
  * @FilePath: /gui/application/ui/LanguageScreen.c
  * @Description: None
  * @other: None
@@ -136,7 +134,7 @@ static void CreateLanguagePanel(lv_obj_t* parent)
 static void LanguageInit(void)
 {
     LanguageRootScreen = lv_obj_create(NULL);
-    lv_obj_set_size(LanguageRootScreen, 1280, 720);
+    lv_obj_set_size(LanguageRootScreen, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_style_bg_color(LanguageRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(LanguageRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
 

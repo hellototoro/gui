@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
- * @LastEditors: Please set LastEditors
- * @LastEditTime: 2022-09-21 12:39:37
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -628,7 +626,7 @@ static void SetTotalTimeAndProgress(uint32_t total_time)
 static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int file_number)
 {
     PlayListPanel = lv_obj_create(lv_scr_act());
-    lv_obj_set_size(PlayListPanel, 1280, 682);
+    lv_obj_set_size(PlayListPanel, LV_HOR_RES, 682);
     lv_obj_set_pos(PlayListPanel, 0, 705);
     lv_obj_set_align(PlayListPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayListPanel, LV_OBJ_FLAG_SCROLLABLE);
@@ -659,7 +657,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_style_text_font(PlayListMode_LAB, &ui_font_MyFont34, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* FileListPanel = lv_obj_create(PlayListPanel);
-    lv_obj_set_size(FileListPanel, 1280, 535);
+    lv_obj_set_size(FileListPanel, LV_HOR_RES, 535);
     lv_obj_set_pos(FileListPanel, 0, -5);
     lv_obj_set_align(FileListPanel, LV_ALIGN_CENTER);
     lv_obj_set_flex_flow(FileListPanel, LV_FLEX_FLOW_COLUMN);

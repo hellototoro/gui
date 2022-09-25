@@ -305,8 +305,8 @@ lv_obj_t* CreateLoadingScreen(lv_obj_t* parent)
 {
     if (lv_obj_is_valid(LoadingPanel))
         return LoadingPanel;
-    LoadingPanel = lv_obj_create(parent);//lv_scr_act()
-    lv_obj_set_size(LoadingPanel, 1280, 720);
+    LoadingPanel = lv_obj_create(parent);
+    lv_obj_set_size(LoadingPanel, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_pos(LoadingPanel, 0, 0);
     lv_obj_set_align(LoadingPanel, LV_ALIGN_CENTER);
     lv_obj_clear_flag(LoadingPanel, LV_OBJ_FLAG_SCROLLABLE);
