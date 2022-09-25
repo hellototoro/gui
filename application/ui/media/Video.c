@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-12 18:49:59
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 19:55:25
  * @FilePath: /gui/application/ui/media/Video.c
  * @Description: None
  * @other: None
@@ -75,9 +73,6 @@ static void SetStyleForPlayBar(lv_obj_t* bar)
     lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(lv_obj_get_child(bar, PlayedTime), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_text_color(lv_obj_get_child(bar, TotalTime), lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
-    #ifdef USB_PLUG_TEST
-    USB_PlugTest(bar);
-    #endif
 }
 
 

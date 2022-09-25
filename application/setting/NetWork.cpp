@@ -1,14 +1,11 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-15 13:36:10
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 20:09:25
  * @FilePath: /gui/application/setting/NetWork.cpp
  * @Description: None
  * @other: None
  */
 #include <string.h>
-#include <iostream>
 #include <string>
 #include <pthread.h>
 #include "NetWork.h"
@@ -161,9 +158,6 @@ void CreateNetWorkPanel(lv_obj_t* parent)
 
 void CreateWiFiPanel(lv_obj_t* parent)
 {
-    lv_obj_t* panel;
-    lv_obj_t* lab;
-    lv_obj_t* img;
     auto event_cb = [] (lv_event_t* event) {
         lv_obj_t* target = lv_event_get_current_target(event);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
@@ -221,7 +215,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_color(WiFiControlPanel, lv_color_hex(0xFFFFFF), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(WiFiControlPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-    panel = lv_obj_create(WiFiControlPanel);
+    lv_obj_t* panel = lv_obj_create(WiFiControlPanel);
     lv_obj_set_size(panel, 980, 65);
     lv_obj_set_pos(panel, 0, -36);
     lv_obj_set_align(panel, LV_ALIGN_CENTER);
@@ -232,7 +226,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_group_add_obj(MainGroup, panel);
     lv_obj_add_event_cb(panel, event_cb, LV_EVENT_KEY, nullptr);
 
-    lab = lv_label_create(panel);
+    lv_obj_t* lab = lv_label_create(panel);
     lv_obj_set_size(lab, 600, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_pos(lab, -170, 0);
     lv_obj_set_align(lab, LV_ALIGN_CENTER);
@@ -310,7 +304,7 @@ void CreateWiFiPanel(lv_obj_t* parent)
         lv_obj_set_style_text_opa(lab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-        img = lv_img_create(panel);
+        lv_obj_t* img = lv_img_create(panel);
         lv_img_set_src(img, &ui_img_wifi_64_png);
         lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 64
         lv_obj_set_pos(img, 430, 0);
@@ -432,8 +426,6 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
                     memcpy(password, lv_textarea_get_text(PwdArea),20);
                     #ifdef HCCHIP_GCC
                     WiFi_Connect(static_cast<wifi_ap_info_t *>(l_parent->user_data));
-                    #else
-                    std::cout << "password: " << password << std::endl;
                     #endif
 
                     break;
@@ -468,7 +460,11 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_set_size(WiFiName, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(WiFiName, 0, -135);
     lv_obj_set_align(WiFiName, LV_ALIGN_CENTER);
+    #ifdef HCCHIP_GCC
+    lv_label_set_text(WiFiName, (static_cast<wifi_ap_info_t *>(wifi_info))->ssid);
+    #else
     lv_label_set_text(WiFiName, "HONOR");
+    #endif
     lv_obj_set_style_text_font(WiFiName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     PwdArea = lv_textarea_create(ConnectPanel);
@@ -489,8 +485,6 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
             memcpy(password, lv_textarea_get_text(target),20);
             #ifdef HCCHIP_GCC
             WiFi_Connect(static_cast<wifi_ap_info_t *>(parent->user_data));
-            #else
-            std::cout << "password: " << password << std::endl;
             #endif
             MainGroup = delete_group(MainGroup);
             lv_obj_del_async(Keyboard);
@@ -557,8 +551,6 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
 /* 本文件内函数 */
 static void WiFiRefreshAvailableList(void)
 {
-    lv_obj_t* lab;
-    lv_obj_t* img;
     auto event_cb = [] (lv_event_t* event) {
         lv_obj_t* target = lv_event_get_current_target(event);
         uint32_t value = lv_indev_get_key(lv_indev_get_act());
@@ -586,7 +578,7 @@ static void WiFiRefreshAvailableList(void)
     #ifdef HCCHIP_GCC
     wifi_ap_info_t *wifi_list = WiFi_GetAPList();
     ap_count = WiFi_GetAPCount();
-    if (wifi_list == nullptr) return;
+    if (wifi_list == nullptr || ap_count == 0) return;
     #else
     ap_count = 10;
     #endif
@@ -605,13 +597,13 @@ static void WiFiRefreshAvailableList(void)
             lv_group_add_obj(MainGroup, child);
             lv_obj_add_event_cb(child, event_cb, LV_EVENT_KEY, nullptr);
 
-            lab = lv_label_create(child);
+            lv_obj_t* lab = lv_label_create(child);
             lv_obj_set_size(lab, 600, LV_SIZE_CONTENT);    /// 1
             lv_obj_set_pos(lab, -170, 0);
             lv_obj_set_align(lab, LV_ALIGN_CENTER);
             lv_obj_set_style_text_font(lab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
-            img = lv_img_create(child);
+            lv_obj_t* img = lv_img_create(child);
             lv_img_set_src(img, &ui_img_wifi_64_png);
             lv_obj_set_size(img, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 64
             lv_obj_set_pos(img, 430, 0);

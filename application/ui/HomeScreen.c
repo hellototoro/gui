@@ -1,8 +1,6 @@
 ﻿/*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 00:10:55
  * @FilePath: /gui/application/ui/HomeScreen.c
  * @Description: None
  * @other: None
@@ -13,10 +11,8 @@
 #include <pthread.h>
 #include "HomeScreen.h"
 #include "application/windows.h"
-#include "Volume.h"
 #include "application/key_map.h"
 #include "SettingScreen.h"
-#include "HdmiRx.h"
 #include "SyncScreen.h"
 #include "application/ui/media/MediaScreen.h"
 #ifdef HCCHIP_GCC
@@ -120,7 +116,6 @@ static void key_event_handler(lv_event_t* event)
             break;
         case HOME_MIRRORING:
             ExitHome(SyncScreen);
-            //CreateSyncScreen(HomeRootScreen);
             break;
         default:
             break;
@@ -283,9 +278,6 @@ static void HomeInit(void)
     lv_obj_add_event_cb(HomeRootScreen, sys_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     CreateMainPanel(HomeRootScreen);
-    #ifdef USB_PLUG_TEST
-    USB_PlugTest(MainPanel);
-    #endif
 }
 
 static void LoadHome(void)

@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:26
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:14:19
  * @FilePath: /gui/application/ui/ui_com.h
  * @Description: None
  * @other: None
@@ -18,19 +16,9 @@
 extern "C" {
 #endif
 
-#define USB_PLUG_TEST
-#ifdef HCCHIP_GCC
-#undef USB_PLUG_TEST
-#endif
-#ifdef USB_PLUG_TEST
-extern int hotplug_usb_plugout(void);
-extern void USB_PlugTest(lv_obj_t* parent);
-#endif
 /*Define a message ID*/
 #define MSG_SHOW_WIFI_LIST      1
 #define MSG_HOTPLUG             2
-#define MSG_HOTPLUG_IN          3
-#define MSG_HOTPLUG_OUT         4
 #define MSG_EXIT_SCREEN         5
 
 typedef struct ObjNavigation

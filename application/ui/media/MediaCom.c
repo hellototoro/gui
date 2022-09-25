@@ -1,8 +1,8 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-13 13:31:24
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:25:13
+ * @LastEditors: Please set LastEditors
+ * @LastEditTime: 2022-09-21 12:39:37
  * @FilePath: /gui/application/ui/media/MediaCom.c
  * @Description: None
  * @other: None
@@ -483,6 +483,7 @@ static void play_list_event_handler(lv_event_t* event)
         case LV_KEY_ENTER:
             SetMediaIndex(lv_obj_get_index(target));
             PlayMedia(GetCurrentMediaName());
+            ShowOffPlayList();
             break;
         case LV_KEY_UP:
             lv_group_focus_prev(group);

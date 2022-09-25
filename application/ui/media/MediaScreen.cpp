@@ -1,8 +1,6 @@
 ﻿/*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-23 13:51:24
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 23:03:44
  * @FilePath: /gui/application/ui/media/MediaScreen.cpp
  * @Description: None
  * @other: None
@@ -315,7 +313,7 @@ static void CreateCategoryPanel(lv_obj_t* parent)
                 ExitMedia(HomeScreen);
                 break;
             default:
-                key_base_event_handler(event);
+                base_event_handler(event);
                 break;
             }
         }, LV_EVENT_KEY, nullptr);
@@ -492,9 +490,6 @@ static void MediaInit(void)
             ShowFileList(GetFileList(current_path));
         }
     }, LV_EVENT_MSG_RECEIVED, NULL);
-    #ifdef USB_PLUG_TEST
-    USB_PlugTest(MediaSubScreen);
-    #endif
 
     lv_obj_t* ui_LAB_Path = lv_label_create(MediaSubScreen);
     lv_obj_set_size(ui_LAB_Path, LV_SIZE_CONTENT, LV_SIZE_CONTENT);

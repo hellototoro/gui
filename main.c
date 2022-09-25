@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-05-19 00:48:40
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-17 22:46:51
  * @FilePath: /gui/main.c
  * @Description: None
  * @other: None
@@ -34,10 +32,6 @@ extern int sdl_init_2(void);
 #endif
 
 pthread_mutex_t lvgl_task_mutex;
-
-#ifdef HCCHIP_GCC
-int hcscreen(void);
-#endif
 
 static void exit_console(int signo);
 
@@ -87,42 +81,10 @@ int main(int argc, char *argv[])
     return 0;
 }
 
-#ifdef USB_PLUG_TEST
-int status = 1;
-void set_plug_status(void)
-{
-    status = status == 0 ? 1 : 0;
-}
-
-int hotplug_usb_plugout(void)
-{
-    return status;
-}
-
-static void plug_status_event_handler(lv_event_t* event)
-{
-    set_plug_status();
-    lv_msg_send(MSG_HOTPLUG, &status);
-    if(status == 1)
-        lv_msg_send(MSG_HOTPLUG_OUT, NULL);
-    else
-        lv_msg_send(MSG_HOTPLUG_IN, NULL);
-}
-
-void USB_PlugTest(lv_obj_t* parent)
-{
-    lv_obj_t* plug_test = lv_btn_create(parent);
-    lv_obj_set_size(plug_test, 50, 50);
-    lv_obj_set_pos(plug_test, 0, 0);
-    lv_obj_set_align(plug_test, LV_ALIGN_TOP_LEFT);
-    lv_obj_add_event_cb(plug_test, plug_status_event_handler, LV_EVENT_CLICKED, NULL);
-}
-#endif
-
 void exit_console(int signo)
 {
     printf("%s(), signo: %d, error: %s\n", __FUNCTION__, signo, strerror(errno));
-    #ifdef HCCHIP_GCC
+    #if 0//def HCCHIP_GCC
     api_gpio_deinit();
     #endif
     exit(0);

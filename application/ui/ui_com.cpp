@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-21 12:32:11
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:05:59
  * @FilePath: /gui/application/ui/ui_com.cpp
  * @Description: None
  * @other: None
@@ -372,13 +370,11 @@ void ProcessSysMsg(void)
     {
     case MSG_TYPE_USB_DISK_PLUGIN:
         UdiskStatus = 0;
-        lv_msg_send(MSG_HOTPLUG_IN, nullptr);
         lv_msg_send(MSG_HOTPLUG, &UdiskStatus);
         printf("usb plug in\n");
         break;
     case MSG_TYPE_USB_DISK_PLUGOUT:
         UdiskStatus = 1;
-        lv_msg_send(MSG_HOTPLUG_OUT, nullptr);
         lv_msg_send(MSG_HOTPLUG, &UdiskStatus);
         printf("usb plug out\n");
         break;
