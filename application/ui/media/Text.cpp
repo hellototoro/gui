@@ -15,44 +15,69 @@
 #include "MediaFile.h"
 #include "MediaCom.h"
 
-lv_obj_t* TextWindow;
-lv_obj_t* TextPanel;
-lv_obj_t* TextName;
-lv_group_t* Text_Group;
+static lv_obj_t* TextWindow;
+static lv_obj_t* TextPanel;
+static lv_obj_t* PlayBar;
+static lv_group_t* Page_Group;
 static constexpr lv_coord_t letter_space = 4;
 static constexpr lv_coord_t line_space = 10;
 static lv_coord_t TextLabWidth;
-std::vector<std::string> *TextBuff;
-std::string buff;
+static std::vector<std::string> *TextBuff;
+static std::string buff;
 
-static void key_event_handler(lv_event_t* event);
 static void CreateTextWindow(lv_obj_t* parent);
 static void CreateTextPanel(lv_obj_t* parent);
 static void LoadText(char* file_name);
+static void SetStyleForPlayBar(lv_obj_t* bar);
 
 void creat_text_window(lv_obj_t* parent, char* file_name)
 {
     TextLabWidth = LV_HOR_RES * 0.96875;
 
-    Text_Group = create_new_group();
-    set_group_activity(Text_Group);
-
     TextBuff = new std::vector<std::string>;
     LoadText(file_name);
 
     CreateTextWindow(parent);
+
+    MediaComInit(MEDIA_TEXT, nullptr);
+    CreateMediaArray();
+    LocateMediaIndex(file_name);
+    PlayBar = CreatePlayBar(lv_scr_act());
+    SetStyleForPlayBar(PlayBar);
 }
 
 void close_text_window(void)
 {
-    delete_group(Text_Group);
-    Text_Group = NULL;
+    lv_group_del(Page_Group);
 
     TextBuff->clear();
     delete TextBuff;
     TextBuff = nullptr;
 
+    //step2 清理播放列表
+    DestroyMediaArray();
+    MediaComDeinit();
+
+    lv_obj_del_async(PlayBar);
     lv_obj_del_async(TextWindow);
+}
+
+void Text_NextPage(void)
+{
+    lv_group_focus_next(Page_Group);
+}
+
+void Text_PrePage(void)
+{
+    lv_group_focus_prev(Page_Group);
+}
+
+void ReLoadText(char* file_name)
+{
+    lv_obj_del(TextPanel);
+    TextBuff->clear();
+    LoadText(file_name);
+    CreateTextPanel(TextWindow);
 }
 
 static void LoadText(char* file_name)
@@ -79,30 +104,6 @@ static void LoadText(char* file_name)
     delete text_file;
 }
 
-static void key_event_handler(lv_event_t* event)
-{
-    lv_obj_t* target = lv_event_get_current_target(event);
-    uint32_t value = lv_indev_get_key(lv_indev_get_act());
-    switch (value)
-    {
-        case LV_KEY_LEFT:
-            if (lv_obj_get_index(target) > 0 )
-                lv_group_focus_prev(Text_Group);
-            break;
-        case LV_KEY_RIGHT:
-            if (lv_obj_get_index(target) < (lv_obj_get_child_cnt(TextPanel) - 1) )
-                lv_group_focus_next(Text_Group);
-            break;
-        case LV_KEY_ESC:
-            close_text_window();
-        break;
-
-        default:
-            base_event_handler(event);
-            break;
-    }
-}
-
 static void CreateTextWindow(lv_obj_t* parent)
 {
     TextWindow = lv_obj_create(parent);
@@ -114,6 +115,8 @@ static void CreateTextWindow(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(TextWindow, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(TextWindow, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
+    Page_Group = lv_group_create();//对于类别组做一般处理
+    lv_group_set_wrap(Page_Group, false);
     CreateTextPanel(TextWindow);
 }
 
@@ -139,8 +142,7 @@ static void CreateTextPanel(lv_obj_t* parent)
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
         lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_border_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_group_add_obj(Text_Group, obj);
-        lv_obj_add_event_cb(obj, key_event_handler, LV_EVENT_KEY, NULL);
+        lv_group_add_obj(Page_Group, obj);
 
         lv_obj_t* ui_Label = lv_label_create(obj);
         lv_obj_set_size(ui_Label, TextLabWidth, 680);
@@ -153,4 +155,23 @@ static void CreateTextPanel(lv_obj_t* parent)
         lv_obj_set_style_text_line_space(ui_Label, line_space, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(ui_Label, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
+}
+
+static void SetStyleForPlayBar(lv_obj_t* bar)
+{
+    lv_obj_set_height(bar, 100);
+    lv_obj_set_y(bar, 310);
+    lv_obj_set_style_bg_color(bar, lv_color_hex(0x303030), LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_opa(bar, LV_OPA_90, LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_border_opa(bar, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+    lv_obj_set_pos(lv_obj_get_child(bar, Previous), -100, 0);
+    lv_obj_set_pos(lv_obj_get_child(bar, Next), 0, 0);
+    lv_obj_set_pos(lv_obj_get_child(bar, PlayList), 100, 0);
+
+    lv_obj_add_flag(lv_obj_get_child(bar, PlayMode), LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(lv_obj_get_child(bar, Play), LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(lv_obj_get_child(bar, PlayedTime), LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(lv_obj_get_child(bar, ProgressSlider), LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(lv_obj_get_child(bar, TotalTime), LV_OBJ_FLAG_HIDDEN);
 }

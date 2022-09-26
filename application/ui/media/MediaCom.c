@@ -14,6 +14,7 @@
 #include "Video.h"
 #include "Music.h"
 #include "Photo.h"
+#include "Text.h"
 #ifdef HCCHIP_GCC
 #include <pthread.h>
 #include <sys/msg.h>
@@ -60,7 +61,7 @@ static const lv_img_dsc_t* play_list_image_src[MEDIA_MAX] = {
     &ui_img_movie_list_png,
     &ui_img_music_list_png,
     &ui_img_photo_list_png,
-    NULL
+    &ui_img_photo_list_png
 };
 
 extern pthread_mutex_t lvgl_task_mutex;
@@ -102,10 +103,11 @@ void MediaComDeinit(void)
     delete_group(MainGroup);
 
     //step4 清除定时器
-    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO)
+    if (CurrentPlayingType != MEDIA_MUSIC)
         lv_timer_del(PlayBar_Timer);
+    if (CurrentPlayingType != MEDIA_TEXT) 
+        lv_timer_del(PlayState_Timer);
     CurrentPlayingType = MEDIA_MAX;
-    lv_timer_del(PlayState_Timer);
 
     CloseLoadingScreen();
 }
@@ -361,12 +363,20 @@ static void key_event_handler(lv_event_t* event)
     if (lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
         switch (value)
         {
-            case LV_KEY_ENTER:
             case LV_KEY_LEFT:
+                if (CurrentPlayingType == MEDIA_TEXT){
+                    Text_PrePage();
+                    return;
+                }
             case LV_KEY_RIGHT:
-                    lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);
-                    lv_timer_reset(PlayBar_Timer);
-                    lv_timer_resume(PlayBar_Timer);
+                if (CurrentPlayingType == MEDIA_TEXT){
+                    Text_NextPage();
+                    return;
+                }
+            case LV_KEY_ENTER:
+                lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_HIDDEN);
+                lv_timer_reset(PlayBar_Timer);
+                lv_timer_resume(PlayBar_Timer);
                 return;
             default:
             break;
@@ -413,10 +423,16 @@ static void key_event_handler(lv_event_t* event)
                 }
                 break;
                 case Previous:
-                    PlayMedia(GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
+                    if (CurrentPlayingType != MEDIA_TEXT)
+                        PlayMedia(GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
+                    else
+                        Text_PrePage();
                     break;
                 case Next:
-                    PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
+                    if (CurrentPlayingType != MEDIA_TEXT)
+                        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
+                    else
+                        Text_NextPage();
                     break;
                 case PlayList:
                     ShowOnPlayList(NULL, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
@@ -424,9 +440,7 @@ static void key_event_handler(lv_event_t* event)
                 case PlayMode:
                     CurrentPlayMode++;
                     CurrentPlayMode %= PlayModeNumber;
-                    //lv_img_set_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode]);
                     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
-                    //CyclePlay
                     break;
                 default:
                     break;
@@ -452,6 +466,9 @@ static void key_event_handler(lv_event_t* event)
                 case MEDIA_PHOTO:
                     close_photo_window();
                     break;
+                case MEDIA_TEXT:
+                    close_text_window();
+                    break;
                 
                 default:
                     break;
@@ -464,7 +481,7 @@ static void key_event_handler(lv_event_t* event)
             base_event_handler(event);
             break;
     }
-    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
+    if (CurrentPlayingType != MEDIA_MUSIC) {
         if (!lv_obj_has_flag(PlayBar, LV_OBJ_FLAG_HIDDEN)) {
             lv_timer_reset(PlayBar_Timer);
         }
@@ -480,7 +497,10 @@ static void play_list_event_handler(lv_event_t* event)
     {
         case LV_KEY_ENTER:
             SetMediaIndex(lv_obj_get_index(target));
-            PlayMedia(GetCurrentMediaName());
+            if (CurrentPlayingType == MEDIA_TEXT)
+                ReLoadText(GetCurrentMediaName());
+            else
+                PlayMedia(GetCurrentMediaName());
             ShowOffPlayList();
             break;
         case LV_KEY_UP:
@@ -538,7 +558,6 @@ static void PlayedStateTimer_cb(lv_timer_t * timer)
 
 lv_obj_t* CreatePlayBar(lv_obj_t* parent)
 {
-    lv_obj_t* lv_obj;
     static const lv_coord_t img_area[][2] = {//{ x, y}
         { -200, 10},
         { -100, 10},
@@ -555,12 +574,12 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     };
 
     PlayBar = lv_obj_create(parent);
-    lv_obj_set_size(PlayBar, 1260, 150);
+    lv_obj_set_size(PlayBar, LV_HOR_RES * 0.98, 150);
     lv_obj_set_pos(PlayBar, 0, 300);
     lv_obj_set_align(PlayBar, LV_ALIGN_CENTER);
     lv_obj_clear_flag(PlayBar, LV_OBJ_FLAG_SCROLLABLE);
 
-    lv_obj = lv_label_create(PlayBar);
+    lv_obj_t* lv_obj = lv_label_create(PlayBar);
     lv_obj_set_size(lv_obj, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(lv_obj, -550, -50);
     lv_obj_set_align(lv_obj, LV_ALIGN_CENTER);
@@ -601,15 +620,21 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
     }
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayList), play_list_image_src[CurrentPlayingType], LV_PART_MAIN | LV_STATE_DEFAULT);
-    lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
-    if (CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO) {
+    if (CurrentPlayingType == MEDIA_TEXT)
+        lv_group_focus_obj(lv_obj_get_child(PlayBar, Previous));
+    else
+        lv_group_focus_obj(lv_obj_get_child(PlayBar, Play));
+    if (CurrentPlayingType != MEDIA_MUSIC) {
         PlayBar_Timer = lv_timer_create(PlayBarTimer_cb, (5+1)*1000, NULL);
     }
-    PlayState_Timer = lv_timer_create(PlayedStateTimer_cb, 1000, NULL);
-    lv_timer_set_repeat_count(PlayState_Timer, -1);
-    lv_timer_pause(PlayState_Timer);
+    if (CurrentPlayingType != MEDIA_TEXT) {
+        PlayState_Timer = lv_timer_create(PlayedStateTimer_cb, 1000, NULL);
+        lv_timer_set_repeat_count(PlayState_Timer, -1);
+        lv_timer_pause(PlayState_Timer);
+    }
     #ifdef HOST_GCC
-    SetTotalTimeAndProgress(20);
+    if (CurrentPlayingType != MEDIA_TEXT)
+        SetTotalTimeAndProgress(20);
     #endif
     return PlayBar;
 }
