@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-08-04 19:12:38
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-09 20:54:54
  * @FilePath: /gui/application/SystemInit.cpp
  * @Description: None
  * @other: None
@@ -10,8 +8,13 @@
 #include "SystemInit.h"
 #include "ConfigParam.h"
 #include "windows.h"
-#include "ui/LanguageScreen.h"
 #include "lv_i18n/src/lv_i18n.h"
+
+/**********外部变量声明***************/
+extern ActiveScreen CurrentScreen;
+extern ActiveScreen DefaultScreen;
+extern int DefaultLanguageIndex;
+extern uint8_t Volume;
 
 void SystemInit(void)
 {
@@ -27,4 +30,8 @@ void SystemInit(void)
         lv_i18n_set_locale(config.get<std::string>("language", "en-GB").c_str());
     }
     CurrentScreen = DefaultScreen;
+
+    //step2 读取音量
+    ReadConfigFile(config, "sound_setting");
+    Volume = config.get<int>("volume", 50);
 }

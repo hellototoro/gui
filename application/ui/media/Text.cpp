@@ -140,20 +140,28 @@ static void CreateTextPanel(lv_obj_t* parent)
         lv_obj_set_pos(obj, i * LV_HOR_RES, 0);
         lv_obj_set_align(obj, LV_ALIGN_CENTER);
         lv_obj_add_flag(obj, LV_OBJ_FLAG_SCROLL_ON_FOCUS);
+        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
         lv_obj_set_style_bg_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_border_opa(obj, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_group_add_obj(Page_Group, obj);
 
-        lv_obj_t* ui_Label = lv_label_create(obj);
-        lv_obj_set_size(ui_Label, TextLabWidth, 680);
-        lv_obj_set_align(ui_Label, LV_ALIGN_TOP_MID);
-        lv_obj_clear_flag(obj, LV_OBJ_FLAG_SCROLLABLE);
-        lv_label_set_text(ui_Label, TextBuff->at(i).c_str());
-        lv_obj_set_style_text_color(ui_Label, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_opa(ui_Label, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_letter_space(ui_Label, letter_space, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_line_space(ui_Label, line_space, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(ui_Label, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_t* TextLab = lv_label_create(obj);
+        lv_obj_set_size(TextLab, TextLabWidth, 680);
+        lv_obj_set_align(TextLab, LV_ALIGN_TOP_MID);
+        lv_label_set_text(TextLab, TextBuff->at(i).c_str());
+        lv_obj_set_style_text_color(TextLab, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(TextLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_letter_space(TextLab, letter_space, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_line_space(TextLab, line_space, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(TextLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
+
+        lv_obj_t* PageLab = lv_label_create(obj);
+        lv_obj_set_size(PageLab, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
+        lv_obj_set_align(PageLab, LV_ALIGN_BOTTOM_RIGHT);
+        lv_label_set_text_fmt(PageLab, "%d / %d", i + 1, page);
+        lv_obj_set_style_text_color(PageLab, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_opa(PageLab, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
+        lv_obj_set_style_text_font(PageLab, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
     }
 }
 

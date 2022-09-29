@@ -19,8 +19,6 @@
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
-#include "application/ui/Volume.h"
-#include "application/key_map.h"
 
 #define FileListPanelWidth 1010
 #define FileListPanelHeight 615

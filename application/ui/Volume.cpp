@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:51:44
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-19 01:06:12
  * @FilePath: /gui/application/ui/Volume.cpp
  * @Description: None
  * @other: None
@@ -12,20 +10,23 @@
 #ifdef HCCHIP_GCC
 #include "hcapi/media_player.h"
 #endif
+#include "application/ConfigParam.h"
 
-lv_obj_t* VolumePanel;
-lv_obj_t* VolumeSlider;
-lv_obj_t* VolumeImage;
-lv_timer_t* VolumeTimer;
-const lv_img_dsc_t* VolumeImg;
-bool PlayingFadeDownAnimation_Flag;
 uint8_t Volume;
+
+static lv_obj_t* VolumePanel;
+static lv_obj_t* VolumeSlider;
+static lv_obj_t* VolumeImage;
+static lv_timer_t* VolumeTimer;
+static const lv_img_dsc_t* VolumeImg;
+static bool PlayingFadeDownAnimation_Flag;
 
 static void CreateVolumePanel(lv_obj_t* parent);
 static void VolumeTimer_cb(lv_timer_t * timer);
 static void fade_up_Animation(lv_obj_t * TargetObject, int delay);
 static void fade_down_Animation(lv_obj_t * TargetObject, int delay);
 static void anim_callback_delete_obj(struct _lv_anim_t *a);
+
 
 static void event_handler(lv_event_t* event)
 {
@@ -39,11 +40,17 @@ void SetVolume(uint32_t value)
     switch (value)
     {
         case LV_KEY_VOLUME_UP:
-            if (Volume < 100) Volume += 5;
+            if (Volume < 100) {
+                Volume += 5;
+                WriteConfigFile_I("sound_setting.volume", Volume);
+            }
             break;
 
         case LV_KEY_VOLUME_DOWN:
-            if (Volume > 0) Volume -= 5;
+            if (Volume > 0) {
+                Volume -= 5;
+                WriteConfigFile_I("sound_setting.volume", Volume);
+            }
             break;
 
         default :

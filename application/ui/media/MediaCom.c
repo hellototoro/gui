@@ -23,8 +23,6 @@
 #include "hcapi/com_api.h"
 #include "hcapi/os_api.h"
 #endif
-#include "application/ui/Volume.h"
-#include "application/key_map.h"
 
 /* 全局变量 */
 char current_path[100];
@@ -34,7 +32,7 @@ int current_path_size = sizeof(current_path);
 static lv_obj_t* PlayBar;
 static lv_obj_t* PlayListPanel;
 static MediaType CurrentPlayingType = MEDIA_MAX;
-static PlayListMode CurrentPlayMode;
+static PlayListMode CurrentPlayMode[MEDIA_MAX];
 static MediaHandle* current_media_hdl;
 static MediaList* media_list[MEDIA_MAX];
 #ifdef HOST_GCC
@@ -63,8 +61,16 @@ static const lv_img_dsc_t* play_list_image_src[MEDIA_MAX] = {
     &ui_img_photo_list_png,
     &ui_img_photo_list_png
 };
+static const char* PlayModeName[] = {
+    NULL,//0
+    "media.VideoPlayMode",//1
+    "media.MusicPlayMode",//2
+    "media.PhotoPlayMode"//3 
+};
 
 extern pthread_mutex_t lvgl_task_mutex;
+extern void WriteConfigFile_I(const char* ConfigName, int value);
+extern int ReadConfigFile_I(const char* ConfigName);
 
 static MediaList* GetMediaList(MediaType media_type);
 static DLNode * GetNextMediaNode(MediaList* list, PlayListMode mode);
@@ -87,7 +93,7 @@ void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
 {
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
-    //CurrentPlayMode = RandPlay;
+    CurrentPlayMode[CurrentPlayingType] = ReadConfigFile_I(PlayModeName[CurrentPlayingType < 4 ? CurrentPlayingType : 0]);
     srand(time(0));
     PlayingAnimation_Flag = false;
 
@@ -424,13 +430,13 @@ static void key_event_handler(lv_event_t* event)
                 break;
                 case Previous:
                     if (CurrentPlayingType != MEDIA_TEXT)
-                        PlayMedia(GetPreMediaName(CurrentPlayingType, CurrentPlayMode));
+                        PlayMedia(GetPreMediaName(CurrentPlayingType, CurrentPlayMode[CurrentPlayingType]));
                     else
                         Text_PrePage();
                     break;
                 case Next:
                     if (CurrentPlayingType != MEDIA_TEXT)
-                        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, ManualPlay));
+                        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode[CurrentPlayingType], ManualPlay));
                     else
                         Text_NextPage();
                     break;
@@ -438,9 +444,11 @@ static void key_event_handler(lv_event_t* event)
                     ShowOnPlayList(NULL, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
                     break;
                 case PlayMode:
-                    CurrentPlayMode++;
-                    CurrentPlayMode %= PlayModeNumber;
-                    lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
+                    CurrentPlayMode[CurrentPlayingType]++;
+                    CurrentPlayMode[CurrentPlayingType] %= PlayModeNumber;
+                    if (CurrentPlayingType != MEDIA_TEXT)
+                        WriteConfigFile_I(PlayModeName[CurrentPlayingType], CurrentPlayMode[CurrentPlayingType]);
+                    lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode[CurrentPlayingType]], LV_PART_MAIN | LV_STATE_DEFAULT);
                     break;
                 default:
                     break;
@@ -543,7 +551,7 @@ static void PlayedStateTimer_cb(lv_timer_t * timer)
     if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
         lv_timer_pause(timer);
         #ifdef HOST_GCC
-        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
+        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode[CurrentPlayingType], AutoPlay));
         if (played_time_host == 0)
             SetTotalTimeAndProgress(20);
         #endif
@@ -618,7 +626,7 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         lv_group_add_obj(MainGroup, ctrl_bar);
         lv_obj_add_event_cb(ctrl_bar, key_event_handler, LV_EVENT_KEY, NULL);
     }
-    lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode], LV_PART_MAIN | LV_STATE_DEFAULT);
+    lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode[CurrentPlayingType]], LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayList), play_list_image_src[CurrentPlayingType], LV_PART_MAIN | LV_STATE_DEFAULT);
     if (CurrentPlayingType == MEDIA_TEXT)
         lv_group_focus_obj(lv_obj_get_child(PlayBar, Previous));
@@ -666,7 +674,7 @@ static void CreatePlayListPanel(lv_obj_t* parent, file_name_t* name_list, int fi
     lv_obj_set_style_border_opa(PlayListInfo, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* PlayListMode_IMG = lv_img_create(PlayListInfo);
-    lv_img_set_src(PlayListMode_IMG, play_mode_image_src[CurrentPlayMode]);
+    lv_img_set_src(PlayListMode_IMG, play_mode_image_src[CurrentPlayMode[CurrentPlayingType]]);
     lv_obj_set_size(PlayListMode_IMG, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(PlayListMode_IMG, 0, 0);
     lv_obj_set_align(PlayListMode_IMG, LV_ALIGN_LEFT_MID);
@@ -777,7 +785,7 @@ void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
     case HCPLAYER_MSG_STATE_EOS:
         printf (">> app get eos, normal play end!\n");
         pthread_mutex_lock(&lvgl_task_mutex);
-        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode, AutoPlay));
+        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode[CurrentPlayingType], AutoPlay));
         pthread_mutex_unlock(&lvgl_task_mutex);
         //api_control_send_key(V_KEY_NEXT);
         break;

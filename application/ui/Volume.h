@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-27 21:52:32
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-10 18:16:22
  * @FilePath: /gui/application/ui/Volume.h
  * @Description: None
  * @other: None
@@ -15,6 +13,8 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+extern uint8_t Volume;
 
 extern void SetVolume(uint32_t value);
 

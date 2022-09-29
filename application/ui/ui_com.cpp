@@ -420,7 +420,7 @@ bool HasUsbDevice(void)
     #ifdef HCCHIP_GCC
     fp = popen("ls /proc/scsi","r");
     #else
-    fp = popen("ls /home/totoro/temp/media","r");
+    fp = popen("ls ~/temp/lvgl_test_dir","r");
     #endif
     if (nullptr != fp) {
         while (fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
