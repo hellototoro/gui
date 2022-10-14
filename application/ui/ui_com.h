@@ -35,7 +35,6 @@ typedef enum {
 
 typedef void (*MsgBoxFunc_t)(void);
 
-extern lv_indev_t* keypad_indev;
 extern SourceType_t CureentSource;
 
 extern void group_init(void);
@@ -44,7 +43,7 @@ extern void set_group_activity(lv_group_t* group);
 extern lv_group_t* get_activity_group(void);
 extern lv_group_t* delete_group(lv_group_t* group);
 extern void delete_all_group(void);
-extern lv_indev_t* get_keypad_indev(void);
+extern void get_keypad_indev(void);
 extern void refresh_all_lable_text(lv_obj_t* parent);
 extern lv_obj_t* CreateMsgBox(lv_obj_t* parent, const char* title, int btn_num, MsgBoxFunc_t func);
 extern lv_obj_t* CreateSpinBox(lv_obj_t* parent, const char* title, int time_s, MsgBoxFunc_t func);

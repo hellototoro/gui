@@ -67,7 +67,6 @@ int main(int argc, char *argv[])
     sdl_init_2();
     #endif
     group_init();
-    get_keypad_indev();
 
     SystemInit();
     while(1) {
