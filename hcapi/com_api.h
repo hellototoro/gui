@@ -104,6 +104,9 @@ typedef enum{
     UPG_STATUS_FILE_UNZIP_ERROR,
     UPG_STATUS_BURN_FAIL,
 
+	UPG_STATUS_SERVER_FAIL,
+	UPG_STATUS_USER_STOP_DOWNLOAD,
+
 
 }upgrade_status_t;
 
@@ -152,7 +155,6 @@ typedef enum{
     MSG_TYPE_NETWORK_DEVICE_BE_CONNECTED, //connected by phone
     MSG_TYPE_NETWORK_DEVICE_BE_DISCONNECTED, //disconected by phone
     MSG_TYPE_NETWORK_DEV_NAME_SET,
-    MSG_TYPE_KEY_TRIGER_RESET,
 
     MSG_TYPE_CAST_DLNA_START,
     MSG_TYPE_CAST_DLNA_STOP,
@@ -173,11 +175,21 @@ typedef enum{
     MSG_TYPE_CAST_MIRACAST_CONNECTED,
     MSG_TYPE_CAST_MIRACAST_SSID_DONE,
 
+    MSG_TYPE_CAST_AUSB_START, //android usb mirror start
+    MSG_TYPE_CAST_AUSB_STOP,  //android usb mirror stop
+    MSG_TYPE_CAST_IUSB_START, //apple usb mirror start
+    MSG_TYPE_CAST_IUSB_STOP,  //apple usb mirror stop
+
     MSG_TYPE_AIR_INVALID_CERT,
 
     MSG_TYPE_VIDEO_DECODER_ERROR,
     MSG_TYPE_AUDIO_DECODER_ERROR,
    	MSG_TYPE_HDMI_TX_CHANGED,
+   	MSG_TYPE_AIR_HOSTAP_SKIP_URL,
+   	MSG_TYPE_AIR_MIRROR_BAD_NETWORK,
+    MSG_TYPE_KEY_TRIGER_RESET,
+    MSG_TYPE_ENTER_STANDBY,
+
 
     //command
     MSG_TYPE_CMD = 1000
@@ -286,6 +298,9 @@ int sys_upg_usb_check(uint32_t timeout);
 int sys_upg_flash_burn(char *buff, uint32_t length);
 
 void api_system_reboot(void);
+void api_system_standby(void);
+
+void api_osd_off_time(uint32_t timeout);
 
 #ifdef __cplusplus
 } /*extern "C"*/

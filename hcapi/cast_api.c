@@ -116,6 +116,50 @@ int hccast_mira_service_uninit(void)
 #endif
 
 
+//#ifndef USBMIRROR_SUPPORT
+#if 0
+int hccast_um_init(void)
+{
+    return 0;
+}
+
+int hccast_um_deinit(void)
+{
+    return 0;
+}
+
+int hccast_um_param_set(hccast_um_param_t *param)
+{
+    (void)param;
+    return 0;
+}
+
+int hccast_ium_start(char *uuid, hccast_um_cb event_cb)
+{
+    (void)uuid;
+    (void)event_cb;
+    return 0;   
+}
+
+int hccast_ium_stop(void)
+{
+    return 0;
+}
+
+int hccast_aum_start(hccast_aum_param_t *param, hccast_um_cb event_cb)
+{
+    (void)param;
+    (void)event_cb;
+    return 0;
+}
+
+int hccast_aum_stop(void)
+{
+    return 0;
+}
+
+#endif
+
 int cast_get_service_name(cast_type_t cast_type, char *service_name, int length)
 {
     unsigned char mac_addr[6] = {0};
@@ -136,6 +180,182 @@ int cast_get_service_name(cast_type_t cast_type, char *service_name, int length)
              service_prefix, mac_addr[3]&0xFF, mac_addr[4]&0xFF, mac_addr[5]&0xFF);
 
     return 0;
+}
+
+
+#ifdef USBMIRROR_SUPPORT
+
+static char m_ium_uuid[40] = {0};
+static void ium_event_process_cb(int event, void *param1, void *param2)
+{
+    control_msg_t ctl_msg = {0};
+    printf("ium event: %d\n", event);
+
+    switch (event)
+    {
+    case HCCAST_IUM_EVT_DEVICE_ADD:
+        break;
+    case HCCAST_IUM_EVT_DEVICE_REMOVE:
+        break;
+    case HCCAST_IUM_EVT_MIRROR_START:
+        printf("%s(), line:%d. HCCAST_IUM_EVT_MIRROR_START\n", __func__, __LINE__);
+        ctl_msg.msg_type = MSG_TYPE_CAST_IUSB_START;
+        api_osd_off_time(5000);
+        api_logo_off();
+        break;
+    case HCCAST_IUM_EVT_MIRROR_STOP:
+        printf("%s(), line:%d. HCCAST_IUM_EVT_MIRROR_STOP\n", __func__, __LINE__);
+        ctl_msg.msg_type = MSG_TYPE_CAST_IUSB_STOP;
+        break;
+    case HCCAST_IUM_EVT_SAVE_PAIR_DATA: //param1: buf; param2: length
+        break;
+    case HCCAST_IUM_EVT_GET_PAIR_DATA: //param1: buf; param2: length
+        break;
+    case HCCAST_IUM_EVT_NEED_USR_TRUST:
+        break;
+    case HCCAST_IUM_EVT_USR_TRUST_DEVICE:
+        break;
+    case HCCAST_IUM_EVT_CREATE_CONN_FAILED:
+        break;
+    case HCCAST_IUM_EVT_CANNOT_GET_AV_DATA:
+        break;
+    case HCCAST_IUM_EVT_UPG_DOWNLOAD_PROGRESS: //param1: data len; param2: file len
+        break;
+    case HCCAST_IUM_EVT_GET_UPGRADE_DATA: //param1: hccast_ium_upg_bo_t
+        break;
+    case HCCAST_IUM_EVT_SAVE_UUID:
+        break;
+    case HCCAST_IUM_EVT_CERT_INVALID:
+        break;
+    default:
+        break;
+    }
+
+    if (0 != ctl_msg.msg_type){
+        api_control_send_msg(&ctl_msg);
+    }
+
+}
+
+static void aum_event_process_cb(int event, void *param1, void *param2)
+{
+    control_msg_t ctl_msg = {0};
+
+    printf("aum event: %d\n", event);
+    switch (event)
+    {
+    case HCCAST_AUM_EVT_DEVICE_ADD:
+        break;
+    case HCCAST_AUM_EVT_DEVICE_REMOVE:
+        break;
+    case HCCAST_AUM_EVT_MIRROR_START:
+        printf("%s(), line:%d. HCCAST_AUM_EVT_MIRROR_START\n", __func__, __LINE__);
+        ctl_msg.msg_type = MSG_TYPE_CAST_AUSB_START;
+        api_osd_off_time(5000);
+        api_logo_off();
+        break;
+    case HCCAST_AUM_EVT_MIRROR_STOP:
+        printf("%s(), line:%d. HCCAST_AUM_EVT_MIRROR_STOP\n", __func__, __LINE__);
+        ctl_msg.msg_type = MSG_TYPE_CAST_AUSB_STOP;
+        break;
+    case HCCAST_AUM_EVT_IGNORE_NEW_DEVICE:
+        break;
+    case HCCAST_AUM_EVT_SERVER_MSG:
+        break;
+    case HCCAST_AUM_EVT_UPG_DOWNLOAD_PROGRESS:
+        break;
+    case HCCAST_AUM_EVT_GET_UPGRADE_DATA:
+        break;
+    case HCCAST_AUM_EVT_SET_SCREEN_ROTATE:
+        break;
+    case HCCAST_AUM_EVT_SET_AUTO_ROTATE:
+        break;
+    case HCCAST_AUM_EVT_SET_FULL_SCREEN:
+        break;
+    default:
+        break;
+    }    
+    if (0 != ctl_msg.msg_type){
+        api_control_send_msg(&ctl_msg);
+    }
+}
+
+
+int cast_usb_mirror_start(void)
+{
+    int ret;
+    if (hccast_um_init() < 0)
+        return API_FAILURE;
+
+    hccast_um_param_t um_param = {0};
+    hccast_aum_param_t aum_param = {0};
+    
+    um_param.screen_rotate_en = 0;
+    um_param.screen_rotate_auto = 1;
+    um_param.full_screen_en = 1;
+    hccast_um_param_set(&um_param);
+
+    ret = hccast_ium_start(m_ium_uuid, ium_event_process_cb);
+    if (ret)
+        printf("%s(), line:%d. ret = %d\n", __func__, __LINE__, ret);    
+
+    strcat(aum_param.product_id, "HCT-AT01");
+    strcat(aum_param.fw_url, "http://119.3.89.190:8080/apk/elfcast-HCT-AT01.json");
+    strcat(aum_param.apk_url, "http://119.3.89.190:8080/apk/elfcast.apk");
+    strcat(aum_param.aoa_desc, "ElfCast-Screen_Mirror");
+    aum_param.fw_version = 0;
+    ret = hccast_aum_start(&aum_param, aum_event_process_cb);
+    if (ret)
+        printf("%s(), line:%d. ret = %d\n", __func__, __LINE__, ret);    
+
+    return API_SUCCESS;
+}
+#endif
+
+int cast_init(void)
+{
+#ifdef DLNA_SUPPORT
+    hccast_dlna_service_init(hccast_dlna_callback_func);
+#endif
+
+#ifdef MIRACAST_SUPPORT    
+    hccast_mira_service_init(hccast_mira_callback_func);
+#endif    
+
+#ifdef AIRCAST_SUPPORT    
+    hccast_air_service_init(hccast_air_callback_event);
+#endif    
+
+    hccast_scene_init();
+    hccast_set_aspect_mode(1, 3,DIS_SCALE_ACTIVE_IMMEDIATELY);//16:9 as default.
+
+    return API_SUCCESS;   
+}
+
+
+int cast_deinit(void)
+{
+#ifdef DLNA_SUPPORT
+    hccast_dlna_service_stop();
+    hccast_dlna_service_uninit();
+#endif
+
+#ifdef MIRACAST_SUPPORT    
+    hccast_mira_service_stop();
+    hccast_mira_service_uninit();
+#endif    
+
+#ifdef AIRCAST_SUPPORT    
+    hccast_air_service_stop();
+#endif    
+
+#ifdef USBMIRROR_SUPPORT
+    hccast_aum_stop();
+    hccast_ium_stop();
+    hccast_um_deinit();
+#endif    
+
+    return API_SUCCESS;
 }
 
 /*
@@ -348,6 +568,10 @@ int hccast_air_callback_event(hccast_air_event_e event, void* in, void* out)
             printf("[%s]HCCAST_AIR_GET_MIRROR_MODE\n",__func__);
             *(int*)in = app_data->aircast_mode;
             break;
+		case HCCAST_AIR_GET_NETWORK_STATUS:
+            printf("[%s]HCCAST_AIR_GET_NETWORK_STATUS\n",__func__);
+            *(int*)in = hccast_wifi_mgr_get_hostap_status();
+            break;
         case HCCAST_AIR_MIRROR_START:
             printf("[%s]HCCAST_AIR_MIRROR_START\n",__func__);
             ctl_msg.msg_type = MSG_TYPE_CAST_AIRMIRROR_START;
@@ -382,7 +606,14 @@ int hccast_air_callback_event(hccast_air_event_e event, void* in, void* out)
             }
 
             break;
-
+		case HCCAST_AIR_HOSTAP_MODE_SKIP_URL:
+			ctl_msg.msg_type = MSG_TYPE_AIR_HOSTAP_SKIP_URL;
+            printf("[%s]HCCAST_AIR_HOSTAP_MODE_SKIP_URL\n",__func__);
+            break;	
+		case HCCAST_AIR_BAD_NETWORK:
+			ctl_msg.msg_type = MSG_TYPE_AIR_MIRROR_BAD_NETWORK;	
+			printf("[%s]HCCAST_AIR_BAD_NETWORK\n",__func__);
+			break;
         default:
             break;
     }
@@ -431,4 +662,19 @@ void cast_restart_services()
 
 }
 
+void restart_air_service_by_hdmi_change(void)
+{
+#ifdef AIRCAST_SUPPORT
+	int cur_scene = 0;
+	cur_scene = hccast_get_current_scene();
+	if((cur_scene != HCCAST_SCENE_AIRCAST_PLAY) && (cur_scene != HCCAST_SCENE_AIRCAST_MIRROR))
+	{
+		if(hccast_air_service_is_start())
+		{
+			hccast_air_service_stop();
+    		hccast_air_service_start();
+		}
+	}
+#endif
+}
 

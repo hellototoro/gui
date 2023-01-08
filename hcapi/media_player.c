@@ -12,6 +12,8 @@
 #include <hcuapi/dis.h>
 #include <hcuapi/avsync.h>
 #include <hcuapi/snd.h>
+#include <sys/msg.h>
+
 #include "com_api.h"
 #include "media_player.h"
 #include <sys/ioctl.h>
@@ -298,14 +300,16 @@ int media_play(media_handle_t *media_hld, const char *media_src)
 	player_args.user_data = media_hld;
 	player_args.sync_type = 2;
 
-	player_args.img_dis_mode = 0;
-	player_args.img_dis_hold_time = 3000;
-	player_args.gif_dis_interval = 50;
-	player_args.img_alpha_mode = 0;	
 
 	if (MEDIA_TYPE_MUSIC == media_hld->type){
 		player_args.play_attached_file = 1;
+	}else if (MEDIA_TYPE_PHOTO == media_hld->type){
+		player_args.img_dis_mode = IMG_DIS_REALSIZE;
+		player_args.img_dis_hold_time = 3000;
+		player_args.gif_dis_interval = 50;
+		player_args.img_alpha_mode = 0;	
 	}
+	
     media_hld->player = hcplayer_create(&player_args);
     if (!media_hld->player){
         printf("hcplayer_create() fail!\n");
@@ -576,7 +580,7 @@ uint32_t media_get_playtime(media_handle_t *media_hld)
 	pthread_mutex_lock(&media_hld->api_lock);
 	play_time = (uint32_t)(hcplayer_get_position(media_hld->player)/1000);
 	media_hld->play_time = play_time;
-	printf("play time %ld\n", play_time);
+	printf("play time %d\n", play_time);
 	pthread_mutex_unlock(&media_hld->api_lock);
 	return play_time;
 }
@@ -586,7 +590,7 @@ uint32_t media_get_totaltime(media_handle_t *media_hld)
 	uint32_t total_time;
 	ASSERT_API(media_hld);
 	total_time = (uint32_t)(hcplayer_get_duration(media_hld->player)/1000);
-	media_hld->play_time = total_time;
+	media_hld->total_time = total_time;
 	return total_time;
 }
 

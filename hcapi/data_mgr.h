@@ -52,7 +52,7 @@ typedef struct app_data{
 	int ratio;
 	int mirror_mode;//1-standard.
     int mirror_frame;//0-30FPS,1-60FPS
-    int aircast_mode;//0-mirror-stream, 1-mirror-only
+    int aircast_mode;//0-mirror-stream, 1-mirror-only, 2-Auto
     int wifi_mode;   // 1: 2.4G, 2: 5G, 3: 60G (res)
     int wifi_ch;     // hostap channel
 }app_data_t;

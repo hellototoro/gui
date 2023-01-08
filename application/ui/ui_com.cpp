@@ -7,6 +7,7 @@
  */
 #include <stack>
 #include <list>
+#include <vector>
 #include <stdio.h>
 #include <string.h>
 #include "ui_com.h"
@@ -19,7 +20,7 @@
 
 /************全局变量*****************/
 std::stack<lv_group_t*, std::list<lv_group_t*>> group_stack;
-lv_indev_t* keypad_indev = nullptr;
+std::vector<lv_indev_t*> indev;
 lv_group_t* activity_group = nullptr;
 
 /*************************** 组 ****************************/
@@ -29,19 +30,18 @@ void group_init(void)
     if (group) {
         lv_group_del(group);
     }
+    get_keypad_indev();
 }
 
-lv_indev_t* get_keypad_indev(void)
+void get_keypad_indev(void)
 {
-    keypad_indev = NULL;
+    lv_indev_t* lv_indev = NULL;
     for (;;) {
-        keypad_indev = lv_indev_get_next(keypad_indev);
-        if (keypad_indev == NULL)
+        lv_indev = lv_indev_get_next(lv_indev);
+        if (lv_indev == NULL)
             break;
-        if (keypad_indev->driver->type == LV_INDEV_TYPE_KEYPAD)
-            break;
+        indev.push_back(lv_indev);
     }
-    return keypad_indev;
 }
 
 lv_group_t* create_new_group(void)
@@ -54,7 +54,8 @@ lv_group_t* create_new_group(void)
 void set_group_activity(lv_group_t* group)
 {
     activity_group = group;
-    lv_indev_set_group(keypad_indev, group);
+    for(auto indev_iter : indev)
+        lv_indev_set_group(indev_iter, group);
 }
 
 lv_group_t* get_activity_group(void)
