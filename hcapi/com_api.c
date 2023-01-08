@@ -9,6 +9,8 @@
 #include <sys/ioctl.h>
 #include <linux/fb.h>
 #include <hcuapi/fb.h>
+#include <hcuapi/standby.h>
+
 //#include "lvgl/lvgl.h"
 //#include "lv_drivers/display/fbdev.h"
 #include <hccast/hccast_wifi_mgr.h>
@@ -77,6 +79,10 @@ int api_logo_show(const char *file)
     //stop 
     //hcplayer_stop2(m_logo_player, false, false);
     printf("=============================Show logo: %s ok!=============================\n", file_path);
+
+    /* if wifi is exist, probe it */
+    system("/etc/wifiprobe.sh &");
+
     return 0;
 }
 
@@ -375,4 +381,113 @@ void api_system_reboot(void)
     printf("%s(): reboot now!!\n", __func__);
     system("reboot");
     while(1);
+}
+
+
+/*
+we can wake up by 3 ways: ir, gpio and sacadc key. 
+ */
+void api_system_standby(void)
+{
+    int fd = -1;
+
+    fd = open("/dev/standby", O_RDWR);
+    if (fd < 0) {
+        printf("%s(), line:%d. open standby device error!\n", __func__, __LINE__);
+        return;
+    }
+
+    printf("%s(), line:%d.\n", __func__, __LINE__);
+
+    //step 1: off the display
+    api_osd_show_onoff(false);
+    api_logo_off();
+    api_dis_show_onoff(false);
+    //sleep for a while so that hardware display is really off.
+    api_sleep_ms(100);
+    
+
+    //Step 2: off other devices
+
+
+    //Step 3: config the standby wake up methods
+        
+    //config wake up ir scancode(so far, default is power key:28)   
+    //check hclinux\SOURCE\linux-drivers\drivers\hcdrivers\rc\keymaps\rc-hcdemo.c
+    //for scan code. 
+    struct standby_ir_setting ir = { 0 };
+    ir.num_of_scancode = 1;
+    ir.scancode[0] = 28;
+    ioctl(fd, STANDBY_SET_WAKEUP_BY_IR, (unsigned long)&ir);
+
+    //config wake up GPIO
+    struct standby_gpio_setting gpio = { 0 };
+    gpio.pin = PINPAD_L08;
+    gpio.polarity = 0;//low is active;
+    ioctl(fd, STANDBY_SET_WAKEUP_BY_GPIO, (unsigned long)&gpio);
+
+#if 0
+    //config wake up adc key
+    struct standby_saradc_setting adc = { 0 };
+    adc.channel = 1;
+    adc.min = 1000;
+    adc.max = 1500;
+    ioctl(fd, STANDBY_SET_WAKEUP_BY_SARADC, (unsigned long)&adc);
+#endif    
+
+#if 0
+    //lower the volatage of ddr via the GPIO
+    struct standby_pwroff_ddr_setting ddr = { 0 };
+    ddr.pin = PINPAD_L09;
+    ddr.polarity = 0;//low is active;
+    ioctl(fd, STANDBY_SET_PWROFF_DDR, (unsigned long)&ddr);
+#endif
+
+    //Step 4: entering system standby
+    ioctl(fd, STANDBY_ENTER, 0);
+    close(fd);
+    while(1);
+}
+
+static volatile int m_osd_off_time_cnt = 0;
+#define ONE_COUNT_TIME  200
+static void *osd_off_for_time(void *arg)
+{
+    uint32_t timeout = (uint32_t)arg;
+    m_osd_off_time_cnt = timeout/ONE_COUNT_TIME;
+    do{
+        api_sleep_ms(ONE_COUNT_TIME);
+    }while(m_osd_off_time_cnt --);
+
+    m_osd_off_time_cnt = 0;
+    api_osd_show_onoff(true);
+
+    return NULL;
+}
+
+//Turn off OSD for a time, then turn on OSD.
+//because sometimes enter dlna music play, the OSD is still show
+//but the video screen is black(BUG #2848), so we turn off OSD for some time.
+void api_osd_off_time(uint32_t timeout)
+{
+
+    //update the wait time
+    if (m_osd_off_time_cnt){
+        int timeout_cnt = timeout/ONE_COUNT_TIME;
+        if (timeout_cnt > m_osd_off_time_cnt)
+            m_osd_off_time_cnt = timeout_cnt;
+
+        return;
+    }
+
+    api_osd_show_onoff(false);
+    pthread_t thread_id = 0;
+    pthread_attr_t attr;
+
+    pthread_attr_init(&attr);
+    pthread_attr_setstacksize(&attr, 0x1000);
+    pthread_attr_setdetachstate(&attr,PTHREAD_CREATE_DETACHED); //release task resource itself
+    if (pthread_create(&thread_id, &attr, osd_off_for_time, (void*)timeout)) {
+        return;
+    }
 }

@@ -24,7 +24,12 @@
 #include <hccast/hccast_mira.h>
 #endif
 
+#ifdef USBMIRROR_SUPPORT
+#include <hccast/hccast_um.h>
+#endif
+
 #include <hccast/hccast_scene.h>
+#include <hccast/hccast_av.h>
 
 
 #ifdef __cplusplus
@@ -42,6 +47,8 @@ typedef enum{
 
 int cast_get_service_name(cast_type_t cast_type, char *service_name, int length);
 void cast_restart_services(void);
+int cast_init(void);
+int cast_deinit(void);
 
 #ifdef DLNA_SUPPORT
 int hccast_dlna_callback_func(hccast_dlna_event_e event, void* in, void* out);
@@ -74,6 +81,24 @@ void hccast_air_mediaplayer_2_aircast_event(int type, void *param);
 int hccast_air_ap_get_mirror_frame_num(void);
 int hccast_air_service_is_start(void);
 #endif
+
+
+#ifdef USBMIRROR_SUPPORT
+int cast_usb_mirror_start(void);
+#else
+/*
+int hccast_um_init(void);
+int hccast_um_deinit(void);
+int hccast_um_param_set(hccast_um_param_t *param);
+int hccast_ium_start(char *uuid, hccast_um_cb event_cb);
+int hccast_ium_stop(void);
+int hccast_aum_start(hccast_aum_param_t *param, hccast_um_cb event_cb);
+int hccast_aum_stop(void);
+*/
+#endif
+
+void restart_air_service_by_hdmi_change(void);
+
 
 #ifdef __cplusplus
 } /*extern "C"*/

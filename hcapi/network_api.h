@@ -20,6 +20,9 @@ int hostap_get_connect_count(void);
 char *wifi_local_ip_get(void);
 char *wifi_connected_phone_ip_get(void);
 
+void hccast_start_services(void);
+void hccast_stop_services(void);
+
 #define HOATAP_CHANNEL_24G  6
 #define HOATAP_CHANNEL_5G   36
 

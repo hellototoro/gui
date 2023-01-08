@@ -144,7 +144,8 @@ static void tv_sys_scale_out(int fd_dis)
 
 	fd_fb = open(DEV_FB , O_RDWR);
 	if (fd_fb < 0) {
-		printf("open device: %s error\n", DEV_FB);
+		printf("%s(), line:%d. open device: %s error!\n", 
+			__func__, __LINE__, DEV_FB);
 		return;
 	}
 
@@ -173,11 +174,12 @@ static int tv_sys_edid_get(uint32_t timeout)
 	enum TVSYS tv_sys = 0;
 	enum TVTYPE tv_type = TV_LINE_1080_60;
 	uint32_t loop_cnt = timeout/100;
-	int ret;
+	int ret = -1;
 
 	fd_hdmi = open(DEV_HDMI , O_RDWR);
 	if (fd_hdmi < 0) {
-		printf("open device: %s error\n", DEV_HDMI);
+		printf("%s(), line:%d. open device: %s error!\n", 
+			__func__, __LINE__, DEV_HDMI);
 		return -1;
 	} else {
 		do{
@@ -197,7 +199,9 @@ static int tv_sys_edid_get(uint32_t timeout)
 	}
 
 	close(fd_hdmi);
-
+	if (ret < 0)
+		return -1;
+	
 	return tv_type;
 }
 
@@ -211,11 +215,14 @@ static int tv_sys_set(bool dual_out, int set_tv_type, bool auto_set)
 	enum TVTYPE real_tv_type = 0;
 
 	tv_type = tv_sys_edid_get(200);
+	if ((int)tv_type < 0)
+		return API_FAILURE;
 
 	fd_dis = open(DEV_DIS , O_WRONLY);
 	if(fd_dis < 0) {
-		printf("open device: %s error\n", DEV_DIS);
-		return -1;
+        printf("%s(), line:%d. open device: %s error!\n", 
+            __func__, __LINE__, DEV_DIS);
+		return API_FAILURE;
 	}
 
 	struct dis_tvsys get_tvsys = { 0 };	
@@ -237,7 +244,7 @@ static int tv_sys_set(bool dual_out, int set_tv_type, bool auto_set)
 		if (tv_type < set_tv_type) {
 			printf("tv not support tvtype: tv_type=%d, set_tv_type:%d\n",
 				tv_type, set_tv_type);
-			return -1;
+			return API_FAILURE;
 		}
 
 	#if 0
@@ -397,11 +404,14 @@ static int tv_sys_auto_set(bool dual_out, int set_tv_type, bool auto_set, uint32
 		__FUNCTION__, __LINE__, set_tv_type, auto_set);
 
 	tv_type = tv_sys_edid_get(timeout);
-
+	if ((int)tv_type < 0){
+		return -1;
+	}
 
 	fd_dis = open(DEV_DIS , O_WRONLY);
 	if(fd_dis < 0) {
-		printf("open device: %s error\n", DEV_DIS);
+		printf("%s(), line:%d, open device: %s error!\n", 
+			__func__, __LINE__, DEV_DIS);
 		return -1;
 	}
 
@@ -501,6 +511,8 @@ int tv_sys_app_auto_set(int app_tv_sys, uint32_t timeout)
 	convert_tv_type = tv_sys_app_sys_to_de_sys(app_tv_sys);
 
 	support_tv_type = tv_sys_auto_set(dual_out, convert_tv_type, auto_set, timeout);
+	if (support_tv_type < 0)
+		return -1;
 	return tv_sys_de_sys_to_app_sys(support_tv_type);
 }
 
@@ -520,6 +532,9 @@ int tv_sys_app_start_set(int check)
 		enum TVTYPE edid_tv_type = TV_LINE_1080_60;
 		enum TVTYPE de_tv_type;
 		edid_tv_type = tv_sys_edid_get(200);
+		if ((int)edid_tv_type < 0)
+			return -1;
+
 		de_tv_type = data_mgr_de_tv_sys_get();
 
 		if (APP_TV_SYS_AUTO == ap_tv_sys){

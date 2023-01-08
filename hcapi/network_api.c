@@ -52,7 +52,7 @@ static void media_callback_func(hccast_media_event_e msg_type, void* param);
 
 static void network_probed_wifi(void);
 
-static void hccast_start_services(void)
+void hccast_start_services(void)
 {
     if (hccast_get_current_scene() != HCCAST_SCENE_NONE)
     {
@@ -66,7 +66,7 @@ static void hccast_start_services(void)
     hccast_mira_service_start();
 }
 
-static void hccast_stop_services(void)
+void hccast_stop_services(void)
 {
     printf("[%s]  begin stop services.\n", __func__);
 
@@ -329,6 +329,7 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
     int ap_tv_sys;
     hccast_wifi_ap_info_t *ap_wifi = NULL;
     unsigned int version;
+	int temp;
     control_msg_t msg = {0};
 
     switch (event)
@@ -353,13 +354,17 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
             ret = app_data->aircast_mode;
             break;
         case HCCAST_HTTPD_SET_AIRCAST_MODE:
-            app_data->aircast_mode = (int)in;
-            data_mgr_save();
-            if(hccast_get_current_scene() == HCCAST_SCENE_NONE)
-            {
-                hccast_air_service_stop();
-                hccast_air_service_start();
-            }
+			temp = (int)in;
+			if(temp != app_data->aircast_mode)
+			{
+	            app_data->aircast_mode = temp;
+	            data_mgr_save();
+	            if(hccast_get_current_scene() == HCCAST_SCENE_NONE)
+	            {
+	                hccast_air_service_stop();
+	                hccast_air_service_start();
+	            }
+			}
             break;
         case HCCAST_HTTPD_GET_MIRROR_FRAME:
             ret = app_data->mirror_frame;
@@ -530,6 +535,8 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
         }
         case HCCAST_HTTPD_GET_UPLOAD_DATA_START:
         {
+        	hccast_stop_services();//stop all services, avoid download data abort.
+        	
             msg.msg_type = MSG_TYPE_NET_UPGRADE;
             api_control_send_msg(&msg);
             api_sleep_ms(500);
@@ -538,6 +545,8 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
         }
         case HCCAST_HTTPD_GET_UPGRADE_FILE_BEGING:
         {
+        	hccast_stop_services();//stop all services, avoid download data abort.
+        	
             msg.msg_type = MSG_TYPE_NET_UPGRADE;
             api_control_send_msg(&msg);
             api_sleep_ms(500);
@@ -545,6 +554,20 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
         }
         case HCCAST_HTTPD_GET_UPLOAD_DATA_FAILED:
         {
+        	hccast_start_services();//restart all services.
+        	
+        	msg.msg_type = MSG_TYPE_UPG_STATUS;
+        	msg.msg_code = UPG_STATUS_SERVER_FAIL;
+        	api_control_send_msg(&msg);
+            break;
+        }
+		case HCCAST_HTTPD_MSG_UPGRADE_SERVER_BAD:
+        {
+        	hccast_start_services();//restart all services.
+        	
+        	msg.msg_type = MSG_TYPE_UPG_STATUS;
+        	msg.msg_code = UPG_STATUS_SERVER_FAIL;
+        	api_control_send_msg(&msg);
             break;
         }
         case HCCAST_HTTPD_MSG_UPGRADE_BAD_RES:
@@ -554,6 +577,11 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
         }
         case HCCAST_HTTPD_MSG_USER_UPGRADE_ABORT:
         {
+        	hccast_start_services();//restart all services.
+
+			msg.msg_type = MSG_TYPE_UPG_STATUS;
+        	msg.msg_code = UPG_STATUS_USER_STOP_DOWNLOAD;
+        	api_control_send_msg(&msg);
             break;
         }
         case HCCAST_HTTPD_MSG_UPGRADE_FILE_SUC:
@@ -621,14 +649,34 @@ static int httpd_callback_func(hccast_httpd_event_e event, void* in, void* out)
             break;
         }
         case HCCAST_HTTPD_GET_CUR_SCENE_PLAY:
-            if((hccast_get_current_scene() != HCCAST_SCENE_NONE) || (hccast_air_ap_audio_stat()))
-            {
-                ret = 1;
-            }
-            else
-            {
-                ret = 0;
-            }
+
+			if(hccast_air_ap_audio_stat())
+			{
+				ret = 1;
+			}
+			else if(hccast_get_current_scene() != HCCAST_SCENE_NONE)
+			{
+				if((hccast_get_current_scene() == HCCAST_SCENE_AIRCAST_PLAY) || ((hccast_get_current_scene() == HCCAST_SCENE_DLNA_PLAY)))
+				{
+					if(hccast_media_get_status() == HCCAST_MEDIA_STATUS_STOP)
+					{
+						ret = 0;
+					}
+					else
+					{
+						ret = 1;
+					}
+				}
+				else
+				{
+					ret = 1;
+				}
+			}
+			else
+			{
+				ret = 0;
+			}
+
             break;
         case HCCAST_HTTPD_STOP_MIRA_SERVICE:
             hccast_mira_service_stop();
@@ -881,21 +929,7 @@ int network_init(void)
     hccast_httpd_service_init(httpd_callback_func);
     hccast_media_init(media_callback_func);
 
-#ifdef DLNA_SUPPORT
-    hccast_dlna_service_init(hccast_dlna_callback_func);
-#endif
-
-#ifdef MIRACAST_SUPPORT    
-    hccast_mira_service_init(hccast_mira_callback_func);
-#endif    
-
-#ifdef AIRCAST_SUPPORT    
-    hccast_air_service_init(hccast_air_callback_event);
-#endif    
-
-    hccast_scene_init();
-    hccast_set_aspect_mode(1, 3);//16:9 as default.
-
+    cast_init();
     network_probed_wifi();
     hostap_connect_detect_init();
 
@@ -980,6 +1014,8 @@ static void *network_connect_task(void *arg)
             goto connect_exit;
     }
 
+    network_init();
+
     //step 1: http server startup
     //hccast_wifi_mgr_connect("TP-LINK_A422", "hichip1234");
 
@@ -1012,6 +1048,9 @@ static void *network_connect_task(void *arg)
     }
     else
     {
+        ctl_msg.msg_type = MSG_TYPE_NETWORK_WIFI_CONNECTED;
+        api_control_send_msg(&ctl_msg);
+
         //No wif AP in flash, entering AP mode
         hccast_wifi_mgr_hostap_start();
         hccast_mira_service_start();

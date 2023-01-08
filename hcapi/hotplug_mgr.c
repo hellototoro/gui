@@ -28,6 +28,7 @@ hotplug_mgr.c: to manage the hotplug device, such as usb wifi, usb disk etc
 #include "network_api.h"
 #include "data_mgr.h"
 #include "hotplug_mgr.h"
+#include "cast_api.h"
 
 #define MX_EVNTS (10)
 #define EPL_TOUT (1000)
@@ -36,7 +37,7 @@ hotplug_mgr.c: to manage the hotplug device, such as usb wifi, usb disk etc
 
 static int m_hdmi_tx_plugin = 0;
 static int m_hdmi_rx_plugin = 0;
-static int m_usb_plugout = -1;
+static int m_usb_plugout = 0;
 static int m_wifi_plugin = 0;
 
 enum EPOLL_EVENT_TYPE
@@ -155,9 +156,7 @@ static void do_kumsg(KuMsgDH *msg)
 		if(((last_tv_sys < TV_LINE_4096X2160_30) && (data_mgr_de_tv_sys_get() >= TV_LINE_4096X2160_30)) \
 			|| ((last_tv_sys >= TV_LINE_4096X2160_30) && (data_mgr_de_tv_sys_get() < TV_LINE_4096X2160_30)))
 		{
-			control_msg_t ctl_msg = {0};
-			ctl_msg.msg_type = MSG_TYPE_HDMI_TX_CHANGED;
-			api_control_send_msg(&ctl_msg);
+			restart_air_service_by_hdmi_change();
 		}
 		
         break;
@@ -250,6 +249,9 @@ static void *hotplug_receive_event_func(void *arg)
                     break;
             }
         }
+
+	usleep(10 * 1000);
+
     }
 
     return NULL;
@@ -333,8 +335,9 @@ void hotplug_init(void)
     }
 
     hdmi_tx_fd = open(DEV_HDMI, O_RDWR);  
-    if (-1 == hdmi_tx_fd){
-        printf("open device %s error!\n", __func__);
+    if (hdmi_tx_fd < 0){
+        printf("%s(), line:%d. open device: %s error!\n", 
+            __func__, __LINE__, DEV_HDMI);
         goto out;
     }
     kumsg_fd = ioctl(hdmi_tx_fd, KUMSGQ_FD_ACCESS, O_CLOEXEC);
@@ -372,7 +375,9 @@ void hotplug_init(void)
 
 
 out:
-    return ;
+    if (hdmi_tx_fd >= 0)
+        close(hdmi_tx_fd);
+
 }
 
 int hotplug_hdmi_tx_get(void)
