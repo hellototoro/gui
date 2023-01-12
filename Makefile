@@ -26,27 +26,27 @@ CFLAGS += $(LVGL_HEADERS)
 CPPFLAGS += "-I$(ROOT_DIR)/boost_1_79_0" $(CODE_MICRO) $(LVGL_HEADERS)
 
 LDFLAGS ?= -lm -llvgl -lmiracast -laircast -ldlna
-BIN = gui_app
+BIN = projector_gui_app
 
-GUI_LIBS = -lffplayer -lpthread -lge -Wl,--start-group -lstdc++ $(CAST_LIBS) -Wl,--end-group
-GUI_LIBS += -lcjson -lwpa_client -lhccast-com -lhccast-net -lhccast-wl -lmdns -lcrypto -lhcfota
+PROJECTOR_GUI_LIBS = -lffplayer -lpthread -lge -Wl,--start-group -lstdc++ $(CAST_LIBS) -Wl,--end-group
+PROJECTOR_GUI_LIBS += -lcjson -lwpa_client -lhccast-com -lhccast-net -lhccast-wl -lmdns -lcrypto -lhcfota
 
 MAINSRC = ./main.c
 
 include $(ROOT_DIR)/hcapi/hcapi.mk
-include $(ROOT_DIR)/application/gui_app.mk
+include $(ROOT_DIR)/application/projector_gui_app.mk
 include $(ROOT_DIR)/lv_i18n/lv_i18n.mk
 
 OBJEXT ?= .o
 
 AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
-GUI_OBJS = $(GUI_APP_SRC:.c=$(OBJEXT))
-GUI_OBJS += $(GUI_APP_CPP_SRC:.cpp=$(OBJEXT))
+PROJECTOR_GUI_OBJS = $(PROJECTOR_GUI_APP_SRC:.c=$(OBJEXT))
+PROJECTOR_GUI_OBJS += $(PROJECTOR_GUI_APP_CPP_SRC:.cpp=$(OBJEXT))
 
 MAINOBJ = $(MAINSRC:.c=$(OBJEXT))
 
-all: make_gui_app
+all: make_projector_gui_app
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -59,11 +59,11 @@ all: make_gui_app
 default: $(AOBJS) $(COBJS) $(MAINOBJ)
 	@$(CC) -o $(BIN) $(MAINOBJ) $(AOBJS) $(COBJS) $(LDFLAGS) -lffplayer
 	
-make_gui_app:	$(COBJS) $(GUI_OBJS) $(MAINOBJ)
-	@$(CC) -o $(BIN) $(MAINOBJ) $(GUI_OBJS) $(COBJS) $(LDFLAGS) $(GUI_LIBS)
+make_projector_gui_app:	$(COBJS) $(PROJECTOR_GUI_OBJS) $(MAINOBJ)
+	@$(CC) -o $(BIN) $(MAINOBJ) $(PROJECTOR_GUI_OBJS) $(COBJS) $(LDFLAGS) $(PROJECTOR_GUI_LIBS)
 	
 clean: 
-	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ) $(GUI_OBJS)
+	rm -f $(BIN) $(AOBJS) $(COBJS) $(MAINOBJ) $(PROJECTOR_GUI_OBJS)
 
 install:
 	@echo "install ......"
