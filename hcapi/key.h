@@ -98,9 +98,7 @@ enum ui_key
 	VKEY_NULL = 0xFFFF,
 };
 
-int key_regist(lv_group_t * group);
-int key_init(void);
-uint32_t key_convert_vkey(uint32_t lv_key);
+void key_init(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
