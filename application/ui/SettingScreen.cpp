@@ -79,6 +79,7 @@ void CreateSettingScreen(lv_obj_t* parent)
                 break;
 
             case Position:
+                CreateSettingPanel(SettingRootScreen, 800, 90, new Setting::Position, true, false);
                 break;
 
             case Picture:

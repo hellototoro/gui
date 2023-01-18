@@ -14,6 +14,7 @@
 #include "Sound.h"
 #include "System.h"
 #include "NetWork.h"
+#include "Position.h"
 
 namespace Setting {
 

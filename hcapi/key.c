@@ -98,7 +98,7 @@ static void ir_keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
     static int key_pressing = false;
     static time_t last_time = 0;
     static uint32_t last_key = 0;
-    uint32_t act_key = keypad_get_key(fd_ir_key);
+    uint32_t act_key = keypad_get_key(key_code, key_pressing, fd_ir_key);
     time_t cur_time = time(NULL);
     if (act_key != 0) {
         time_t diff = difftime(cur_time, last_time)*10;
@@ -120,10 +120,10 @@ static void adc_keypad_read(lv_indev_drv_t * indev_drv, lv_indev_data_t * data)
 {
     ((void)indev_drv);
     static int key_code = 0;
-    static int key_pressing = false;
+    static int key_pressing = false; 
     static time_t last_time = 0;
     static uint32_t last_key = 0;
-    uint32_t act_key = keypad_get_key(fd_adc_key);
+    uint32_t act_key = keypad_get_key(key_code, key_pressing, fd_adc_key);
     time_t cur_time = time(NULL);
     if (act_key != 0) {
         time_t diff = difftime(cur_time, last_time)*10;
