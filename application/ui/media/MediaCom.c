@@ -511,11 +511,9 @@ static void PlayedStateTimer_cb(lv_timer_t * timer)
     played_time = played_time_host;
     if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
         lv_timer_pause(timer);
-        #ifdef HOST_GCC
         PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode[CurrentPlayingType], AutoPlay));
         if (played_time_host == 0)
             SetTotalTimeAndProgress(20);
-        #endif
         return;
     }
     if(CurrentPlayingType == MEDIA_MUSIC) { //刷新歌词

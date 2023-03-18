@@ -17,11 +17,7 @@
 extern "C" {
 #endif
 
-#ifdef HOST_GCC
 #define media_dir "mnt"
-#else
-#define media_dir "media"
-#endif
 
 typedef enum
 { 

@@ -19,11 +19,7 @@
 extern "C" {
 #endif
 
-#ifdef HOST_GCC
 #include "lv_host_sim/lvgl/lvgl.h"
-#else
-#include "lvgl/lvgl.h"
-#endif
 
 LV_IMG_DECLARE(ui_img_udisk_n_png);    // assets\udisk_n.png
 LV_IMG_DECLARE(ui_img_udisk_f_png);    // assets\udisk_f.png

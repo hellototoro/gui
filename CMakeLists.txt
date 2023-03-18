@@ -14,8 +14,6 @@ include_directories(
 
 #file(GLOB_RECURSE INCLUDES "./*.h" )
 
-add_definitions(-DHOST_GCC)
-
 add_subdirectory(application)
 add_subdirectory(lv_i18n)
 add_subdirectory(lv_host_sim)
