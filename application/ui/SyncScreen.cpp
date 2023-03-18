@@ -9,10 +9,6 @@
 #include "SyncScreen.h"
 #include "LanguageScreen.h"
 #include "application/windows.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/cast_api.h"
-#include "hcapi/data_mgr.h"
-#endif
 
 static lv_obj_t* SyncRootScreen;
 static lv_obj_t* SyncSubScreen;
@@ -28,11 +24,6 @@ typedef enum {
 
 static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType);
 static void ExitSync(ActiveScreen screen);
-#if 0//def HCCHIP_GCC
-static volatile int m_first_flag = 1;
-static void SyncScreenOpen(void);
-static void win_cast_connect_state_upate(bool force_station);
-#endif
 
 static constexpr const lv_img_dsc_t* root_img_src[] = {
     &cast_es,
@@ -215,11 +206,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
     lv_obj_t* WifiName1 = lv_label_create(CastPanel);
     lv_obj_set_size(WifiName1, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
     lv_obj_set_align(WifiName1, LV_ALIGN_LEFT_MID);
-    #ifdef HCCHIP_GCC
-    lv_label_set_text(WifiName1, data_mgr_get_device_name());
-    #else
-    lv_label_set_text(WifiName1, "Project_3A4D");
-    #endif
+    //lv_label_set_text(WifiName1, data_mgr_get_device_name());
     lv_obj_set_style_text_font(WifiName1, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     lv_obj_t* img = lv_img_create(CastPanel);
@@ -248,11 +235,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
 
         text1_lab->user_data = (void*)"cast_mira_str1";
-        #ifdef HCCHIP_GCC
-        lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), data_mgr_get_device_name());
-        #else
         lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), "Project_3A4D");
-        #endif
         lv_obj_set_style_text_letter_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -266,10 +249,6 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_letter_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
-        #if 0//def HCCHIP_GCC
-        hccast_mira_service_init(hccast_mira_callback_func);
-        hccast_mira_service_start();
-        #endif
     }
     else {
         lv_obj_set_style_bg_img_src(CastPanel, &iOSCast, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -296,11 +275,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_size(WifiName2, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
         lv_obj_set_pos(WifiName2, 945, -90);
         lv_obj_set_align(WifiName2, LV_ALIGN_LEFT_MID);
-        #ifdef HCCHIP_GCC
-        lv_label_set_text(WifiName2, data_mgr_get_device_name());
-        #else
-        lv_label_set_text(WifiName2, "Project_3A4D");
-        #endif
+        //lv_label_set_text(WifiName2, data_mgr_get_device_name());
         lv_obj_set_style_text_font(WifiName2, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
 
         lv_obj_t* text1_lab = lv_label_create(CastPanel);
@@ -308,11 +283,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_pos(text1_lab, 90, 410);
         lv_obj_set_align(text1_lab, LV_ALIGN_TOP_LEFT);
         text1_lab->user_data = (void*)"cast_airplay_str1";
-        #ifdef HCCHIP_GCC
-        lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), data_mgr_get_device_name());
-        #else
         lv_label_set_text_fmt(text1_lab, "%s%s", _(static_cast<const char*>(text1_lab->user_data)), "Project_3A4D");
-        #endif
         lv_obj_set_style_text_letter_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text1_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text1_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -322,11 +293,7 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_pos(text2_lab, 90, 445);
         lv_obj_set_align(text2_lab, LV_ALIGN_TOP_LEFT);
         text2_lab->user_data = (void*)"cast_airplay_str2";
-        #ifdef HCCHIP_GCC
-        lv_label_set_text_fmt(text2_lab, "%s%s", _(static_cast<const char*>(text2_lab->user_data)), data_mgr_get_device_name());
-        #else
-        lv_label_set_text_fmt(text2_lab, "%s%s", _(static_cast<const char*>(text2_lab->user_data)), "Project_3A4D");
-        #endif
+        //lv_label_set_text_fmt(text2_lab, "%s%s", _(static_cast<const char*>(text2_lab->user_data)), data_mgr_get_device_name());
         lv_obj_set_style_text_letter_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text2_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text2_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
@@ -340,10 +307,6 @@ static void CreateCastPanel(lv_obj_t* parent, SyncScreenType_t CastType)
         lv_obj_set_style_text_letter_space(text3_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_line_space(text3_lab, 2, LV_PART_MAIN | LV_STATE_DEFAULT);
         lv_obj_set_style_text_font(text3_lab, &ui_font_MyFont26, LV_PART_MAIN | LV_STATE_DEFAULT);
-        #if 0//def HCCHIP_GCC
-        hccast_air_service_init(hccast_air_callback_event);
-        hccast_air_service_start();
-        #endif
     }
 }
 

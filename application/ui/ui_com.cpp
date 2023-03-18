@@ -14,9 +14,6 @@
 #include "Volume.h"
 #include "Source.h"
 #include "SettingScreen.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
-#endif
 
 /************全局变量*****************/
 std::stack<lv_group_t*, std::list<lv_group_t*>> group_stack;
@@ -363,54 +360,6 @@ void other_event_handler(lv_event_t* event)
 /*************************** 系统消息 ****************************/
 void ProcessSysMsg(void)
 {
-    #ifdef HCCHIP_GCC
-    static int UdiskStatus = -1;
-    control_msg_t ctl_msg;
-    api_control_receive_msg(&ctl_msg);
-    switch (ctl_msg.msg_type)
-    {
-    case MSG_TYPE_USB_DISK_PLUGIN:
-        UdiskStatus = 0;
-        lv_msg_send(MSG_HOTPLUG, &UdiskStatus);
-        printf("usb plug in\n");
-        break;
-    case MSG_TYPE_USB_DISK_PLUGOUT:
-        UdiskStatus = 1;
-        lv_msg_send(MSG_HOTPLUG, &UdiskStatus);
-        printf("usb plug out\n");
-        break;
-    case MSG_TYPE_CAST_MIRACAST_CONNECTING:
-    {
-        lv_obj_t* obj = CreateLoadingScreen(lv_scr_act());
-        lv_obj_t* text = lv_label_create(obj);
-        lv_obj_set_size(text, LV_SIZE_CONTENT, LV_SIZE_CONTENT);    /// 1
-        lv_obj_set_pos(text, 0, 80);
-        lv_obj_set_align(text, LV_ALIGN_CENTER);
-        lv_label_set_text(text, _("cast_connecting"));
-        lv_obj_set_style_text_color(text, lv_color_hex(0x0084FF), LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_opa(text, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-        lv_obj_set_style_text_font(text, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
-        break;
-    }
-    case MSG_TYPE_CAST_MIRACAST_CONNECTED:
-        //CloseLoadingScreen();
-        break;
-    case MSG_TYPE_CAST_AIRCAST_START:
-    case MSG_TYPE_CAST_MIRACAST_START:
-        CloseLoadingScreen();
-        lv_obj_add_flag(lv_obj_get_child(lv_scr_act(), 0), LV_OBJ_FLAG_HIDDEN);
-        break;
-    case MSG_TYPE_CAST_AIRCAST_STOP:
-    case MSG_TYPE_CAST_MIRACAST_STOP:
-        lv_obj_clear_flag(lv_obj_get_child(lv_scr_act(), 0), LV_OBJ_FLAG_HIDDEN);
-        break;
-    case MSG_TYPE_CAST_DLNA_START:
-        break;
-    
-    default:
-        break;
-    }
-    #endif
 }
 
 /*************************** 其他 ****************************/
@@ -418,11 +367,7 @@ bool HasUsbDevice(void)
 {
     FILE * fp;
     char buffer[20];
-    #ifdef HCCHIP_GCC
-    fp = popen("ls /proc/scsi","r");
-    #else
     fp = popen("ls ~/temp/lvgl_test_dir","r");
-    #endif
     if (nullptr != fp) {
         while (fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
             if (strncmp("usb-storage", buffer, strlen("usb-storage")) == 0) {

@@ -12,9 +12,6 @@
 #include "application/ConfigParam.h"
 #include "application/ui/LanguageScreen.h"
 #include "application/ui/ui_com.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
-#endif
 #include "application/ui/SettingScreen.h"
 
 namespace Setting {
@@ -72,11 +69,7 @@ void System::SelectedValue(int index)
             WriteConfigFile_I("guide_flag.flag", 1);
             WriteConfigFile_I("default_language.index", 2);
             WriteConfigFile_S("default_language.language", "en-GB");
-            #ifdef HCCHIP_GCC
-            CreateSpinBox(lv_scr_act(), _("setting_p_waiting"), 3, api_system_reboot);
-            #else
             CreateSpinBox(lv_scr_act(), _("setting_p_waiting"), 3, nullptr);
-            #endif
         });
         
     }

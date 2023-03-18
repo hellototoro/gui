@@ -11,9 +11,6 @@
 #define NET_WORK_APT_H
 
 #include <stdbool.h>
-#ifdef HCCHIP_GCC
-#include "hcapi/wifi_api.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,16 +18,13 @@ extern "C" {
 
 typedef void (*NetWorkTaskCallBack)(void);
 
-#ifdef HCCHIP_GCC
 extern int NetWorkInit(void);
 extern void NetWorkDeInit(void);
 extern int WiFi_GetAPCount(void);
 extern wifi_ap_info_t* WiFi_GetAPList(void);
 extern void WiFi_Connect(wifi_ap_info_t *wifi_info);
-#endif
 extern void WiFi_Scan(NetWorkTaskCallBack cb);
 extern bool WiFi_IsConnected(void);
-
 
 #ifdef __cplusplus
 }

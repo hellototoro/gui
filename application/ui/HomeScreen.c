@@ -15,9 +15,6 @@
 #include "SettingScreen.h"
 #include "SyncScreen.h"
 #include "application/ui/media/MediaScreen.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/hotplug_mgr.h"
-#endif
 
 static lv_obj_t* HomeRootScreen;
 static lv_obj_t* MainPanel;
@@ -203,11 +200,7 @@ static void CreateMainPanel(lv_obj_t* parent)
     lv_obj_set_style_bg_opa(UdiskDetectPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_color(UdiskDetectPanel, lv_color_hex(0x000000), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(UdiskDetectPanel, 0, LV_PART_MAIN | LV_STATE_DEFAULT);
-    #ifdef HCCHIP_GCC
-    lv_msg_subsribe_obj(MSG_HOTPLUG, UdiskDetectPanel, NULL);
-    #else
     lv_msg_subscribe_obj(MSG_HOTPLUG, UdiskDetectPanel, NULL);
-    #endif
     lv_obj_add_event_cb(UdiskDetectPanel, UdiskStatus_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     lv_obj_t* img = lv_img_create(UdiskDetectPanel);
@@ -270,11 +263,7 @@ static void HomeInit(void)
     lv_obj_set_size(HomeRootScreen, LV_HOR_RES, LV_VER_RES);
     lv_obj_set_style_bg_color(HomeRootScreen, lv_color_hex(0x3200FE), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(HomeRootScreen, 255, LV_PART_MAIN | LV_STATE_DEFAULT);
-    #ifdef HCCHIP_GCC
-    lv_msg_subsribe_obj(MSG_EXIT_SCREEN, HomeRootScreen, NULL);
-    #else
     lv_msg_subscribe_obj(MSG_EXIT_SCREEN, HomeRootScreen, NULL);
-    #endif
     lv_obj_add_event_cb(HomeRootScreen, sys_event_handler, LV_EVENT_MSG_RECEIVED, NULL);
 
     CreateMainPanel(HomeRootScreen);

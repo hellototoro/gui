@@ -12,9 +12,6 @@
 
 #include "application/ui/ui_com.h"
 #include "MediaFile.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

@@ -16,9 +16,6 @@
 #include "Music.h"
 #include "Photo.h"
 #include "Text.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
-#endif
 
 #define FileListPanelWidth 1010
 #define FileListPanelHeight 615
@@ -446,11 +443,7 @@ static void MediaInit(void)
     lv_obj_set_style_bg_color(MediaSubScreen, lv_color_hex(0x0C9D89), LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_bg_opa(MediaSubScreen, LV_OPA_COVER, LV_PART_MAIN | LV_STATE_DEFAULT);
     lv_obj_set_style_border_opa(MediaSubScreen, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
-    #ifdef HCCHIP_GCC
-    lv_msg_subsribe_obj(MSG_HOTPLUG, MediaSubScreen, NULL);
-    #else
     lv_msg_subscribe_obj(MSG_HOTPLUG, MediaSubScreen, NULL);
-    #endif
     lv_obj_add_event_cb(MediaSubScreen, [] (lv_event_t* event) {
         lv_msg_t* msg = lv_event_get_msg(event);
         const int* UdiskStatus = static_cast<const int*>(lv_msg_get_payload(msg));

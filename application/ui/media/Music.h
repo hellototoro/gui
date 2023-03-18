@@ -11,9 +11,6 @@
 #define __MUSIC_H__
 
 #include "application/ui/ui_com.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {

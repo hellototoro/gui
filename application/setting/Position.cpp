@@ -9,9 +9,6 @@
 #include "Position.h"
 #include "application/ConfigParam.h"
 #include "application/ui/ui_com.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
-#endif
 #include "application/ui/SettingScreen.h"
 
 namespace Setting {

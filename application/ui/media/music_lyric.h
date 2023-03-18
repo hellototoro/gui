@@ -11,9 +11,6 @@
 #define __MUSIC_LYRIC_H__
 
 #include "lvgl/lvgl.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
-#endif
 
 #include <vector>
 #include <string>

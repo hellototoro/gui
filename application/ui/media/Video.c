@@ -22,17 +22,11 @@ static void UdiskStatus_event_handler(lv_event_t * event);
 void creat_video_window(lv_obj_t* parent, char* file_name)
 {
     BackWindow = parent;
-    #ifdef HOST_GCC
     VideoWindow = lv_ffmpeg_player_create(parent);
     lv_obj_clear_flag(VideoWindow, LV_OBJ_FLAG_SCROLLABLE);
     lv_ffmpeg_player_set_auto_restart(VideoWindow, true);
     lv_obj_center(VideoWindow);
     VideoHandler = VideoWindow;
-    #elif defined(HCCHIP_GCC)
-    VideoHandler = media_open(MEDIA_TYPE_VIDEO, (void*)MediaMsgProc);
-    VideoWindow = lv_obj_create(parent);
-    lv_obj_set_style_bg_opa(VideoWindow, LV_OPA_TRANSP, LV_PART_MAIN | LV_STATE_DEFAULT);
-    #endif
     lv_obj_add_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
 
     MediaComInit(MEDIA_VIDEO, VideoHandler);
@@ -47,13 +41,7 @@ void creat_video_window(lv_obj_t* parent, char* file_name)
 void close_video_window(void)
 {
     //step1 停止播放
-    #ifdef HOST_GCC
     lv_ffmpeg_player_set_cmd(VideoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
-    #elif defined(HCCHIP_GCC)
-    media_stop(VideoHandler);
-    media_close(VideoHandler);
-    VideoHandler = NULL;
-    #endif
     
     //step2 清理播放列表
     DestroyMediaArray();

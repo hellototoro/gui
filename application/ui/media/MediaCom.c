@@ -15,14 +15,6 @@
 #include "Music.h"
 #include "Photo.h"
 #include "Text.h"
-#ifdef HCCHIP_GCC
-#include <pthread.h>
-#include <sys/msg.h>
-#include <ffplayer.h>
-#include <hcuapi/codec_id.h>
-#include "hcapi/com_api.h"
-#include "hcapi/os_api.h"
-#endif
 
 /* 全局变量 */
 char current_path[100];
@@ -35,10 +27,8 @@ static MediaType CurrentPlayingType = MEDIA_MAX;
 static PlayListMode CurrentPlayMode[MEDIA_MAX];
 static MediaHandle* current_media_hdl;
 static MediaList* media_list[MEDIA_MAX];
-#ifdef HOST_GCC
 static uint32_t played_time_host;
 static lv_ffmpeg_player_cmd_t play_state;
-#endif
 static file_name_t* media_file_name_array;
 static int current_playing_index;
 static bool PlayingAnimation_Flag;
@@ -337,20 +327,12 @@ void PlayMedia(char * file_name)
         strcat(file_path, current_path);
         strcat(file_path, "/");
         strcat(file_path,  file_name);
-        #ifdef HOST_GCC
         lv_ffmpeg_player_set_src(current_media_hdl, file_path);
         lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_START);
         play_state = LV_FFMPEG_PLAYER_CMD_START;
         played_time_host = 0;
-        #elif defined(HCCHIP_GCC)
-        if (current_media_hdl->state == MEDIA_PLAY)
-            media_stop(current_media_hdl);
-        media_play(current_media_hdl, file_path);
-        #endif
         if(CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO ) {
-            #ifdef HCCHIP_GCC
-            CreateLoadingScreen(lv_scr_act());
-            #endif
+            //CreateLoadingScreen(lv_scr_act());
         }
         else if(CurrentPlayingType == MEDIA_MUSIC) {
             SetCurrentMusicTitle(file_name);
@@ -395,36 +377,20 @@ static void key_event_handler(lv_event_t* event)
             {
                 case Play:
                 {
-                    #ifdef HOST_GCC
                     lv_ffmpeg_player_cmd_t state = play_state;
                     #define __MEDIA_PLAY    LV_FFMPEG_PLAYER_CMD_START
                     #define __MEDIA_PAUSE   LV_FFMPEG_PLAYER_CMD_PAUSE
-                    #elif defined(HCCHIP_GCC)
-                    media_state_t state = current_media_hdl->state;
-                    #define __MEDIA_PLAY    MEDIA_PLAY
-                    #define __MEDIA_PAUSE   MEDIA_PAUSE
-                    #endif
                     if (state == __MEDIA_PLAY) {
                         //lv_img_set_src(target, &ui_img_play_start_png);
                         lv_obj_set_style_bg_img_src(target, &ui_img_play_start_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-                        #ifdef HOST_GCC
                         play_state = __MEDIA_PAUSE;
                         lv_ffmpeg_player_set_cmd(current_media_hdl, __MEDIA_PAUSE);
-                        #elif defined(HCCHIP_GCC)
-                        current_media_hdl->state = __MEDIA_PAUSE;
-                        media_pause(current_media_hdl);
-                        #endif
                     }
                     else if (state == __MEDIA_PAUSE) {
                         //lv_img_set_src(target, &ui_img_play_pause_png);
                         lv_obj_set_style_bg_img_src(target, &ui_img_play_pause_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-                        #ifdef HOST_GCC
                         play_state = __MEDIA_PLAY;
                         lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_RESUME);
-                        #elif defined(HCCHIP_GCC)
-                        current_media_hdl->state = __MEDIA_PLAY;
-                        media_resume(current_media_hdl);
-                        #endif
                     }
                 }
                 break;
@@ -540,14 +506,9 @@ static void PlayBarTimer_cb(lv_timer_t * timer)
 static void PlayedStateTimer_cb(lv_timer_t * timer)
 {
     uint32_t played_time = 0;
-    #ifdef HOST_GCC
     if (play_state == LV_FFMPEG_PLAYER_CMD_START)
         played_time_host++;
     played_time = played_time_host;
-    #elif defined(HCCHIP_GCC)
-    if (current_media_hdl != NULL)
-        played_time = media_get_playtime(current_media_hdl);
-    #endif
     if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
         lv_timer_pause(timer);
         #ifdef HOST_GCC
@@ -775,146 +736,3 @@ static void ShowDownAnimation(lv_obj_t * TargetObject, int delay)
     lv_anim_set_deleted_cb(&a, anim_callback_delete_obj);
     lv_anim_start(&a);
 }
-
-#ifdef HCCHIP_GCC
-void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg)
-{
-    if (!media_hld || !msg) return;
-    switch (msg->type)
-    {
-    case HCPLAYER_MSG_STATE_EOS:
-        printf (">> app get eos, normal play end!\n");
-        pthread_mutex_lock(&lvgl_task_mutex);
-        PlayMedia(GetNextMediaName(CurrentPlayingType, CurrentPlayMode[CurrentPlayingType], AutoPlay));
-        pthread_mutex_unlock(&lvgl_task_mutex);
-        //api_control_send_key(V_KEY_NEXT);
-        break;
-    case HCPLAYER_MSG_STATE_TRICK_EOS:
-        printf (">> app get trick eos, fast play to end\n");
-        //api_control_send_key(V_KEY_NEXT);
-        break;
-    case HCPLAYER_MSG_STATE_TRICK_BOS:
-        printf (">> app get trick bos, fast back play to begining!\n");
-        //api_control_send_key(V_KEY_PLAY);
-        break;
-    case HCPLAYER_MSG_OPEN_FILE_FAILED:
-        printf (">> open file fail\n");
-        break;
-    case HCPLAYER_MSG_ERR_UNDEFINED:
-        printf (">> error unknow\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_FORMAT:
-        printf (">> unsupport format\n");
-        break;
-    case HCPLAYER_MSG_BUFFERING:
-        printf(">> buffering %d\n", msg->val);
-        break;
-    case HCPLAYER_MSG_STATE_PLAYING:
-        printf(">> player playing\n");
-        break;
-    case HCPLAYER_MSG_STATE_PAUSED:
-        printf(">> player paused\n");
-        break;
-    case HCPLAYER_MSG_STATE_READY:
-        printf(">> player ready\n");
-        pthread_mutex_lock(&lvgl_task_mutex);
-        SetTotalTimeAndProgress(media_get_totaltime(media_hld));
-        CloseLoadingScreen();
-        pthread_mutex_unlock(&lvgl_task_mutex);
-        break;
-    case HCPLAYER_MSG_READ_TIMEOUT:
-        printf(">> player read timeout\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_ALL_AUDIO:
-        printf(">> no audio track/or no supported audio track\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_ALL_VIDEO:
-        printf(">> no video track/or no supported video track\n");
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_VIDEO_TYPE:
-        {
-            HCPlayerVideoInfo video_info;
-            char *video_type = "unknow";
-            if (!hcplayer_get_nth_video_stream_info (media_hld->player, msg->val, &video_info)) {
-                /* only a simple sample, app developers use a static struct to mapping them. */
-                if (video_info.codec_id == HC_AVCODEC_ID_HEVC) {
-                    video_type = "h265";
-                } 
-            }
-            printf("unsupport video type %s\n", video_type);
-        }
-        break;
-    case HCPLAYER_MSG_UNSUPPORT_AUDIO_TYPE:
-        {
-            HCPlayerAudioInfo audio_info;
-            char *audio_type = "unknow";
-            if (!hcplayer_get_nth_audio_stream_info (media_hld->player, msg->val, &audio_info)) {
-                /* only a simple sample, app developers use a static struct to mapping them. */
-                if (audio_info.codec_id < 0x11000) {
-                    audio_type = "pcm";
-                } else if (audio_info.codec_id < 0x12000) {
-                    audio_type = "adpcm";
-                } else if (audio_info.codec_id == HC_AVCODEC_ID_DTS) {
-                    audio_type = "dts";
-                } else if (audio_info.codec_id == HC_AVCODEC_ID_EAC3) {
-                    audio_type = "eac3";
-                } else if (audio_info.codec_id == HC_AVCODEC_ID_APE) {
-                    audio_type = "ape";
-                } 
-            }
-            printf("unsupport audio type %s\n", audio_type);
-        }
-        break;
-    case HCPLAYER_MSG_AUDIO_DECODE_ERR:
-        {
-            printf("audio dec err, audio idx %d\n", msg->val);
-            /* check if it is the last audio track, if not, then change to next one. */
-            if (media_hld->player) {
-                int total_audio_num = -1;
-                total_audio_num = hcplayer_get_audio_streams_count(media_hld->player);
-                if (msg->val >= 0 && total_audio_num > (msg->val + 1)) {
-                    HCPlayerAudioInfo audio_info;
-                    if (!hcplayer_get_cur_audio_stream_info(media_hld->player, &audio_info)) {
-                        if (audio_info.index == msg->val) {
-                            int idx = audio_info.index + 1;
-                            while (hcplayer_change_audio_track(media_hld->player, idx)) {
-                                idx++;
-                                if (idx >= total_audio_num) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    case HCPLAYER_MSG_VIDEO_DECODE_ERR:
-        {
-            printf("video dec err, video idx %d\n", msg->val);
-            /* check if it is the last video track, if not, then change to next one. */
-            if (media_hld->player) {
-                int total_video_num = -1;
-                total_video_num = hcplayer_get_video_streams_count(media_hld->player);
-                if (msg->val >= 0 && total_video_num > (msg->val + 1)) {
-                    HCPlayerVideoInfo video_info;
-                    if (!hcplayer_get_cur_video_stream_info(media_hld->player, &video_info)) {
-                        if (video_info.index == msg->val) {
-                            int idx = video_info.index + 1;
-                            while (hcplayer_change_video_track(media_hld->player, idx)) {
-                                idx++;
-                                if (idx >= total_video_num) {
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        break;
-    }
-}
-#endif

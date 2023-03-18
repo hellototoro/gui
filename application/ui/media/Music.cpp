@@ -31,16 +31,12 @@ static void CreateLyricPanel(lv_obj_t* parent);
 void creat_music_window(lv_obj_t* parent, char* file_name)
 {
     CreateMusicWindow(parent);
-    #ifdef HOST_GCC
     lv_obj_t* Player = lv_ffmpeg_player_create(MusicWindow);
     lv_ffmpeg_player_set_auto_restart(Player, true);
     lv_obj_set_pos(Player, -300, -50);
     lv_obj_set_size(Player, 256, 256);
     //lv_obj_center(Player);
     MusicHandler = Player;
-    #elif defined(HCCHIP_GCC)
-    MusicHandler = media_open(MEDIA_TYPE_MUSIC, (void*)MediaMsgProc);
-    #endif
 
     MediaComInit(MEDIA_MUSIC, MusicHandler);
     CreateMediaArray();
@@ -56,13 +52,7 @@ void creat_music_window(lv_obj_t* parent, char* file_name)
 void close_music_window(void)
 {
     //step1 停止播放
-    #ifdef HOST_GCC
     //lv_ffmpeg_player_set_cmd(MusicHandler, LV_FFMPEG_PLAYER_CMD_STOP);
-    #elif defined(HCCHIP_GCC)
-    media_stop(MusicHandler);
-    media_close(MusicHandler);
-    MusicHandler = NULL;
-    #endif
 
     lyric->clean();
     delete lyric;

@@ -352,12 +352,8 @@ void CreateWiFiPanel(lv_obj_t* parent)
     lv_obj_set_flex_flow(WiFiAvailableListPanel, LV_FLEX_FLOW_COLUMN);
     lv_obj_set_flex_align(WiFiAvailableListPanel, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
-    #ifdef HCCHIP_GCC
-    lv_msg_subsribe_obj(MSG_SHOW_WIFI_LIST, WiFiAvailableListPanel, nullptr);
-    NetWorkInit();
-    #else
     lv_msg_subscribe_obj(MSG_SHOW_WIFI_LIST, WiFiAvailableListPanel, nullptr);
-    #endif
+    NetWorkInit();
     lv_obj_add_event_cb(WiFiAvailableListPanel, [] (lv_event_t* event) {
         WiFiRefreshAvailableList();
     }, LV_EVENT_MSG_RECEIVED, NULL);
@@ -424,9 +420,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
                     break;
                 case WiFiConnectPanel_Ok:
                     memcpy(password, lv_textarea_get_text(PwdArea),20);
-                    #ifdef HCCHIP_GCC
-                    WiFi_Connect(static_cast<wifi_ap_info_t *>(l_parent->user_data));
-                    #endif
+                    // WiFi_Connect(static_cast<wifi_ap_info_t *>(l_parent->user_data));
 
                     break;
                 case WiFiConnectPanel_Cancel:
@@ -460,11 +454,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
     lv_obj_set_size(WiFiName, LV_SIZE_CONTENT, LV_SIZE_CONTENT);
     lv_obj_set_pos(WiFiName, 0, -135);
     lv_obj_set_align(WiFiName, LV_ALIGN_CENTER);
-    #ifdef HCCHIP_GCC
-    lv_label_set_text(WiFiName, (static_cast<wifi_ap_info_t *>(wifi_info))->ssid);
-    #else
-    lv_label_set_text(WiFiName, "HONOR");
-    #endif
+    // lv_label_set_text(WiFiName, (static_cast<wifi_ap_info_t *>(wifi_info))->ssid);
     lv_obj_set_style_text_font(WiFiName, &ui_font_MyFont30, LV_PART_MAIN | LV_STATE_DEFAULT);
 
     PwdArea = lv_textarea_create(ConnectPanel);
@@ -483,9 +473,7 @@ void CreateConnectPanel(lv_obj_t* parent, void* wifi_info)
         lv_obj_t* parent = lv_obj_get_parent(target);
         if (lv_obj_is_valid(Keyboard)) {
             memcpy(password, lv_textarea_get_text(target),20);
-            #ifdef HCCHIP_GCC
-            WiFi_Connect(static_cast<wifi_ap_info_t *>(parent->user_data));
-            #endif
+            // WiFi_Connect(static_cast<wifi_ap_info_t *>(parent->user_data));
             MainGroup = delete_group(MainGroup);
             lv_obj_del_async(Keyboard);
             lv_obj_set_y(ConnectPanel, 0);//-150
@@ -575,13 +563,9 @@ static void WiFiRefreshAvailableList(void)
         }
     };
     int ap_count = 0;
-    #ifdef HCCHIP_GCC
-    wifi_ap_info_t *wifi_list = WiFi_GetAPList();
-    ap_count = WiFi_GetAPCount();
-    if (wifi_list == nullptr || ap_count == 0) return;
-    #else
-    ap_count = 10;
-    #endif
+    // wifi_ap_info_t *wifi_list = WiFi_GetAPList();
+    // ap_count = WiFi_GetAPCount();
+    // if (wifi_list == nullptr || ap_count == 0) return;
     lv_obj_t* child = NULL;
     int i;
     for(i = 0; i < ap_count; ++i) {
@@ -611,12 +595,8 @@ static void WiFiRefreshAvailableList(void)
             lv_obj_add_flag(img, LV_OBJ_FLAG_ADV_HITTEST);     /// Flags
             lv_obj_clear_flag(img, LV_OBJ_FLAG_SCROLLABLE);      /// Flags
         }
-        #ifdef HCCHIP_GCC
-        child->user_data = static_cast<void*>(&wifi_list[i]);
-        lv_label_set_text(child->spec_attr->children[0], wifi_list[i].ssid);
-        #else
-        lv_label_set_text(child->spec_attr->children[0], "HONOR");
-        #endif
+        // child->user_data = static_cast<void*>(&wifi_list[i]);
+        // lv_label_set_text(child->spec_attr->children[0], wifi_list[i].ssid);
     }
     uint16_t ChildCnt = lv_obj_get_child_cnt(WiFiAvailableListPanel);
     for ( ; i < ChildCnt; ++i) {
@@ -624,9 +604,7 @@ static void WiFiRefreshAvailableList(void)
     }
     lv_obj_add_flag(WiFiRefreshObj,LV_OBJ_FLAG_HIDDEN);
     lv_anim_del(WiFiRefreshObj, nullptr);
-    #ifdef HCCHIP_GCC
     NetWorkDeInit();
-    #endif
 }
 
 static void WiFiRefresh(void)

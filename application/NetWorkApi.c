@@ -12,38 +12,45 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "NetWorkApi.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/com_api.h"
-#include "hcapi/cast_api.h"
-#endif
 
-#ifdef HCCHIP_GCC
 #define DEFAULT_AP_ADDR  "192.168.68.1"
 #define DEFAULT_AP_PSW  "12345678"
 #define DEFAULT_HOSTAPD_CONF  "/tmp/hostapd.conf"
 #define HOST_AP_CHNNNEL 6
 
+typedef struct wifi_ap_info{
+	//struct list_head node;
+	char 	ssid[32];     // AP's SSID
+	//WIFI_ENCRYPT_MODE	encrypt_mode;   // Encrypt mode. frank:the old mode, not used in linux, must check again
+	char 	key_index;                     // for WEP key index
+	char	pwd[128];      // Password
+	char 	pwd_count;        		    // the count of characters for password
+	int 	quality;	//rssi strength
+	short   enctypt_mode_support; //frank add.
+
+	int network_id;// the ID is created from wpa command "add_network"
+	char 	ap_index; //the index of the wifi ap list
+}wifi_ap_info_t;
+
 void *WiFi_handle = NULL;
-#ifdef HCCHIP_GCC
 wifi_ap_info_t *g_wifi_list;
 int g_ap_count;
-#endif
 
 static int hc_dhcpc_start()
 {
     FILE *fp = NULL;
-    int ret = API_FAILURE;
+    int ret = -1;
 
     char result_buf[256];
     char parse_buf1[128];
     char parse_buf2[128];
     char parse_buf3[128];
 
-    snprintf(result_buf, sizeof(result_buf)-1, "udhcpc -b -i %s -q", WLAN0_NAME);
+    snprintf(result_buf, sizeof(result_buf)-1, "udhcpc -b -i %s -q", "wlan0");
 
     fp = popen(result_buf, "r");
     if (!fp)
-        return API_FAILURE;
+        return -1;
 
     printf("start hdcp: %s!\n", result_buf);
 
@@ -54,11 +61,11 @@ static int hc_dhcpc_start()
 
         if(sscanf(result_buf,"%s %s %s", parse_buf1, parse_buf2, parse_buf3) == 3){
         //If the hdcp success, it return string like that: "adding dns 192.168.51.1"
-            if (api_is_ip_addr(parse_buf3)){
-                printf("DHCP success: %s!\n", parse_buf3);
-                ret = API_SUCCESS;
-                break;
-            }
+            // if (api_is_ip_addr(parse_buf3)){
+            //     printf("DHCP success: %s!\n", parse_buf3);
+            //     ret = 0;
+            //     break;
+            // }
         }
     }
     if (!fp)
@@ -72,14 +79,14 @@ static int hc_create_hostapd_conf(char *file_name)
 {
     FILE *fp = NULL;
     char service_name[64] = {0};
-    cast_get_service_name(CAST_TYPE_NONE, service_name, sizeof(service_name));
+    // cast_get_service_name(3, service_name, sizeof(service_name));
 
     fp = fopen(file_name, "w+");
     if (NULL == fp){
         printf("Create hostapd conf fail!\n");
-        return API_FAILURE;
+        return -1;
     }
-    fprintf(fp, "interface=%s\n", WLAN0_NAME);
+    fprintf(fp, "interface=%s\n", "wlan0");
     fprintf(fp, "driver=nl80211\n");
     fprintf(fp, "ctrl_interface_group=0\n");
     fprintf(fp, "hw_mode=g\n");
@@ -101,12 +108,12 @@ static int hc_create_hostapd_conf(char *file_name)
         fsync(wfd); 
 
     fclose(fp);
-    return API_SUCCESS;
+    return 0;
 }
 
 static int hc_network_station_mode_init(void *wifi_handle)
 {
-    int ret = API_FAILURE;
+    int ret = -1;
 
 //just for test wifi WPA command
     wifi_ap_info_t *wifi_info = NULL;
@@ -114,10 +121,10 @@ static int hc_network_station_mode_init(void *wifi_handle)
     int ap_count;
     int i;
 
-    ret = wifi_ap_scan(wifi_handle);
-    if (ret == API_SUCCESS) 
+    // ret = wifi_ap_scan(wifi_handle);
+    if (ret == 0) 
         printf(" *** wifi_ap_scan() OK!");
-    ret = wifi_ap_list_get(wifi_handle, &wifi_list, &ap_count);
+    // ret = wifi_ap_list_get(wifi_handle, &wifi_list, &ap_count);
     if (ret == 0) 
         printf("*** wifi_ap_list_get() OK, ap_count = %d!\n", ap_count);
     //list the ap
@@ -125,45 +132,45 @@ static int hc_network_station_mode_init(void *wifi_handle)
         printf("ssid[%d]: %s, quality: %d%%\n", i, wifi_list[i].ssid, wifi_list[i].quality);
     }
 
-    wifi_info = wifi_choose_ap_from_scan(wifi_handle);
+    // wifi_info = wifi_choose_ap_from_scan(wifi_handle);
     if (NULL == wifi_info)
-        return API_FAILURE;
+        return -1;
 
     printf("*** Connect to AP: %s ...!\n", wifi_info->ssid ? "wifi_info->ssid" : "NO AP");
-    ret = wifi_ap_connect(wifi_handle, wifi_info);
-    if (ret == API_SUCCESS) 
+    // ret = wifi_ap_connect(wifi_handle, wifi_info);
+    if (ret == 0) 
         printf(" *** wifi_ap_connect() OK!");
 
-    ret = hc_dhcpc_start();
-    if (ret == API_SUCCESS){
-        control_msg_t ctl_msg = {0};
-        ctl_msg.msg_type = MSG_TYPE_NETWORK_DHCP_ON;
-        api_control_send_msg(&ctl_msg);
+    // ret = hc_dhcpc_start();
+    if (ret == 0){
+        //control_msg_t ctl_msg = {0};
+        //ctl_msg.msg_type = MSG_TYPE_NETWORK_DHCP_ON;
+        //api_control_send_msg(&ctl_msg);
     }    
-    return API_SUCCESS;
+    return 0;
 
 }
 
 static int hc_network_ap_mode_init()
 {
     FILE *fp = NULL;
-    int ret = API_FAILURE;
+    int ret = -1;
     char result_buf[256];
 
-    char *cmd1 = "ifconfig "WLAN0_NAME" up";
-    char *cmd2 = "ifconfig "WLAN0_NAME " " DEFAULT_AP_ADDR;
+    char *cmd1 = "ifconfig ""wlan0"" up";
+    char *cmd2 = "ifconfig ""wlan0" " " DEFAULT_AP_ADDR;
     char *cmd3 = "hostapd "DEFAULT_HOSTAPD_CONF" -B";
     char *cmd4 = "dhcpcd";
 
-    ret = hc_create_hostapd_conf(DEFAULT_HOSTAPD_CONF);
-    if (API_FAILURE == ret){
+    // ret = hc_create_hostapd_conf(DEFAULT_HOSTAPD_CONF);
+    if (-1 == ret){
     }
 
-    ret = api_shell_exe_result(cmd1);
-    if (API_FAILURE == ret)
+    // ret = api_shell_exe_result(cmd1);
+    if (-1 == ret)
         return ret;
-    ret = api_shell_exe_result(cmd2);
-    if (API_FAILURE == ret)
+    // ret = api_shell_exe_result(cmd2);
+    if (-1 == ret)
         return ret;
 
     fp = popen(cmd3, "r");
@@ -175,21 +182,21 @@ static int hc_network_ap_mode_init()
         if (NULL != strstr(result_buf, "Failed")){
             printf("*** [%s] fail!\n", cmd3);
             pclose(fp);
-            return API_FAILURE;
+            return -1;
         }
     }
     pclose(fp);
 
-    ret = api_shell_exe_result(cmd4);
-    if (API_FAILURE == ret)
+    // ret = api_shell_exe_result(cmd4);
+    if (-1 == ret)
         return ret;
 
-    return API_SUCCESS;
+    return 0;
 }
 
 static int hc_network_p2p_mode_init(void)
 {
-    return API_SUCCESS;    
+    return 0;    
 }
 
 static void *hc_network_monitor_task(void *arg)
@@ -198,40 +205,40 @@ static void *hc_network_monitor_task(void *arg)
     static bool disconnect_draw = true;
     int check_connect_cnt = 0;
     int check_connect_max = 20;
-    control_msg_t ctl_msg = {0};
+    // control_msg_t ctl_msg = {0};
     void *wifi_handle = NULL;
     
     while(1){
 
         if (NULL == wifi_handle){
-            wifi_handle = wifi_wpa_get_handle(WLAN0_NAME);
-            api_sleep_ms(100);
+            // wifi_handle = wifi_wpa_get_handle("wlan0");
+            // api_sleep_ms(100);
             continue;
         }
 
         if (check_connect_cnt++ > check_connect_max){
-            if (true == wifi_ap_is_connected(wifi_handle)){
-                //only update the OSD once time in connected status.
-                if (connect_draw){
-                    ctl_msg.msg_type = MSG_TYPE_NETWORK_WIFI_CONNECTED;
-                    api_control_send_msg(&ctl_msg);
-                }
-                connect_draw = false;
-                disconnect_draw = true;
-                printf("...connect...\n");
-            }else{
-                //only update the OSD once time in connected status.
-                if (disconnect_draw){
-                    ctl_msg.msg_type = MSG_TYPE_NETWORK_WIFI_DISCONNECTED;
-                    api_control_send_msg(&ctl_msg);
-                }
-                disconnect_draw = false;
-                connect_draw = true;
-                printf("...disconnect...\n");
-            }
+            // if (true == wifi_ap_is_connected(wifi_handle)){
+            //     //only update the OSD once time in connected status.
+            //     if (connect_draw){
+            //         ctl_msg.msg_type = MSG_TYPE_NETWORK_WIFI_CONNECTED;
+            //         api_control_send_msg(&ctl_msg);
+            //     }
+            //     connect_draw = false;
+            //     disconnect_draw = true;
+            //     printf("...connect...\n");
+            // }else{
+            //     //only update the OSD once time in connected status.
+            //     if (disconnect_draw){
+            //         ctl_msg.msg_type = MSG_TYPE_NETWORK_WIFI_DISCONNECTED;
+            //         api_control_send_msg(&ctl_msg);
+            //     }
+            //     disconnect_draw = false;
+            //     connect_draw = true;
+            //     printf("...disconnect...\n");
+            // }
             check_connect_cnt = 0;
         }
-        api_sleep_ms(100);
+        // api_sleep_ms(100);
     }
 
     return NULL;
@@ -251,23 +258,23 @@ static void hc_network_monitor_start()
 
 int NetWorkInit(void)
 {
-    control_msg_t ctl_msg;
+    // control_msg_t ctl_msg;
 
-    if (API_FAILURE == wifi_driver_module_init()){
+    if (-1 == wifi_driver_module_init()){
         return -1;
     }
-    ctl_msg.msg_type = MSG_TYPE_NETWORK_MAC_OK;
-    ctl_msg.msg_code = 0;
-    api_control_send_msg(&ctl_msg);
+    // ctl_msg.msg_type = MSG_TYPE_NETWORK_MAC_OK;
+    // ctl_msg.msg_code = 0;
+    // api_control_send_msg(&ctl_msg);
 
-    WiFi_handle = wifi_wpa_open(WLAN0_NAME);
+    WiFi_handle = wifi_wpa_open("wlan0");
     if (WiFi_handle) 
         printf("*** wifi_wpa_open() OK!\n");
     else
         return -1;
 
-    ctl_msg.msg_type = MSG_TYPE_NETWORK_INIT_OK;
-    api_control_send_msg(&ctl_msg);
+    // ctl_msg.msg_type = MSG_TYPE_NETWORK_INIT_OK;
+    // api_control_send_msg(&ctl_msg);
     return 0;
 
     /*int sys_ap_list_count = 0;
@@ -275,7 +282,7 @@ int NetWorkInit(void)
     int ret;
     control_msg_t ctl_msg;
 
-    if (API_FAILURE == wifi_driver_module_init()){
+    if (-1 == wifi_driver_module_init()){
         return -1;
     }
     ctl_msg.msg_type = MSG_TYPE_NETWORK_MAC_OK;
@@ -287,7 +294,7 @@ int NetWorkInit(void)
     sys_ap_list_count = wifi_sys_ap_init_list();
     if (sys_ap_list_count > 0)
     {
-        wifi_handle = wifi_wpa_open(WLAN0_NAME);
+        wifi_handle = wifi_wpa_open("wlan0");
         if (wifi_handle) 
             printf("*** wifi_wpa_open() OK!\n");
         else
@@ -310,16 +317,16 @@ void NetWorkDeInit(void)
 
 void WiFi_Connect(wifi_ap_info_t *wifi_info)
 {
-    int ret = API_FAILURE;
-    ret = wifi_ap_connect(WiFi_handle, wifi_info);
-    if (ret == API_SUCCESS) 
+    int ret = -1;
+    // ret = wifi_ap_connect(WiFi_handle, wifi_info);
+    if (ret == 0) 
         printf(" *** wifi_ap_connect() OK!");
 
-    ret = hc_dhcpc_start();
-    if (ret == API_SUCCESS){
-        control_msg_t ctl_msg = {0};
-        ctl_msg.msg_type = MSG_TYPE_NETWORK_DHCP_ON;
-        api_control_send_msg(&ctl_msg);
+    // ret = hc_dhcpc_start();
+    if (ret == 0){
+        // control_msg_t ctl_msg = {0};
+        // ctl_msg.msg_type = MSG_TYPE_NETWORK_DHCP_ON;
+        // api_control_send_msg(&ctl_msg);
     }
 }
 
@@ -338,19 +345,15 @@ wifi_ap_info_t* WiFi_GetAPList(void)
     return g_wifi_list;
 }
 
-#endif
+
 
 static void* WiFi_ScanTask(void* arg)
 {
     NetWorkTaskCallBack WiFi_ScanCallBack = arg;
-    #ifdef HCCHIP_GCC
-    if (wifi_ap_scan(WiFi_handle) == API_SUCCESS) 
-        printf(" *** wifi_ap_scan() OK!");
-    if (wifi_ap_list_get(WiFi_handle, &g_wifi_list, &g_ap_count) == API_SUCCESS) 
-        printf("*** wifi_ap_list_get() OK, ap_count = %d!\n", g_ap_count);
-    #else
-    usleep(1000*1000);
-    #endif
+    // if (wifi_ap_scan(WiFi_handle) == 0) 
+    //     printf(" *** wifi_ap_scan() OK!");
+    // if (wifi_ap_list_get(WiFi_handle, &g_wifi_list, &g_ap_count) == 0) 
+    //     printf("*** wifi_ap_list_get() OK, ap_count = %d!\n", g_ap_count);
     if(WiFi_ScanCallBack)
         WiFi_ScanCallBack();
     pthread_exit(NULL);

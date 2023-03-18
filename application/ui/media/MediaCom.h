@@ -13,9 +13,6 @@
 #include "application/ui/ui_com.h"
 #include "media_list.h"
 #include "MediaFile.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,11 +47,7 @@ typedef enum {
 typedef DLNode MediaNode;
 typedef LinkDList MediaList;
 typedef char* file_name_t;
-#ifdef HOST_GCC
 typedef lv_obj_t       MediaHandle;
-#elif defined(HCCHIP_GCC)
-typedef media_handle_t MediaHandle;
-#endif
 
 extern char current_path[];
 extern int current_path_size;
@@ -72,10 +65,6 @@ extern void PlayMedia(char * file_name);
 
 //公共ui部分
 extern lv_obj_t* CreatePlayBar(lv_obj_t* parent);
-
-#ifdef HCCHIP_GCC
-extern void MediaMsgProc(media_handle_t *media_hld, HCPlayerMsg *msg);
-#endif
 
 #ifdef __cplusplus
 } /*extern "C"*/

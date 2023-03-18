@@ -7,10 +7,7 @@
  */
 #include "Volume.h"
 #include "application/key_map.h"
-#ifdef HCCHIP_GCC
-#include "hcapi/media_player.h"
-#endif
-#include "application/ConfigParam.h"
+]#include "application/ConfigParam.h"
 
 uint8_t Volume;
 
@@ -79,9 +76,6 @@ void SetVolume(uint32_t value)
         lv_img_set_src(VolumeImage, VolumeImg);
     }
     lv_slider_set_value(VolumeSlider, Volume, LV_ANIM_ON);
-    #ifdef HCCHIP_GCC
-    media_set_vol(Volume);
-    #endif
 }
 
 static void CreateVolumePanel(lv_obj_t* parent)

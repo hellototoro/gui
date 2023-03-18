@@ -7,11 +7,7 @@
  */
 #include "ConfigParam.h"
 
-#ifdef HCCHIP_GCC
-constexpr char ConfigFileName[] = {"/mnt/data/gui_setting/gui_setting.ini"};
-#else
 constexpr char ConfigFileName[] = {"/home/totoro/workspace/vasunrise/hclinux/SOURCE/projector_gui/application/setting/gui_setting.ini"};
-#endif
 
 void ReadConfigFile(boost::property_tree::ptree& config, std::string ConfigName)
 {
