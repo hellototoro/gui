@@ -28,7 +28,7 @@ static PlayListMode CurrentPlayMode[MEDIA_MAX];
 static MediaHandle* current_media_hdl;
 static MediaList* media_list[MEDIA_MAX];
 static uint32_t played_time_host;
-static lv_ffmpeg_player_cmd_t play_state;
+// static lv_ffmpeg_player_cmd_t play_state;
 static file_name_t* media_file_name_array;
 static int current_playing_index;
 static bool PlayingAnimation_Flag;
@@ -327,9 +327,9 @@ void PlayMedia(char * file_name)
         strcat(file_path, current_path);
         strcat(file_path, "/");
         strcat(file_path,  file_name);
-        lv_ffmpeg_player_set_src(current_media_hdl, file_path);
-        lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_START);
-        play_state = LV_FFMPEG_PLAYER_CMD_START;
+        // lv_ffmpeg_player_set_src(current_media_hdl, file_path);
+        // lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_START);
+        // play_state = LV_FFMPEG_PLAYER_CMD_START;
         played_time_host = 0;
         if(CurrentPlayingType == MEDIA_VIDEO || CurrentPlayingType == MEDIA_PHOTO ) {
             //CreateLoadingScreen(lv_scr_act());
@@ -377,21 +377,21 @@ static void key_event_handler(lv_event_t* event)
             {
                 case Play:
                 {
-                    lv_ffmpeg_player_cmd_t state = play_state;
-                    #define __MEDIA_PLAY    LV_FFMPEG_PLAYER_CMD_START
-                    #define __MEDIA_PAUSE   LV_FFMPEG_PLAYER_CMD_PAUSE
-                    if (state == __MEDIA_PLAY) {
-                        //lv_img_set_src(target, &ui_img_play_start_png);
-                        lv_obj_set_style_bg_img_src(target, &ui_img_play_start_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-                        play_state = __MEDIA_PAUSE;
-                        lv_ffmpeg_player_set_cmd(current_media_hdl, __MEDIA_PAUSE);
-                    }
-                    else if (state == __MEDIA_PAUSE) {
-                        //lv_img_set_src(target, &ui_img_play_pause_png);
-                        lv_obj_set_style_bg_img_src(target, &ui_img_play_pause_png, LV_PART_MAIN | LV_STATE_DEFAULT);
-                        play_state = __MEDIA_PLAY;
-                        lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_RESUME);
-                    }
+                    // lv_ffmpeg_player_cmd_t state = play_state;
+                    // #define __MEDIA_PLAY    LV_FFMPEG_PLAYER_CMD_START
+                    // #define __MEDIA_PAUSE   LV_FFMPEG_PLAYER_CMD_PAUSE
+                    // if (state == __MEDIA_PLAY) {
+                    //     //lv_img_set_src(target, &ui_img_play_start_png);
+                    //     lv_obj_set_style_bg_img_src(target, &ui_img_play_start_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    //     play_state = __MEDIA_PAUSE;
+                    //     lv_ffmpeg_player_set_cmd(current_media_hdl, __MEDIA_PAUSE);
+                    // }
+                    // else if (state == __MEDIA_PAUSE) {
+                    //     //lv_img_set_src(target, &ui_img_play_pause_png);
+                    //     lv_obj_set_style_bg_img_src(target, &ui_img_play_pause_png, LV_PART_MAIN | LV_STATE_DEFAULT);
+                    //     play_state = __MEDIA_PLAY;
+                    //     lv_ffmpeg_player_set_cmd(current_media_hdl, LV_FFMPEG_PLAYER_CMD_RESUME);
+                    // }
                 }
                 break;
                 case Previous:
@@ -506,8 +506,8 @@ static void PlayBarTimer_cb(lv_timer_t * timer)
 static void PlayedStateTimer_cb(lv_timer_t * timer)
 {
     uint32_t played_time = 0;
-    if (play_state == LV_FFMPEG_PLAYER_CMD_START)
-        played_time_host++;
+    // if (play_state == LV_FFMPEG_PLAYER_CMD_START)
+    //     played_time_host++;
     played_time = played_time_host;
     if (played_time >= lv_slider_get_max_value(lv_obj_get_child(PlayBar, ProgressSlider))) {
         lv_timer_pause(timer);
@@ -599,10 +599,8 @@ lv_obj_t* CreatePlayBar(lv_obj_t* parent)
         lv_timer_set_repeat_count(PlayState_Timer, -1);
         lv_timer_pause(PlayState_Timer);
     }
-    #ifdef HOST_GCC
     if (CurrentPlayingType != MEDIA_TEXT)
         SetTotalTimeAndProgress(20);
-    #endif
     return PlayBar;
 }
 

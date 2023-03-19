@@ -7,7 +7,7 @@
  */
 #include "Volume.h"
 #include "application/key_map.h"
-]#include "application/ConfigParam.h"
+#include "application/ConfigParam.h"
 
 uint8_t Volume;
 

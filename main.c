@@ -22,23 +22,14 @@ extern int sdl_init_2(void);
 
 pthread_mutex_t lvgl_task_mutex;
 
-static void exit_console(int signo);
-
 int main(int argc, char *argv[])
 {
     if (pthread_mutex_init(&lvgl_task_mutex, NULL) != 0) {
         perror("Mutex init failed");
         exit(EXIT_FAILURE);
     }
-
-    signal(SIGTERM, exit_console); //kill signal
-    signal(SIGINT, exit_console); //Ctrl+C signal
-    signal(SIGSEGV, exit_console);
-    signal(SIGBUS, exit_console);
-
     sdl_init_2();
     group_init();
-
     SystemInit();
     while(1) {
         WindowsManager();
@@ -49,10 +40,4 @@ int main(int argc, char *argv[])
         usleep(5000);
     }
     return 0;
-}
-
-void exit_console(int signo)
-{
-    printf("%s(), signo: %d, error: %s\n", __FUNCTION__, signo, strerror(errno));
-    exit(0);
 }

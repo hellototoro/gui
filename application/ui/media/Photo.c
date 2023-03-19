@@ -23,11 +23,11 @@ static void SetStyleForPlayBar(lv_obj_t* bar);
 void creat_photo_window(lv_obj_t* parent, char* file_name)
 {
     BackWindow = parent;
-    PhotoWindow = lv_ffmpeg_player_create(parent);
-    lv_obj_clear_flag(PhotoWindow, LV_OBJ_FLAG_SCROLLABLE);
-    lv_ffmpeg_player_set_auto_restart(PhotoWindow, true);
-    lv_obj_center(PhotoWindow);
-    PhotoHandler = PhotoWindow;
+    // PhotoWindow = lv_ffmpeg_player_create(parent);
+    // lv_obj_clear_flag(PhotoWindow, LV_OBJ_FLAG_SCROLLABLE);
+    // lv_ffmpeg_player_set_auto_restart(PhotoWindow, true);
+    // lv_obj_center(PhotoWindow);
+    // PhotoHandler = PhotoWindow;
 
     MediaComInit(MEDIA_PHOTO, PhotoHandler);
     CreateMediaArray();
@@ -41,7 +41,7 @@ void creat_photo_window(lv_obj_t* parent, char* file_name)
 void close_photo_window(void)
 {
     //step1 停止播放
-    lv_ffmpeg_player_set_cmd(PhotoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
+    // lv_ffmpeg_player_set_cmd(PhotoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
 
     //step2 清理播放列表
     DestroyMediaArray();

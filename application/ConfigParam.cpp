@@ -7,7 +7,7 @@
  */
 #include "ConfigParam.h"
 
-constexpr char ConfigFileName[] = {"/home/totoro/workspace/vasunrise/hclinux/SOURCE/projector_gui/application/setting/gui_setting.ini"};
+constexpr char ConfigFileName[] = {"/home/totoro/workspace/projector_gui/application/setting/gui_setting.ini"};
 
 void ReadConfigFile(boost::property_tree::ptree& config, std::string ConfigName)
 {

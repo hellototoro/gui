@@ -31,12 +31,12 @@ static void CreateLyricPanel(lv_obj_t* parent);
 void creat_music_window(lv_obj_t* parent, char* file_name)
 {
     CreateMusicWindow(parent);
-    lv_obj_t* Player = lv_ffmpeg_player_create(MusicWindow);
-    lv_ffmpeg_player_set_auto_restart(Player, true);
-    lv_obj_set_pos(Player, -300, -50);
-    lv_obj_set_size(Player, 256, 256);
-    //lv_obj_center(Player);
-    MusicHandler = Player;
+    // lv_obj_t* Player = lv_ffmpeg_player_create(MusicWindow);
+    // lv_ffmpeg_player_set_auto_restart(Player, true);
+    // lv_obj_set_pos(Player, -300, -50);
+    // lv_obj_set_size(Player, 256, 256);
+    // //lv_obj_center(Player);
+    // MusicHandler = Player;
 
     MediaComInit(MEDIA_MUSIC, MusicHandler);
     CreateMediaArray();

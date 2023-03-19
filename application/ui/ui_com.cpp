@@ -367,7 +367,7 @@ bool HasUsbDevice(void)
 {
     FILE * fp;
     char buffer[20];
-    fp = popen("ls ~/temp/lvgl_test_dir","r");
+    fp = popen("ls ~/tmp/lvgl_test_dir","r");
     if (nullptr != fp) {
         while (fgets(buffer, sizeof(buffer)/sizeof(char), fp) != NULL) {
             if (strncmp("usb-storage", buffer, strlen("usb-storage")) == 0) {

@@ -16,6 +16,20 @@
 extern "C" {
 #endif
 
+typedef struct wifi_ap_info{
+	//struct list_head node;
+	char 	ssid[32];     // AP's SSID
+	//WIFI_ENCRYPT_MODE	encrypt_mode;   // Encrypt mode. frank:the old mode, not used in linux, must check again
+	char 	key_index;                     // for WEP key index
+	char	pwd[128];      // Password
+	char 	pwd_count;        		    // the count of characters for password
+	int 	quality;	//rssi strength
+	short   enctypt_mode_support; //frank add.
+
+	int network_id;// the ID is created from wpa command "add_network"
+	char 	ap_index; //the index of the wifi ap list
+}wifi_ap_info_t;
+
 typedef void (*NetWorkTaskCallBack)(void);
 
 extern int NetWorkInit(void);

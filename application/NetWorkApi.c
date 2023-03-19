@@ -11,26 +11,13 @@
 #include <pthread.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 #include "NetWorkApi.h"
 
 #define DEFAULT_AP_ADDR  "192.168.68.1"
 #define DEFAULT_AP_PSW  "12345678"
 #define DEFAULT_HOSTAPD_CONF  "/tmp/hostapd.conf"
 #define HOST_AP_CHNNNEL 6
-
-typedef struct wifi_ap_info{
-	//struct list_head node;
-	char 	ssid[32];     // AP's SSID
-	//WIFI_ENCRYPT_MODE	encrypt_mode;   // Encrypt mode. frank:the old mode, not used in linux, must check again
-	char 	key_index;                     // for WEP key index
-	char	pwd[128];      // Password
-	char 	pwd_count;        		    // the count of characters for password
-	int 	quality;	//rssi strength
-	short   enctypt_mode_support; //frank add.
-
-	int network_id;// the ID is created from wpa command "add_network"
-	char 	ap_index; //the index of the wifi ap list
-}wifi_ap_info_t;
 
 void *WiFi_handle = NULL;
 wifi_ap_info_t *g_wifi_list;
@@ -260,14 +247,14 @@ int NetWorkInit(void)
 {
     // control_msg_t ctl_msg;
 
-    if (-1 == wifi_driver_module_init()){
-        return -1;
-    }
+    // if (-1 == wifi_driver_module_init()){
+    //     return -1;
+    // }
     // ctl_msg.msg_type = MSG_TYPE_NETWORK_MAC_OK;
     // ctl_msg.msg_code = 0;
     // api_control_send_msg(&ctl_msg);
 
-    WiFi_handle = wifi_wpa_open("wlan0");
+    // WiFi_handle = wifi_wpa_open("wlan0");
     if (WiFi_handle) 
         printf("*** wifi_wpa_open() OK!\n");
     else
@@ -312,7 +299,7 @@ int NetWorkInit(void)
 
 void NetWorkDeInit(void)
 {
-    wifi_wpa_close(WiFi_handle);
+    // wifi_wpa_close(WiFi_handle);
 }
 
 void WiFi_Connect(wifi_ap_info_t *wifi_info)

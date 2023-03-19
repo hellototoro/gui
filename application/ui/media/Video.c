@@ -22,12 +22,12 @@ static void UdiskStatus_event_handler(lv_event_t * event);
 void creat_video_window(lv_obj_t* parent, char* file_name)
 {
     BackWindow = parent;
-    VideoWindow = lv_ffmpeg_player_create(parent);
-    lv_obj_clear_flag(VideoWindow, LV_OBJ_FLAG_SCROLLABLE);
-    lv_ffmpeg_player_set_auto_restart(VideoWindow, true);
-    lv_obj_center(VideoWindow);
-    VideoHandler = VideoWindow;
-    lv_obj_add_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
+    // VideoWindow = lv_ffmpeg_player_create(parent);
+    // lv_obj_clear_flag(VideoWindow, LV_OBJ_FLAG_SCROLLABLE);
+    // lv_ffmpeg_player_set_auto_restart(VideoWindow, true);
+    // lv_obj_center(VideoWindow);
+    // VideoHandler = VideoWindow;
+    // lv_obj_add_flag(BackWindow, LV_OBJ_FLAG_HIDDEN);
 
     MediaComInit(MEDIA_VIDEO, VideoHandler);
     CreateMediaArray();
@@ -41,7 +41,7 @@ void creat_video_window(lv_obj_t* parent, char* file_name)
 void close_video_window(void)
 {
     //step1 停止播放
-    lv_ffmpeg_player_set_cmd(VideoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
+    // lv_ffmpeg_player_set_cmd(VideoWindow, LV_FFMPEG_PLAYER_CMD_STOP);
     
     //step2 清理播放列表
     DestroyMediaArray();
