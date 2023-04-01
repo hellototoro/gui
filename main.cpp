@@ -18,7 +18,9 @@
 #include "application/SystemInit.h"
 #include "application/NetWorkApi.h"
 
+extern "C" {
 extern int sdl_init_2(void);
+}
 
 pthread_mutex_t lvgl_task_mutex;
 

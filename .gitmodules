@@ -7,3 +7,6 @@
 [submodule "lv_drivers"]
 	path = lv_drivers
 	url = https://github.com/hellototoro/lv_drivers.git
+[submodule "hlibc"]
+	path = hlibc
+	url = https://github.com/hellototoro/hlibc.git
