@@ -15,20 +15,20 @@ namespace Setting {
 
 Position::Position(/* args */)
 {
-    boost::property_tree::ptree config;
-    ReadConfigFile(config, "position");
-    position_mode = config.get<int>("position_mode", 0);
+    // boost::property_tree::ptree config;
+    // ReadConfigFile(config, "position");
+    // position_mode = config.get<int>("position_mode", 0);
 }
 
 Position::~Position()
 {
-    boost::property_tree::ptree pt;
-    boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
-    boost::property_tree::ptree config;
-    config = pt.get_child("position");
-    config.put<int>("position_mode", position_mode);
-    pt.put_child("position",config);
-    boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
+    // boost::property_tree::ptree pt;
+    // boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
+    // boost::property_tree::ptree config;
+    // config = pt.get_child("position");
+    // config.put<int>("position_mode", position_mode);
+    // pt.put_child("position",config);
+    // boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
 }
 
 const char** Position::GetStrArray(void)

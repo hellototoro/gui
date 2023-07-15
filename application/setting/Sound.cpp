@@ -15,29 +15,29 @@ namespace Setting {
 
 Sound::Sound(/* args */)
 {
-    boost::property_tree::ptree config;
-    ReadConfigFile(config, "sound_setting");
-    mode.type = config.get<int>("mode_type", 0);
-    mode.user.treble = config.get<int>("mode_user_treble", 50);
-    mode.user.bass = config.get<int>("mode_user_bass", 50);
-    surround = config.get<int>("surround", 0);
-    AutoVolume = config.get<int>("AutoVolume", 0);
+    // boost::property_tree::ptree config;
+    // ReadConfigFile(config, "sound_setting");
+    // mode.type = config.get<int>("mode_type", 0);
+    // mode.user.treble = config.get<int>("mode_user_treble", 50);
+    // mode.user.bass = config.get<int>("mode_user_bass", 50);
+    // surround = config.get<int>("surround", 0);
+    // AutoVolume = config.get<int>("AutoVolume", 0);
 }
 
 Sound::~Sound()
 {
-    boost::property_tree::ptree pt;
-    boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
-    boost::property_tree::ptree config;
-    config = pt.get_child("sound_setting");
+    // boost::property_tree::ptree pt;
+    // boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
+    // boost::property_tree::ptree config;
+    // config = pt.get_child("sound_setting");
 
-    config.put<int>("mode_type", mode.type);
-    config.put<int>("mode_user_treble", mode.user.treble);
-    config.put<int>("mode_user_bass", mode.user.bass);
-    config.put<int>("surround", surround);
-    config.put<int>("AutoVolume", AutoVolume);
-    pt.put_child("sound_setting",config);
-    boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
+    // config.put<int>("mode_type", mode.type);
+    // config.put<int>("mode_user_treble", mode.user.treble);
+    // config.put<int>("mode_user_bass", mode.user.bass);
+    // config.put<int>("surround", surround);
+    // config.put<int>("AutoVolume", AutoVolume);
+    // pt.put_child("sound_setting",config);
+    // boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
 }
 
 const char** Sound::GetStrArray(void)

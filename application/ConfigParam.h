@@ -9,12 +9,12 @@
 #define __CONFIG_PARAM_H__
 
 #include <string>
-#include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/ini_parser.hpp>
+// #include <boost/property_tree/ptree.hpp>
+// #include <boost/property_tree/ini_parser.hpp>
 
 extern const char ConfigFileName[];
 
-extern void ReadConfigFile(boost::property_tree::ptree& config, std::string ConfigName);
+// extern void ReadConfigFile(boost::property_tree::ptree& config, std::string ConfigName);
 #ifdef __cplusplus
 extern "C" {
 #endif

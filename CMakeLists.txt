@@ -6,7 +6,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/application/
-    ${PROJECT_SOURCE_DIR}/boost_1_79_0/
     ${PROJECT_SOURCE_DIR}/lvgl/
     ${PROJECT_SOURCE_DIR}/lv_drivers/
     ${PROJECT_SOURCE_DIR}/lv_i18n/

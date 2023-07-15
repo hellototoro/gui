@@ -18,27 +18,27 @@ namespace Setting {
 
 System::System(/* args */)
 {
-    boost::property_tree::ptree config;
-    ReadConfigFile(config, "system_setting");
-    language = DefaultLanguageIndex;
-    OsdTime = config.get<int>("OsdTime", 0);
+    // boost::property_tree::ptree config;
+    // ReadConfigFile(config, "system_setting");
+    // language = DefaultLanguageIndex;
+    // OsdTime = config.get<int>("OsdTime", 0);
 }
 
 System::~System()
 {
-    boost::property_tree::ptree pt;
-    boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
-    boost::property_tree::ptree config;
-    config = pt.get_child("system_setting");
-    config.put<int>("OsdTime", OsdTime);
-    pt.put_child("system_setting",config);
+    // boost::property_tree::ptree pt;
+    // boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
+    // boost::property_tree::ptree config;
+    // config = pt.get_child("system_setting");
+    // config.put<int>("OsdTime", OsdTime);
+    // pt.put_child("system_setting",config);
 
-    DefaultLanguageIndex = language;
-    config = pt.get_child("default_language");
-    config.put<std::string>("language", Language[language]);
-    config.put<int>("index", DefaultLanguageIndex);
-    pt.put_child("default_language",config);
-    boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
+    // DefaultLanguageIndex = language;
+    // config = pt.get_child("default_language");
+    // config.put<std::string>("language", Language[language]);
+    // config.put<int>("index", DefaultLanguageIndex);
+    // pt.put_child("default_language",config);
+    // boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
 }
 
 const char** System::GetStrArray(void)
