@@ -10,3 +10,6 @@
 [submodule "hlibc"]
 	path = hlibc
 	url = https://github.com/hellototoro/hlibc.git
+[submodule "mINI"]
+	path = mINI
+	url = https://github.com/hellototoro/mINI.git
