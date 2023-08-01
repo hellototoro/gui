@@ -10,6 +10,7 @@ include_directories(
     ${PROJECT_SOURCE_DIR}/lv_drivers/
     ${PROJECT_SOURCE_DIR}/lv_i18n/
     ${PROJECT_SOURCE_DIR}/hlibc/src/
+    ${PROJECT_SOURCE_DIR}/mINI/src/
     ${PROJECT_SOURCE_DIR}
 )
 

@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include "LanguageScreen.h"
 #include "application/windows.h"
+#include "SysParam/SysParam.h"
 
 /**********全局变量***********/
 const char* Language[] = {
@@ -19,9 +20,6 @@ const char* Language[] = {
 "zh-CN"
 };
 int DefaultLanguageIndex = 2;
-
-extern void WriteConfigFile_I(const char* ConfigName, int value);
-extern void WriteConfigFile_S(const char* ConfigName, const char* value);
 
 /**********静态变量***********/
 static lv_obj_t* LanguageRootScreen;
@@ -35,8 +33,9 @@ static void ExitLanguage(ActiveScreen screen);
 void SaveCurrentLanguageType(int index)
 {
     DefaultLanguageIndex = index;
-    WriteConfigFile_I("default_language.index", index);
-    WriteConfigFile_S("default_language.language", Language[index]);
+    SysParam sys_param;
+    sys_param.write<int>("default_language", "index", index);
+    sys_param.write<std::string>("default_language", "language", Language[index]);
     lv_i18n_set_locale(Language[index]);
 }
 
@@ -56,10 +55,12 @@ void event_handler(lv_event_t* event)
         case LV_KEY_DOWN:
             lv_group_focus_next(group);
             break;
-        case LV_KEY_ENTER:
-            WriteConfigFile_I("guide_flag.flag", 0);
-            SaveCurrentLanguageType(index);
-            ExitLanguage(HomeScreen);
+        case LV_KEY_ENTER: {
+                SysParam sys_param;
+                sys_param.write<int>("guide_flag", "flag", 0);
+                SaveCurrentLanguageType(index);
+                ExitLanguage(HomeScreen);
+            }
             break;
         case LV_KEY_ESC:
             break;

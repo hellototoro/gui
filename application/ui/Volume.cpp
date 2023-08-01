@@ -7,7 +7,7 @@
  */
 #include "Volume.h"
 #include "application/key_map.h"
-#include "application/ConfigParam.h"
+#include "SysParam/SysParam.h"
 
 uint8_t Volume;
 
@@ -39,14 +39,18 @@ void SetVolume(uint32_t value)
         case LV_KEY_VOLUME_UP:
             if (Volume < 100) {
                 Volume += 5;
-                WriteConfigFile_I("sound_setting.volume", Volume);
+                SysParam sys_param;
+                sys_param.write<int>("sound_setting", "volume", Volume);
+                // WriteConfigFile_I("sound_setting.volume", Volume);
             }
             break;
 
         case LV_KEY_VOLUME_DOWN:
             if (Volume > 0) {
                 Volume -= 5;
-                WriteConfigFile_I("sound_setting.volume", Volume);
+                SysParam sys_param;
+                sys_param.write<int>("sound_setting", "volume", Volume);
+                // WriteConfigFile_I("sound_setting.volume", Volume);
             }
             break;
 

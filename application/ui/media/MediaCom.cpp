@@ -15,6 +15,7 @@
 #include "Music.h"
 #include "Photo.h"
 #include "Text.h"
+#include "SysParam/SysParam.h"
 
 /* 全局变量 */
 char current_path[100];
@@ -51,16 +52,14 @@ static const lv_img_dsc_t* play_list_image_src[MEDIA_MAX] = {
     &ui_img_photo_list_png,
     &ui_img_photo_list_png
 };
-static const char* PlayModeName[] = {
-    NULL,//0
-    "media.VideoPlayMode",//1
-    "media.MusicPlayMode",//2
-    "media.PhotoPlayMode"//3 
+static const char* PlayModeName[][2] = {
+    {NULL, NULL},//0
+    {"media", "VideoPlayMode"},//1
+    {"media", "MusicPlayMode"},//2
+    {"media", "PhotoPlayMode"}//3 
 };
 
 extern pthread_mutex_t lvgl_task_mutex;
-extern void WriteConfigFile_I(const char* ConfigName, int value);
-extern int ReadConfigFile_I(const char* ConfigName);
 
 static MediaList* GetMediaList(MediaType media_type);
 static DLNode * GetNextMediaNode(MediaList* list, PlayListMode mode);
@@ -81,9 +80,12 @@ static void ShowDownAnimation(lv_obj_t * TargetObject, int delay);
 
 void MediaComInit(MediaType media_type, MediaHandle* media_hdl)
 {
+    SysParam sys_param;
     CurrentPlayingType = media_type;
     current_media_hdl = media_hdl;
-    CurrentPlayMode[CurrentPlayingType] = ReadConfigFile_I(PlayModeName[CurrentPlayingType < 4 ? CurrentPlayingType : 0]);
+    const char** playModeName = PlayModeName[CurrentPlayingType < 4 ? CurrentPlayingType : 0];
+    CurrentPlayMode[CurrentPlayingType] =
+            static_cast<PlayListMode>(sys_param.read<int>(std::string(playModeName[0]), std::string(playModeName[1])));
     srand(time(0));
     PlayingAnimation_Flag = false;
 
@@ -208,7 +210,7 @@ static void DestroyMediaList(MediaType media_type)
 void DestroyAllMediaList(void)
 {
     for (int i = 0; i < MEDIA_MAX; i++) {
-        DestroyMediaList(i);
+        DestroyMediaList(static_cast<MediaType>(i));
     }
 }
 
@@ -410,10 +412,14 @@ static void key_event_handler(lv_event_t* event)
                     ShowOnPlayList(NULL, GetMediaArray(), GetMediaArraySize(CurrentPlayingType));
                     break;
                 case PlayMode:
-                    CurrentPlayMode[CurrentPlayingType]++;
-                    CurrentPlayMode[CurrentPlayingType] %= PlayModeNumber;
-                    if (CurrentPlayingType != MEDIA_TEXT)
-                        WriteConfigFile_I(PlayModeName[CurrentPlayingType], CurrentPlayMode[CurrentPlayingType]);
+                    CurrentPlayMode[CurrentPlayingType] = (PlayListMode)(CurrentPlayMode[CurrentPlayingType] + 1);
+                    CurrentPlayMode[CurrentPlayingType] = (PlayListMode)(CurrentPlayMode[CurrentPlayingType] % PlayModeNumber);
+                    if (CurrentPlayingType != MEDIA_TEXT) {
+                        SysParam sys_param;
+                        const char** playModeName = PlayModeName[CurrentPlayingType];
+                        sys_param.write<int>(std::string(playModeName[0]), std::string(playModeName[1]), static_cast<int>(CurrentPlayMode[CurrentPlayingType]));
+                        // WriteConfigFile_I(PlayModeName[CurrentPlayingType], CurrentPlayMode[CurrentPlayingType]);
+                    }
                     lv_obj_set_style_bg_img_src(lv_obj_get_child(PlayBar, PlayMode), play_mode_image_src[CurrentPlayMode[CurrentPlayingType]], LV_PART_MAIN | LV_STATE_DEFAULT);
                     break;
                 default:

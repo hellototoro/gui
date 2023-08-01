@@ -7,7 +7,7 @@
  */
 #include <stdio.h>
 #include "Position.h"
-#include "application/ConfigParam.h"
+#include "SysParam/SysParam.h"
 #include "application/ui/ui_com.h"
 #include "application/ui/SettingScreen.h"
 
@@ -15,20 +15,14 @@ namespace Setting {
 
 Position::Position(/* args */)
 {
-    // boost::property_tree::ptree config;
-    // ReadConfigFile(config, "position");
-    // position_mode = config.get<int>("position_mode", 0);
+    SysParam sys_param;
+    position_mode = sys_param.read<int>("position", "position_mode");
 }
 
 Position::~Position()
 {
-    // boost::property_tree::ptree pt;
-    // boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
-    // boost::property_tree::ptree config;
-    // config = pt.get_child("position");
-    // config.put<int>("position_mode", position_mode);
-    // pt.put_child("position",config);
-    // boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
+    SysParam sys_param;
+    sys_param.write<int>("position", "position_mode", position_mode);
 }
 
 const char** Position::GetStrArray(void)

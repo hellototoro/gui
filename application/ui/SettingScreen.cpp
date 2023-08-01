@@ -7,7 +7,7 @@
  */
 #include "SettingScreen.h"
 #include "application/setting/Setting.h"
-#include "application/ConfigParam.h"
+#include "SysParam/SysParam.h"
 
 static lv_obj_t* SettingRootScreen;
 static lv_obj_t* MainPanel;
@@ -188,11 +188,10 @@ void CreateSettingScreen(lv_obj_t* parent)
     MainPanel = nullptr;
     SubPanel = nullptr;
 
-    // boost::property_tree::ptree config;
-    // ReadConfigFile(config, "system_setting");
-    // int OsdTime = config.get<int>("OsdTime", 0);
-    // if(OsdTime > 0) InitOsdTimer(OsdTime*5);
-    // else            OsdTimer = nullptr;
+    SysParam sys_param;
+    int OsdTime = sys_param.read<int>("system_setting", "OsdTime");
+    if(OsdTime > 0) InitOsdTimer(OsdTime*5);
+    else            OsdTimer = nullptr;
 }
 
 static void CreateSettingPanel(lv_obj_t* parent, lv_coord_t w, lv_coord_t h, void* setting_obj, bool IsMainPanel, bool BgTransp)

@@ -9,48 +9,42 @@
  */
 #include <stdio.h>
 #include "Picture.h"
-#include "application/ConfigParam.h"
+#include "SysParam/SysParam.h"
 
 namespace Setting {
 
 Picture::Picture(/* args */)
 {
-    // boost::property_tree::ptree config;// = pt->get_child("picture_setting");
-    // ReadConfigFile(config, "picture_setting");
-    // mode.type = config.get<int>("mode_type", 0);
-    // mode.user.contrast = config.get<int>("mode_user_contrast", 50);
-    // mode.user.brightness = config.get<int>("mode_user_brightness", 50);
-    // mode.user.colour = config.get<int>("mode_user_colour", 50);
-    // mode.user.sharpness = config.get<int>("mode_user_sharpness", 50);
-    // scale = config.get<int>("scale", 0);
-    // ColorTemperature.type = config.get<int>("ColorTemperature_type", 0);
-    // ColorTemperature.user.red = config.get<int>("ColorTemperature_user_red", 50);
-    // ColorTemperature.user.green = config.get<int>("ColorTemperature_user_green", 50);
-    // ColorTemperature.user.blue = config.get<int>("ColorTemperature_user_blue", 50);
-    // ratio = config.get<int>("ratio", 0);
-    // PowerBankMode = config.get<int>("PowerBankMode", 0);
+    SysParam sys_param;
+    mode.type = sys_param.read<int>("picture_setting", "mode_type");
+    mode.user.contrast = sys_param.read<int>("picture_setting", "mode_user_contrast");
+    mode.user.brightness = sys_param.read<int>("picture_setting", "mode_user_brightness");
+    mode.user.colour = sys_param.read<int>("picture_setting", "mode_user_colour");
+    mode.user.sharpness = sys_param.read<int>("picture_setting", "mode_user_sharpness");
+    scale = sys_param.read<int>("picture_setting", "scale");
+    ColorTemperature.type = sys_param.read<int>("picture_setting", "ColorTemperature_type");
+    ColorTemperature.user.red = sys_param.read<int>("picture_setting", "ColorTemperature_user_red");
+    ColorTemperature.user.green = sys_param.read<int>("picture_setting", "ColorTemperature_user_green");
+    ColorTemperature.user.blue = sys_param.read<int>("picture_setting", "ColorTemperature_user_blue");
+    ratio = sys_param.read<int>("picture_setting", "ratio");
+    PowerBankMode = sys_param.read<int>("picture_setting", "PowerBankMode");
 }
 
 Picture::~Picture()
 {
-    // boost::property_tree::ptree pt;
-    // boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
-    // boost::property_tree::ptree config;
-    // config = pt.get_child("picture_setting");
-    // config.put<int>("mode_type", mode.type);
-    // config.put<int>("mode_user_contrast", mode.user.contrast);
-    // config.put<int>("mode_user_brightness", mode.user.brightness);
-    // config.put<int>("mode_user_colour", mode.user.colour);
-    // config.put<int>("mode_user_sharpness", mode.user.sharpness);
-    // config.put<int>("scale", scale);
-    // config.put<int>("ColorTemperature_type", ColorTemperature.type);
-    // config.put<int>("ColorTemperature_user_red", ColorTemperature.user.red);
-    // config.put<int>("ColorTemperature_user_green", ColorTemperature.user.green);
-    // config.put<int>("ColorTemperature_user_blue", ColorTemperature.user.blue);
-    // config.put<int>("ratio", ratio);
-    // config.put<int>("PowerBankMode", PowerBankMode);
-    // pt.put_child("picture_setting",config);
-    // boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
+    SysParam sys_param;
+    sys_param.write<int>("picture_setting", "mode_type", mode.type);
+    sys_param.write<int>("picture_setting", "mode_user_contrast", mode.user.contrast);
+    sys_param.write<int>("picture_setting", "mode_user_brightness", mode.user.brightness);
+    sys_param.write<int>("picture_setting", "mode_user_colour", mode.user.colour);
+    sys_param.write<int>("picture_setting", "mode_user_sharpness", mode.user.sharpness);
+    sys_param.write<int>("picture_setting", "scale", scale);
+    sys_param.write<int>("picture_setting", "ColorTemperature_type", ColorTemperature.type);
+    sys_param.write<int>("picture_setting", "ColorTemperature_user_red", ColorTemperature.user.red);
+    sys_param.write<int>("picture_setting", "ColorTemperature_user_green", ColorTemperature.user.green);
+    sys_param.write<int>("picture_setting", "ColorTemperature_user_blue", ColorTemperature.user.blue);
+    sys_param.write<int>("picture_setting", "ratio", ratio);
+    sys_param.write<int>("picture_setting", "PowerBankMode", PowerBankMode);
 }
 
 const char** Picture::GetStrArray(void)

@@ -9,7 +9,7 @@
  */
 #include <stdio.h>
 #include "System.h"
-#include "application/ConfigParam.h"
+#include "SysParam/SysParam.h"
 #include "application/ui/LanguageScreen.h"
 #include "application/ui/ui_com.h"
 #include "application/ui/SettingScreen.h"
@@ -18,27 +18,19 @@ namespace Setting {
 
 System::System(/* args */)
 {
-    // boost::property_tree::ptree config;
-    // ReadConfigFile(config, "system_setting");
-    // language = DefaultLanguageIndex;
-    // OsdTime = config.get<int>("OsdTime", 0);
+    SysParam sys_param;
+    language = DefaultLanguageIndex;
+    OsdTime = sys_param.read<int>("system_setting", "OsdTime");
 }
 
 System::~System()
 {
-    // boost::property_tree::ptree pt;
-    // boost::property_tree::ini_parser::read_ini(ConfigFileName, pt);
-    // boost::property_tree::ptree config;
-    // config = pt.get_child("system_setting");
-    // config.put<int>("OsdTime", OsdTime);
-    // pt.put_child("system_setting",config);
+    SysParam sys_param;
+    sys_param.write<int>("system_setting", "OsdTime", OsdTime);
 
-    // DefaultLanguageIndex = language;
-    // config = pt.get_child("default_language");
-    // config.put<std::string>("language", Language[language]);
-    // config.put<int>("index", DefaultLanguageIndex);
-    // pt.put_child("default_language",config);
-    // boost::property_tree::ini_parser::write_ini(ConfigFileName, pt);
+    DefaultLanguageIndex = language;
+    sys_param.write<std::string>("default_language", "language", Language[language]);
+    sys_param.write<int>("default_language", "index", DefaultLanguageIndex);
 }
 
 const char** System::GetStrArray(void)
@@ -65,10 +57,11 @@ void System::SelectedValue(int index)
     {
     case static_cast<int>(Setting_SystemRestoreFactory):
     {
-        CreateMsgBox(lv_scr_act(), _("setting_p_be_sure"), 2, [] () { 
-            WriteConfigFile_I("guide_flag.flag", 1);
-            WriteConfigFile_I("default_language.index", 2);
-            WriteConfigFile_S("default_language.language", "en-GB");
+        CreateMsgBox(lv_scr_act(), _("setting_p_be_sure"), 2, [] () {
+            SysParam sys_param;
+            sys_param.write<int>("guide_flag", "flag", 1);
+            sys_param.write<int>("default_language", "index", 2);
+            sys_param.write<std::string>("default_language", "language", "en-GB");
             CreateSpinBox(lv_scr_act(), _("setting_p_waiting"), 3, nullptr);
         });
         
