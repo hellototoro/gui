@@ -14,7 +14,7 @@
 #include "application/key_map.h"
 #include "SettingScreen.h"
 #include "SyncScreen.h"
-#include "application/ui/media/MediaScreen.h"
+#include "media/MediaScreen.h"
 
 static lv_obj_t* HomeRootScreen;
 static lv_obj_t* MainPanel;

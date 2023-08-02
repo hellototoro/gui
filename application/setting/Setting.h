@@ -13,7 +13,7 @@
 #include "Picture.h"
 #include "Sound.h"
 #include "System.h"
-#include "NetWork.h"
+#include "SysSettings/NetWork.h"
 #include "Position.h"
 
 namespace Setting {

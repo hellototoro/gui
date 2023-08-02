@@ -8,7 +8,7 @@
 #ifndef __UI_COM_H__
 #define __UI_COM_H__
 
-#include "application/ui/resource/ui.h"
+#include "resource/resource.h"
 #include "lv_i18n/src/lv_i18n.h"
 #include "application/key_map.h"
 

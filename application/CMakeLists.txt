@@ -4,6 +4,7 @@ project(application)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/core/
+    ${PROJECT_SOURCE_DIR}
 )
 
 file(GLOB_RECURSE SOURCES ./*.c
