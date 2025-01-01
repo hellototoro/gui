@@ -12,6 +12,7 @@
 
 #include "application/ui/ui_com.h"
 #include "media_list.h"
+#include "list/hlist.h"
 #include "MediaFile.h"
 
 #ifdef __cplusplus

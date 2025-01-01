@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:11
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-11 21:02:39
  * @FilePath: /gui/application/ui/media/MediaFile.c
  * @Description: None
  * @other: None
@@ -38,11 +36,9 @@ FileList * GetFileList(char *path)
     if ((dir = opendir(path)) == NULL) return NULL;
 
     FileStr* file_node = NULL;
-    LinkList *dir_list = (LinkList*) malloc(sizeof(LinkList));
-    LinkList *other_list = (LinkList*) malloc(sizeof(LinkList));
+    hlist_ptr_t dir_list = hlist_create(sizeof(FileStr*));
+    hlist_ptr_t other_list = hlist_create(sizeof(FileStr*));
 
-    InitList(dir_list);
-    InitList(other_list);
     struct dirent *file;
     while ((file = readdir(dir)) != NULL) {
         if (strncmp(file->d_name, ".", 1) == 0) {//skip the upper dir
@@ -52,16 +48,16 @@ FileList * GetFileList(char *path)
         strcpy(file_node->name, file->d_name);
         if (file->d_type == DT_DIR) { //dir
             file_node->type = FILE_DIR;
-            ListAppend(dir_list, file_node);
+            hlist_push_back(dir_list, &file_node, sizeof(file_node));
         }
         else {
             file_node->type = GetFileType(file->d_name);
-            ListAppend(other_list, file_node);
+            hlist_push_back(other_list, &file_node, sizeof(file_node));
         }
     }
     if (file_node == NULL) {
-        DestroyList(dir_list);
-        DestroyList(other_list);
+        hlist_destroy(dir_list);
+        hlist_destroy(other_list);
         return NULL;
     }
     FileList *file_list = (FileList*) malloc(sizeof(FileList));
@@ -77,8 +73,10 @@ FileList * GetFileList(char *path)
 FileList * GetPreviousFileList(void)
 {
     if (current_list == NULL) return NULL;
-    DestroyList(current_list->DirList);
-    DestroyList(current_list->NonDirList);
+    hlist_destroy(current_list->DirList);
+    current_list->DirList = NULL;
+    hlist_destroy(current_list->NonDirList);
+    current_list->NonDirList = NULL;
     free(current_list);
     if (Pop(&file_list_stack, (ElemType *)&current_list) == OK)
         return current_list;
@@ -89,7 +87,7 @@ FileList * GetPreviousFileList(void)
 uint16_t GetDirNumber(FileList* file_list)
 {
     if (file_list)
-        return file_list->DirList->len;
+        return list_size(file_list->DirList);
     else
         return 0;
 }
@@ -97,7 +95,7 @@ uint16_t GetDirNumber(FileList* file_list)
 uint16_t GetNonDirNumber(FileList* file_list)
 {
     if (file_list)
-        return file_list->NonDirList->len;
+        return list_size(file_list->NonDirList);
     else
         return 0;
 }
@@ -105,61 +103,9 @@ uint16_t GetNonDirNumber(FileList* file_list)
 uint16_t GetFileNumber(FileList* file_list)
 {
     if (file_list)
-        return file_list->DirList->len + file_list->NonDirList->len;
+        return list_size(file_list->DirList) + list_size(file_list->NonDirList);
     else
         return 0;
-}
-
-FileStr* GetNextFileFromFileList(FileList* file_list)
-{
-    static LNode *next = NULL;
-    static FileList* last_list = NULL;
-
-    if (file_list == NULL) {
-        last_list = NULL;
-        return NULL;
-    }
-
-    if (last_list != file_list) {
-        last_list = file_list;
-        next = file_list->DirList->head->next;
-        if (next == NULL) {
-            next = file_list->NonDirList->head->next;
-        }
-    }
-    else {
-        next = next->next;
-        if (next == NULL)
-            next = file_list->NonDirList->head->next;
-    }
-    if (next)
-        return (FileStr*) next->data;
-    else
-        return NULL;
-}
-
-FileStr* GetNextFile(LinkList *list)
-{
-    static LNode *next = NULL;
-    static LinkList* last_list = NULL;
-
-    if (list == NULL) {
-        last_list = NULL;
-        return NULL;
-    }
-
-    if (last_list != list) {
-        last_list = list;
-        next = list->head->next;
-    }
-    else {
-        if (next)
-            next = next->next;
-    }
-    if (next)
-        return (FileStr*) next->data;
-    else
-        return NULL;
 }
 
 bool IsRootPath(const char * path)
@@ -171,8 +117,10 @@ void CloseFileList(void)
 {
     do {
         if (current_list != NULL) {
-            DestroyList(current_list->DirList);
-            DestroyList(current_list->NonDirList);
+            hlist_destroy(current_list->DirList);
+            hlist_destroy(current_list->NonDirList);
+            current_list->DirList = NULL;
+            current_list->NonDirList = NULL;
             free(current_list);
             current_list = NULL;
         }

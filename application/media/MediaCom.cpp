@@ -119,6 +119,7 @@ static MediaList* CreateMediaList(MediaType media_type)
 
 void AddToMediaList(MediaType media_type, char * media_name)
 {
+    if (media_type >= MEDIA_MAX) return;
     if (media_list[media_type] == NULL)
         CreateMediaList(media_type);
     DListAppend(media_list[media_type], media_name);

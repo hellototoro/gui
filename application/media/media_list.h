@@ -52,24 +52,11 @@ typedef struct {
 typedef Node StackNode;
 typedef Node* LinkStack;
 
-/* list */
-Status InitList(LinkList *L);
-Status ListAppend(LinkList *L, ElemType e);
-LNode* ListHead(LinkList *L);
-Status DestroyList(LinkList *L);
-
 /* double list */
 Status InitDList(LinkDList *L);
 Status DListAppend(LinkDList *L, ElemType e);
 DLNode* DListHead(LinkDList *L);
 Status DestroyDList(LinkDList *L);
-
-/* Queue */
-Status InitQueue(LinkQueue *Q);
-Status EnQueue(LinkQueue *Q, ElemType e);
-Status DeQueue(LinkQueue *Q, ElemType *e);
-bool QueueIsEmpty(LinkQueue Q);
-void DestroyQueue(LinkQueue *Q);
 
 /* stack */
 Status InitStack(LinkStack *S);

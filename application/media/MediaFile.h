@@ -1,8 +1,6 @@
 /*
  * @Author: totoro huangjian921@outlook.com
  * @Date: 2022-06-05 13:39:26
- * @LastEditors: totoro huangjian921@outlook.com
- * @LastEditTime: 2022-09-02 19:54:58
  * @FilePath: /gui/application/ui/media/MediaFile.h
  * @Description: None
  * @other: None
@@ -12,12 +10,13 @@
 
 #include <stdint.h>
 #include "media_list.h"
+#include "list/hlist.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#define media_dir "mnt"
+#define media_dir "~/tmp/lvgl_test_dir"
 
 typedef enum
 { 
@@ -45,23 +44,21 @@ typedef struct FileStr
     char name[100];
 } FileStr;
 
-typedef struct FileList 
+typedef struct FileList
 {
-    LinkList *DirList;
-    LinkList *NonDirList;
+    hlist_ptr_t DirList;
+    hlist_ptr_t NonDirList;
 } FileList;
 
 
 extern FileList *current_list;
 
 extern void MediaFileInit(void);
-extern FileList * GetFileList(char *path);
+extern FileList* GetFileList(char *path);
 extern uint16_t GetDirNumber(FileList* file_list);
 extern uint16_t GetNonDirNumber(FileList* file_list);
 extern uint16_t GetFileNumber(FileList* file_list);
-extern FileStr* GetNextFileFromFileList(FileList* file_list);
-extern FileStr* GetNextFile(LinkList *list);
-extern FileList * GetPreviousFileList(void);
+extern FileList* GetPreviousFileList(void);
 extern bool IsRootPath(const char * path);
 extern void CloseFileList(void);
 extern void MediaFileDeInit(void);

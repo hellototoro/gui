@@ -159,6 +159,34 @@ static void DrawCell(lv_obj_t* ui_BTN, lv_coord_t w, lv_coord_t h, const void* p
 
 static void ShowFileList(FileList *file_list)
 {
+    static const lv_img_dsc_t* image_types[] = {
+        (lv_img_dsc_t* )&ui_img_folder2_png,
+        (lv_img_dsc_t* )&ui_img_movie_png,
+        (lv_img_dsc_t* )&ui_img_music_png,
+        (lv_img_dsc_t* )&ui_img_image_png,
+        (lv_img_dsc_t* )&ui_img_text_png,
+        (lv_img_dsc_t* )&ui_img_other_png
+    };
+    auto create_file_icon = [] (FileStr* file, const lv_img_dsc_t* image) {
+        if (FileFilter != MediaFile_All) {//必须放在 AddToMediaList 函数后面，因为就算过滤掉此类型，也要将其加入媒体文件列表里面
+            if ((file->type != FILE_DIR) && ((uint8_t)file->type != (uint8_t)FileFilter)) {
+                return;
+            }
+        }
+        lv_obj_t* btn = lv_btn_create(FileListPanel);
+        btn->user_data = file;
+        DrawCell(btn, FileWidth, FileHeight, image, file->name);
+        lv_group_add_obj(FileListGroup, btn);
+        lv_obj_add_event_cb(btn, file_list_handler, LV_EVENT_KEY, nullptr);
+        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
+            lv_obj_t* target = lv_event_get_current_target(event);
+            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
+        }, LV_EVENT_FOCUSED, nullptr);
+        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
+            lv_obj_t* target = lv_event_get_current_target(event);
+            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
+        }, LV_EVENT_DEFOCUSED, nullptr);
+    };
     if (lv_obj_get_child_cnt(FileListPanel) == 0) {
         lv_obj_t* ReturnButton = lv_btn_create(FileListPanel);
         ReturnButton->user_data = const_cast<char*>("media_file_p_return");
@@ -178,58 +206,21 @@ static void ShowFileList(FileList *file_list)
         }, LV_EVENT_KEY, nullptr);
     }
     if (file_list == nullptr) return;
-    int FileCnt = GetFileNumber(file_list);
     DestroyAllMediaList();
-    GetNextFileFromFileList(nullptr);//清理前一次使用痕迹
-    for (int i = 0; i < FileCnt; i++) {
-        lv_img_dsc_t* image;
-        FileStr* file = GetNextFileFromFileList(file_list);
-        switch (file->type)
-        {
-        case FILE_DIR:
-            if (IsRootPath(current_path))
-                image = (lv_img_dsc_t* )&ui_img_drive_png;
-            else
-                image = (lv_img_dsc_t* )&ui_img_folder2_png;
-            break;
-        case FILE_VIDEO:
-            AddToMediaList(MEDIA_VIDEO, file->name);
-            image = (lv_img_dsc_t* )&ui_img_movie_png;
-            break;
-        case FILE_MUSIC:
-            AddToMediaList(MEDIA_MUSIC, file->name);
-            image = (lv_img_dsc_t* )&ui_img_music_png;
-            break;
-        case FILE_PHOTO:
-            AddToMediaList(MEDIA_PHOTO, file->name);
-            image = (lv_img_dsc_t* )&ui_img_image_png;
-            break;
-        case FILE_TEXT:
-            AddToMediaList(MEDIA_TEXT, file->name);
-            image = (lv_img_dsc_t* )&ui_img_text_png;
-            break;
-        default:
-            image = (lv_img_dsc_t* )&ui_img_other_png;
-            break;
+    for (hlist_iterator_ptr_t it = hlist_begin(file_list->DirList); it != hlist_end(file_list->DirList); hlist_iter_forward(&it)) {
+        const lv_img_dsc_t* image;
+        FileStr* file = DATA_CAST(FileStr*)hlist_iter_data(it);
+        if (IsRootPath(current_path)) {
+            image = (lv_img_dsc_t* )&ui_img_drive_png;
+        } else {
+            image = image_types[file->type];
         }
-        if (FileFilter != MediaFile_All) {//必须放在 AddToMediaList 函数后面，因为就算过滤掉此类型，也要将其加入媒体文件列表里面
-            if ((file->type != FILE_DIR) && ((uint8_t)file->type != (uint8_t)FileFilter)) {
-                continue;
-            }
-        }
-        lv_obj_t* btn = lv_btn_create(FileListPanel);
-        btn->user_data = file;
-        DrawCell(btn, FileWidth, FileHeight, image, file->name);
-        lv_group_add_obj(FileListGroup, btn);
-        lv_obj_add_event_cb(btn, file_list_handler, LV_EVENT_KEY, nullptr);
-        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
-            lv_obj_t* target = lv_event_get_current_target(event);
-            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_SCROLL_CIRCULAR);
-        }, LV_EVENT_FOCUSED, nullptr);
-        lv_obj_add_event_cb(btn, [] (lv_event_t* event) {
-            lv_obj_t* target = lv_event_get_current_target(event);
-            lv_label_set_long_mode(target->spec_attr->children[1], LV_LABEL_LONG_DOT);
-        }, LV_EVENT_DEFOCUSED, nullptr);
+        create_file_icon(file, image);
+    }
+    for (hlist_iterator_ptr_t it = hlist_begin(file_list->NonDirList); it != hlist_end(file_list->NonDirList); hlist_iter_forward(&it)) {
+        FileStr* file = DATA_CAST(FileStr*)hlist_iter_data(it);
+        AddToMediaList(static_cast<MediaType>(file->type), file->name);
+        create_file_icon(file, image_types[file->type]);
     }
     lv_label_set_text(RealPath, current_path);
 }
@@ -355,20 +346,9 @@ static void ReturnUpper(void)
     FileList* file_list = GetPreviousFileList();
     int FileCnt = GetFileNumber(file_list);
     DestroyAllMediaList();
-    GetNextFileFromFileList(nullptr);//清理前一次使用痕迹
-    for (int i = 0; i < FileCnt; i++) {
-        FileStr* file = GetNextFileFromFileList(file_list);
-        switch (file->type)
-        {
-        case FILE_VIDEO:
-        case FILE_MUSIC:
-        case FILE_PHOTO:
-        case FILE_TEXT:
-            AddToMediaList(static_cast<MediaType>(file->type), file->name);
-
-        default:
-            break;
-        }
+    for (hlist_iterator_ptr_t it = hlist_begin(file_list->NonDirList); it != hlist_end(file_list->NonDirList); hlist_iter_forward(&it)) {
+        FileStr* file = DATA_CAST(FileStr*)hlist_iter_data(it);
+        AddToMediaList(static_cast<MediaType>(file->type), file->name);
     }
 }
 
@@ -381,22 +361,24 @@ static void FilterFile(MediaFileCategoryList filter_type)
         &ui_img_image_png,
         &ui_img_text_png,
         &ui_img_other_png };
-    if (FileListPanel == nullptr) return;
+    if (FileListPanel == nullptr || current_list == nullptr) return;
     if (last_filter_type != filter_type) {
         FileStr* file = nullptr;
         lv_obj_t* child = nullptr;
         uint16_t dir_number = GetDirNumber(current_list);
         uint16_t non_dir_number = GetNonDirNumber(current_list);
         uint16_t media_number = GetMediaListSize(static_cast<MediaType>(filter_type));
-        int first_file_index = dir_number + 1;//第一个非文件夹对象
-        int end_index = first_file_index + ((filter_type == MediaFile_All) ? non_dir_number : media_number);
-        GetNextFile(nullptr);
-        for (int i = first_file_index; i < end_index; i++) {
-            do {
-                file = GetNextFile(current_list->NonDirList);
-            } while ((file != nullptr) && (filter_type != MediaFile_All) && (file->type != (FileType)filter_type));
+        int next_index = dir_number + 1;//第一个非文件夹对象
+        int end_index = next_index + ((filter_type == MediaFile_All) ? non_dir_number : media_number);
+        for (hlist_iterator_ptr_t it = hlist_begin(current_list->NonDirList); it != hlist_end(current_list->NonDirList); hlist_iter_forward(&it)) {
+            FileStr* file = DATA_CAST(FileStr*)hlist_iter_data(it);
+            if (filter_type != MediaFile_All) {
+                if ((uint8_t)file->type != (uint8_t)filter_type) {
+                    continue;
+                }
+            }
             if (file == nullptr) break;
-            child = lv_obj_get_child(FileListPanel, i);
+            child = lv_obj_get_child(FileListPanel, next_index);
             if (child != nullptr) {
                 child->user_data = file;
                 lv_img_set_src(child->spec_attr->children[0], image_src[file->type]);
