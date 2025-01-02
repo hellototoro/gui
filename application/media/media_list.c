@@ -51,34 +51,3 @@ Status DestroyDList(LinkDList *L)
     //L = NULL;
     return OK;
 }
-
-/* stack */
-Status InitStack(LinkStack *S)
-{
-    *S = NULL;
-    return OK;
-}
-
-Status Push(LinkStack *S, ElemType e)
-{
-    StackNode *p = (StackNode *)malloc(sizeof (StackNode));
-    p->data = e;
-    p->next = *S;
-    *S = p;
-    return OK;
-}
-
-Status Pop(LinkStack *S, ElemType *e)
-{
-    if (*S == NULL) return ERROR;
-    *e = (*S)->data;
-    StackNode *p = *S;
-    *S = (*S)->next;
-    free(p);
-    return OK;
-}
-
-bool StackIsEmpty(LinkStack S)
-{
-    return (S == NULL) ? true : false;
-}

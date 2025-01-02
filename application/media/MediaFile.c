@@ -13,14 +13,14 @@
 #include "MediaFile.h"
 #include "application/ui/ui_com.h"
 
-LinkStack file_list_stack;
+hstack_ptr_t file_list_stack;
 FileList *current_list;
 
 static FileType GetFileType(char *file_name);
 
 void MediaFileInit(void)
 {
-    InitStack(&file_list_stack);
+    file_list_stack = hstack_create(sizeof(FileList*));
     current_list = NULL;
 }
 
@@ -63,7 +63,7 @@ FileList * GetFileList(char *path)
     FileList *file_list = (FileList*) malloc(sizeof(FileList));
     file_list->DirList = dir_list;
     file_list->NonDirList = other_list;
-    Push(&file_list_stack, current_list);
+    hstack_push(file_list_stack, &file_list, sizeof(file_list), NULL);
     current_list = file_list;
     closedir(dir);
     return file_list;
@@ -72,16 +72,13 @@ FileList * GetFileList(char *path)
 /* 获取上一个文件列表，并删除当前文件列表 */
 FileList * GetPreviousFileList(void)
 {
-    if (current_list == NULL) return NULL;
+    if (hstack_empty(file_list_stack)) return NULL;
     hlist_destroy(current_list->DirList);
-    current_list->DirList = NULL;
     hlist_destroy(current_list->NonDirList);
-    current_list->NonDirList = NULL;
     free(current_list);
-    if (Pop(&file_list_stack, (ElemType *)&current_list) == OK)
-        return current_list;
-    else 
-        return NULL;
+    hstack_pop(file_list_stack);
+    current_list = DATA_CAST(FileList*)hstack_top(file_list_stack);
+    return current_list;
 }
 
 uint16_t GetDirNumber(FileList* file_list)
@@ -115,16 +112,13 @@ bool IsRootPath(const char * path)
 
 void CloseFileList(void)
 {
-    do {
-        if (current_list != NULL) {
-            hlist_destroy(current_list->DirList);
-            hlist_destroy(current_list->NonDirList);
-            current_list->DirList = NULL;
-            current_list->NonDirList = NULL;
-            free(current_list);
-            current_list = NULL;
-        }
-    } while ( Pop(&file_list_stack, (ElemType *)&current_list) != ERROR );
+    for (int i = 0; i < hstack_size(file_list_stack); ++i) {
+        current_list = DATA_CAST(FileList *)hstack_top(file_list_stack);
+        hlist_destroy(current_list->DirList);
+        hlist_destroy(current_list->NonDirList);
+        free(current_list);
+        hstack_pop(file_list_stack);
+    }
 }
 
 static FileType GetFileType(char *file_name)

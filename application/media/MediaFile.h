@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "media_list.h"
 #include "list/hlist.h"
+#include "stack/hstack.h"
 
 #ifdef __cplusplus
 extern "C" {

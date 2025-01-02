@@ -58,13 +58,6 @@ Status DListAppend(LinkDList *L, ElemType e);
 DLNode* DListHead(LinkDList *L);
 Status DestroyDList(LinkDList *L);
 
-/* stack */
-Status InitStack(LinkStack *S);
-Status Push(LinkStack *S, ElemType e);
-Status Pop(LinkStack *S, ElemType *e);
-bool StackIsEmpty(LinkStack S);
-
-
 #ifdef __cplusplus
 } /*extern "C"*/
 #endif
