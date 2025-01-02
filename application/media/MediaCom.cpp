@@ -27,7 +27,7 @@ static lv_obj_t* PlayListPanel;
 static MediaType CurrentPlayingType = MEDIA_MAX;
 static PlayListMode CurrentPlayMode[MEDIA_MAX];
 static MediaHandle* current_media_hdl;
-static MediaList* media_list[MEDIA_MAX];
+static hlist_ptr_t media_list[MEDIA_MAX];
 static uint32_t played_time_host;
 // static lv_ffmpeg_player_cmd_t play_state;
 static file_name_t* media_file_name_array;
@@ -61,13 +61,11 @@ static const char* PlayModeName[][2] = {
 
 extern pthread_mutex_t lvgl_task_mutex;
 
-static MediaList* GetMediaList(MediaType media_type);
-static DLNode * GetNextMediaNode(MediaList* list, PlayListMode mode);
-static DLNode * GetPreMediaNode(MediaList* list, PlayListMode mode);
+static hlist_ptr_t GetMediaList(MediaType media_type);
 static void ShowOnPlayList(lv_obj_t *screen, file_name_t* name_list, int file_number);
 static void ShowOffPlayList(void);
 static void SetTotalTimeAndProgress(uint32_t total_time);
-static MediaList* CreateMediaList(MediaType media_type);
+static hlist_ptr_t CreateMediaList(MediaType media_type);
 static void DestroyMediaList(MediaType media_type);
 static uint16_t GetMediaArraySize(MediaType media_type);
 static void SetMediaIndex(int index);
@@ -110,10 +108,9 @@ void MediaComDeinit(void)
     CloseLoadingScreen();
 }
 
-static MediaList* CreateMediaList(MediaType media_type)
+static hlist_ptr_t CreateMediaList(MediaType media_type)
 {
-    media_list[media_type] = (MediaList*) malloc(sizeof(MediaList));
-    InitDList(media_list[media_type]);
+    media_list[media_type] = hlist_create(sizeof(file_name_t));
     return media_list[media_type];
 }
 
@@ -122,10 +119,10 @@ void AddToMediaList(MediaType media_type, char * media_name)
     if (media_type >= MEDIA_MAX) return;
     if (media_list[media_type] == NULL)
         CreateMediaList(media_type);
-    DListAppend(media_list[media_type], media_name);
+    hlist_push_back(media_list[media_type], &media_name, sizeof(media_name));
 }
 
-MediaList* GetMediaList(MediaType media_type)
+hlist_ptr_t GetMediaList(MediaType media_type)
 {
     return media_list[media_type];
 }
@@ -133,77 +130,15 @@ MediaList* GetMediaList(MediaType media_type)
 uint16_t GetMediaListSize(MediaType media_type)
 {
     if (media_list[media_type] != NULL)
-        return media_list[media_type]->len;
+        return hlist_size(media_list[media_type]);
     else
         return 0;
-}
-
-DLNode* GetNextMediaNode(MediaList* list, PlayListMode mode)
-{
-    static DLNode *next = NULL;
-    static DLNode *head = NULL;
-    static MediaList* last_list = NULL;
-
-    if (list == NULL) {//清除获取记录
-        last_list = NULL;
-        next = NULL;
-        head = NULL;
-        return NULL;
-    }
-
-    if ((next == head) && (head != NULL)) { //一个循环结束
-        if (mode == CyclePlay)
-            next = head->next;
-        else
-            return NULL;
-    }
-
-    if (last_list != list) {
-        last_list = list;
-        head = list->head;
-        next = head->next;
-    }
-    else {
-        next = next->next;
-    }
-    return next;
-}
-
-DLNode * GetPreMediaNode(MediaList* list, PlayListMode mode)
-{
-    static DLNode *pre = NULL;
-    static DLNode *head = NULL;
-    static MediaList* last_list = NULL;
-
-    if (list == NULL) {//清除获取记录
-        last_list = NULL;
-        pre = NULL;
-        head = NULL;
-        return NULL;
-    }
-
-    if ((pre == head) && (head != NULL)) { //一个循环结束
-        if (mode == CyclePlay)
-            pre = head->pre;
-        else
-            return NULL;
-    }
-
-    if (last_list != list) {
-        last_list = list;
-        head = list->head;
-        pre = head->pre;
-    }
-    else {
-        pre = pre->pre;
-    }
-    return pre;
 }
 
 static void DestroyMediaList(MediaType media_type)
 {
     if (media_list[media_type] != NULL) {
-        DestroyDList(media_list[media_type]);
+        hlist_destroy(media_list[media_type]);
         media_list[media_type] = NULL;
     }
 }
@@ -222,9 +157,10 @@ void CreateMediaArray(void)
     DestroyMediaArray();
     current_playing_index = 0;
     media_file_name_array = (file_name_t*) malloc(sizeof(file_name_t) * n);
-    GetNextMediaNode(NULL, OrderPlay);
-    for (int i = 0; i < n; i++) {
-        media_file_name_array[i] = (char*) (GetNextMediaNode(GetMediaList(CurrentPlayingType), OrderPlay))->data;
+    hlist_ptr_t list = GetMediaList(CurrentPlayingType);
+    for (hlist_iterator_ptr_t it = hlist_begin(list); it != hlist_end(list); hlist_iter_forward(&it)) {
+        *media_file_name_array = (file_name_t)hlist_iter_data(it);
+        media_file_name_array++;
     }
 }
 

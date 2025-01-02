@@ -84,7 +84,7 @@ FileList * GetPreviousFileList(void)
 uint16_t GetDirNumber(FileList* file_list)
 {
     if (file_list)
-        return list_size(file_list->DirList);
+        return hlist_size(file_list->DirList);
     else
         return 0;
 }
@@ -92,7 +92,7 @@ uint16_t GetDirNumber(FileList* file_list)
 uint16_t GetNonDirNumber(FileList* file_list)
 {
     if (file_list)
-        return list_size(file_list->NonDirList);
+        return hlist_size(file_list->NonDirList);
     else
         return 0;
 }
@@ -100,7 +100,7 @@ uint16_t GetNonDirNumber(FileList* file_list)
 uint16_t GetFileNumber(FileList* file_list)
 {
     if (file_list)
-        return list_size(file_list->DirList) + list_size(file_list->NonDirList);
+        return hlist_size(file_list->DirList) + hlist_size(file_list->NonDirList);
     else
         return 0;
 }

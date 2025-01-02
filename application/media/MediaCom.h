@@ -11,7 +11,6 @@
 #define __MEDIA_COM_H__
 
 #include "application/ui/ui_com.h"
-#include "media_list.h"
 #include "list/hlist.h"
 #include "MediaFile.h"
 
@@ -45,8 +44,7 @@ typedef enum {
     ManualPlay
 } GetNextMode;
 
-typedef DLNode MediaNode;
-typedef LinkDList MediaList;
+// typedef LinkDList MediaList;
 typedef char* file_name_t;
 typedef lv_obj_t       MediaHandle;
 

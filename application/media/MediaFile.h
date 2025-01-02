@@ -9,7 +9,6 @@
 #define __UI_MEDIA_FILE_H__
 
 #include <stdint.h>
-#include "media_list.h"
 #include "list/hlist.h"
 #include "stack/hstack.h"
 
